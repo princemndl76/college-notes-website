@@ -22,6 +22,14 @@ const adminRoutes =
 const app = express();
 app.set("trust proxy", 1);
 
+// Force any request to fail after 20 seconds instead of hanging forever
+app.use((req, res, next) => {
+    res.setTimeout(20000, () => {
+        res.status(504).json({ success: false, message: "Request timed out" });
+    });
+    next();
+});
+
 // Wrap express in an http server so socket.io can attach to it
 const server = http.createServer(app);
 const io = new Server(server, {
