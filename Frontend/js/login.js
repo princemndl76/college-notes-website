@@ -1,3 +1,8 @@
+const API_BASE_URL =
+    window.location.hostname === "localhost"
+        ? "http://localhost:5000"
+        : "https://college-notes-website-f64v.onrender.com";
+
 console.log("LOGIN JS LOADED");
 
 const loginForm = document.getElementById("loginForm");
@@ -121,7 +126,7 @@ loginForm.addEventListener("submit", async function (event) {
     try {
 
         const response = await fetch(
-            "http://localhost:5000/api/login",
+            `${API_BASE_URL}/api/login`,
             {
 
                 method: "POST",
