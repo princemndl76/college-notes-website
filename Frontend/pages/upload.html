@@ -190,6 +190,11 @@
 <script>
   const API_BASE = window.location.origin;
 
+  function authHeaders() {
+    const token = localStorage.getItem('token');
+    return token ? { 'Authorization': 'Bearer ' + token } : {};
+  }
+
   const subjectSelect = document.getElementById('subjectSelect');
   const unitSelect = document.getElementById('unitSelect');
   const unitFieldWrap = document.getElementById('unitFieldWrap');
@@ -334,6 +339,7 @@
 
         const uploadRes = await fetch(`${API_BASE}/api/subjects/notes/upload`, {
           method: 'POST',
+          headers: authHeaders(),
           body: fileFormData
         });
         const uploadData = await parseJsonResponse(uploadRes);
@@ -348,7 +354,7 @@
       if (scope === 'unit') {
         noteRes = await fetch(`${API_BASE}/api/subjects/short-notes`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...authHeaders() },
           body: JSON.stringify({
             unit_id: unitId,
             title: title,
@@ -359,7 +365,7 @@
       } else {
         noteRes = await fetch(`${API_BASE}/api/subjects/subject-notes`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...authHeaders() },
           body: JSON.stringify({
             subject_id: subjectId,
             title: title,
