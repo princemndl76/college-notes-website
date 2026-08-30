@@ -1,3 +1,7 @@
+function authHeaders() {
+    const token = localStorage.getItem("token");
+    return token ? { "Authorization": "Bearer " + token } : {};
+}
 const API_BASE_URL =
     window.location.hostname === "localhost"
         ? "http://localhost:5000"
@@ -795,7 +799,7 @@ if (deleteSelectedBtn) {
             // Delete each selected note one at a time
             for (const id of selectedIds) {
 
-                const res = await fetch(`${API}/notes/${id}`, { method: "DELETE" });
+                const res = await fetch(`${API}/notes/${id}`, { method: "DELETE", headers: authHeaders() });
                 const data = await res.json();
 
                 if (!data.success) {
@@ -845,6 +849,7 @@ async function uploadNoteFileIfNeeded() {
 
     const res = await fetch(`${API}/notes/upload`, {
         method: "POST",
+        headers: authHeaders(),
         body: formData
         // NOTE: do NOT set Content-Type manually for FormData —
         // the browser sets the correct multipart boundary automatically.
@@ -892,7 +897,7 @@ noteForm.addEventListener("submit", async function (event) {
             id ? `${API}/notes/${id}` : `${API}/notes`,
             {
                 method: id ? "PUT" : "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", ...authHeaders() },
                 body: JSON.stringify(payload)
             }
         );
@@ -949,7 +954,7 @@ async function deleteNote(id) {
 
     try {
 
-        const res = await fetch(`${API}/notes/${id}`, { method: "DELETE" });
+        const res = await fetch(`${API}/notes/${id}`, { method: "DELETE", headers: authHeaders() });
         const data = await res.json();
 
         if (!data.success) {
