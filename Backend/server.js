@@ -52,10 +52,13 @@ io.on("connection", (socket) => {
 // MIDDLEWARE
 // ======================================
 
-   app.use(cors({
-       origin: "http://localhost:5000", // your actual frontend origin
-       credentials: true
-   }));
+app.use(cors({
+    origin: [
+        "http://localhost:5000",
+        "https://college-notes-website-f64v.onrender.com"
+    ],
+    credentials: true
+}));
 
 app.use(express.json());
 

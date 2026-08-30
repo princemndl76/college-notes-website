@@ -1,3 +1,8 @@
+const API_BASE_URL =
+    window.location.hostname === "localhost"
+        ? "http://localhost:5000"
+        : "https://college-notes-website-f64v.onrender.com";
+
 // ======================================
 // REGISTRATION FORM
 // ======================================
@@ -187,7 +192,7 @@ registerForm.addEventListener(
 
             const response =
                 await fetch(
-                    "http://localhost:5000/api/register",
+                    `${API_BASE_URL}/api/register`,
                     {
 
                         method: "POST",
