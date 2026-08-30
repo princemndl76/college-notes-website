@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Portal - College Notes</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f5f7;
+    margin: 0;
+    padding: 40px 16px;
+    color: #1a1a1a;
+    font-size: 16px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { text-align: center; margin-bottom: 6px; font-size: 28px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 32px; font-size: 16px; }
+  .card {
+    background: #fff;
+    border: 2px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 26px;
+  }
+  .card h2 { font-size: 20px; margin: 0 0 18px; }
+  label { display: block; font-weight: bold; font-size: 16px; margin: 16px 0 8px; }
+  select, input[type="text"], textarea, input[type="file"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: inherit;
+    line-height: 1.4;
+  }
+  select {
+    cursor: pointer;
+  }
+  select:disabled { background: #eee; color: #999; cursor: not-allowed; }
+  textarea { min-height: 100px; resize: vertical; }
+  button {
+    padding: 12px 20px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button.secondary { background: #666; }
+  button.danger { background: #c62828; }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  button:hover:not(:disabled) { opacity: 0.9; }
+  .form-actions { margin-top: 20px; display: flex; gap: 12px; }
+  #status { margin-top: 14px; font-size: 16px; min-height: 20px; }
+  .status-ok { color: #1a7a3c; }
+  .status-err { color: #c62828; }
+  .note-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #eee;
+    gap: 12px;
+  }
+  .note-row:last-child { border-bottom: none; }
+  .note-row .info { flex: 1; }
+  .note-row .info strong { display: block; font-size: 17px; }
+  .note-row .info span { font-size: 14px; color: #777; }
+  .note-row .actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .note-row .actions button { padding: 8px 14px; font-size: 14px; }
+  #accessDenied { text-align: center; padding: 60px 20px; font-size: 17px; }
+  #accessDenied h2 { font-size: 22px; }
+  #accessDenied a { font-size: 17px; }
+</style>
+</head>
+<body>
+
+<div id="accessDenied" style="display:none;">
+  <h2>Admins only</h2>
+  <p>You need to be logged in as an admin to view this page.</p>
+  <a href="login.html">Go to Login</a>
+</div>
+
+<div class="wrap" id="adminWrap" style="display:none;">
+
+  <h1>Admin Portal</h1>
+  <div class="subtitle">Manage unit notes</div>
+
+  <div class="card">
+    <h2>1. Choose subject &amp; unit</h2>
+
+    <label for="subjectSelect">Subject</label>
+    <select id="subjectSelect">
+      <option value="">Loading subjects...</option>
+    </select>
+
+    <label for="unitSelect">Unit</label>
+    <select id="unitSelect" disabled>
+      <option value="">Select a subject first</option>
+    </select>
+  </div>
+
+  <div class="card" id="notesListCard" style="display:none;">
+    <h2>2. Existing notes for this unit</h2>
+    <div id="notesList"><p>Loading...</p></div>
+  </div>
+
+  <div class="card" id="formCard" style="display:none;">
+    <h2 id="formTitle">3. Add a new note</h2>
+
+    <form id="noteForm">
+      <input type="hidden" id="editingId" value="">
+
+      <label for="titleInput">Title</label>
+      <input type="text" id="titleInput" placeholder="e.g. Unit 1 Full Notes" required>
+
+      <label for="bodyInput">Body text (optional)</label>
+      <textarea id="bodyInput" placeholder="Any notes, description, or context..."></textarea>
+
+      <label for="fileInput">File (PDF or image)</label>
+      <input type="file" id="fileInput" accept="application/pdf,image/png,image/jpeg,image/webp">
+
+      <div class="form-actions">
+        <button type="submit" id="submitBtn">Save Note</button>
+        <button type="button" id="cancelEditBtn" class="secondary" style="display:none;">Cancel Edit</button>
+      </div>
+      <div id="status"></div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5000';
+
+  // ---- Admin gate ----
+  let currentUser = null;
+  try {
+    currentUser = JSON.parse(localStorage.getItem('user'));
+  } catch (e) {
+    currentUser = null;
+  }
+
+  if (!currentUser || currentUser.role !== 'admin') {
+    document.getElementById('accessDenied').style.display = 'block';
+    // Stop here — nothing else on this page runs for non-admins.
+    throw new Error('Admin access only');
+  }
+
+  document.getElementById('adminWrap').style.display = 'block';
+
+  // Every admin request must carry this header so the backend can verify the role.
+  function adminHeaders(extra) {
+    return Object.assign({ 'x-user-email': currentUser.email }, extra || {});
+  }
+
+  const subjectSelect = document.getElementById('subjectSelect');
+  const unitSelect = document.getElementById('unitSelect');
+  const notesListCard = document.getElementById('notesListCard');
+  const notesList = document.getElementById('notesList');
+  const formCard = document.getElementById('formCard');
+  const formTitle = document.getElementById('formTitle');
+  const noteForm = document.getElementById('noteForm');
+  const titleInput = document.getElementById('titleInput');
+  const bodyInput = document.getElementById('bodyInput');
+  const fileInput = document.getElementById('fileInput');
+  const editingId = document.getElementById('editingId');
+  const submitBtn = document.getElementById('submitBtn');
+  const cancelEditBtn = document.getElementById('cancelEditBtn');
+  const statusEl = document.getElementById('status');
+
+  function showStatus(msg, ok) {
+    statusEl.textContent = msg;
+    statusEl.className = ok ? 'status-ok' : 'status-err';
+  }
+
+  async function parseJsonResponse(res) {
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      throw new Error(`Server returned status ${res.status} (not JSON)`);
+    }
+    if (!res.ok) {
+      const debugText = data.debug ? ' — ' + (data.debug.sqlMessage || JSON.stringify(data.debug)) : '';
+      throw new Error((data.message || `Server error (status ${res.status})`) + debugText);
+    }
+    return data;
+  }
+
+  // ---- Load subjects ----
+  async function loadSubjects() {
+    try {
+      const res = await fetch(`${API_BASE}/api/subjects`);
+      const data = await parseJsonResponse(res);
+
+      subjectSelect.innerHTML = '<option value="">Select a subject...</option>';
+      (data.subjects || []).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.subject_name;
+        subjectSelect.appendChild(opt);
+      });
+    } catch (err) {
+      subjectSelect.innerHTML = '<option value="">Could not load subjects</option>';
+    }
+  }
+
+  // ---- Load units when subject changes ----
+  subjectSelect.addEventListener('change', async () => {
+    const subjectId = subjectSelect.value;
+    unitSelect.innerHTML = '<option value="">Loading units...</option>';
+    unitSelect.disabled = true;
+    notesListCard.style.display = 'none';
+    formCard.style.display = 'none';
+
+    if (!subjectId) {
+      unitSelect.innerHTML = '<option value="">Select a subject first</option>';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/subjects/${subjectId}/units`);
+      const data = await parseJsonResponse(res);
+
+      unitSelect.innerHTML = '<option value="">Select a unit...</option>';
+      (data.units || []).forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = 'Unit ' + u.unit_number + ': ' + u.unit_name;
+        unitSelect.appendChild(opt);
+      });
+      unitSelect.disabled = false;
+    } catch (err) {
+      unitSelect.innerHTML = '<option value="">Could not load units</option>';
+    }
+  });
+
+  // ---- Load notes list + show form when unit changes ----
+  unitSelect.addEventListener('change', async () => {
+    const unitId = unitSelect.value;
+
+    if (!unitId) {
+      notesListCard.style.display = 'none';
+      formCard.style.display = 'none';
+      return;
+    }
+
+    resetForm();
+    formCard.style.display = 'block';
+    notesListCard.style.display = 'block';
+    await loadNotesList(unitId);
+  });
+
+  async function loadNotesList(unitId) {
+    notesList.innerHTML = '<p>Loading...</p>';
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/short-notes?unit_id=${unitId}`, {
+        headers: adminHeaders()
+      });
+      const data = await parseJsonResponse(res);
+
+      if (!data.short_notes || data.short_notes.length === 0) {
+        notesList.innerHTML = '<p>No notes yet for this unit.</p>';
+        return;
+      }
+
+      notesList.innerHTML = '';
+      data.short_notes.forEach(note => {
+        const row = document.createElement('div');
+        row.className = 'note-row';
+        row.innerHTML = `
+          <div class="info">
+            <strong>${note.title}</strong>
+            <span>${note.file_url ? 'Has attachment' : 'No file'}</span>
+          </div>
+          <div class="actions">
+            <button type="button" class="secondary" data-edit="${note.id}">Edit</button>
+            <button type="button" class="danger" data-delete="${note.id}">Delete</button>
+          </div>
+        `;
+        notesList.appendChild(row);
+
+        row.querySelector('[data-edit]').addEventListener('click', () => startEdit(note));
+        row.querySelector('[data-delete]').addEventListener('click', () => deleteNote(note.id, unitId));
+      });
+    } catch (err) {
+      notesList.innerHTML = `<p style="color:#c62828;">Could not load notes: ${err.message}</p>`;
+    }
+  }
+
+  let editingExistingFileUrl = null;
+
+  function startEdit(note) {
+    editingId.value = note.id;
+    titleInput.value = note.title;
+    bodyInput.value = note.body || '';
+    fileInput.value = '';
+    editingExistingFileUrl = note.file_url || null;
+    formTitle.textContent = 'Editing: ' + note.title;
+    submitBtn.textContent = 'Update Note';
+    cancelEditBtn.style.display = 'inline-block';
+    statusEl.textContent = '';
+    formCard.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function resetForm() {
+    editingId.value = '';
+    noteForm.reset();
+    formTitle.textContent = '3. Add a new note';
+    submitBtn.textContent = 'Save Note';
+    cancelEditBtn.style.display = 'none';
+    statusEl.textContent = '';
+  }
+
+  cancelEditBtn.addEventListener('click', resetForm);
+
+  async function deleteNote(id, unitId) {
+    if (!confirm('Delete this note? This cannot be undone.')) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/short-notes/${id}`, {
+        method: 'DELETE',
+        headers: adminHeaders()
+      });
+      await parseJsonResponse(res);
+      await loadNotesList(unitId);
+    } catch (err) {
+      alert('Could not delete: ' + err.message);
+    }
+  }
+
+  // ---- Create or update ----
+  noteForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+
+    const unitId = unitSelect.value;
+    const title = titleInput.value.trim();
+    const body = bodyInput.value.trim();
+    const file = fileInput.files[0];
+    const isEditing = !!editingId.value;
+
+    if (!unitId || !title) {
+      showStatus('Please choose a unit and enter a title.', false);
+      submitBtn.disabled = false;
+      return;
+    }
+
+    try {
+      let fileUrl = null;
+
+      if (file) {
+        showStatus('Uploading file...', true);
+        const fd = new FormData();
+        fd.append('file', file);
+
+        const uploadRes = await fetch(`${API_BASE}/api/admin/notes/upload`, {
+          method: 'POST',
+          headers: adminHeaders(),
+          body: fd
+        });
+        const uploadData = await parseJsonResponse(uploadRes);
+        fileUrl = uploadData.file_url;
+      }
+
+      if (isEditing) {
+        showStatus('Updating note...', true);
+        const res = await fetch(`${API_BASE}/api/admin/short-notes/${editingId.value}`, {
+          method: 'PUT',
+          headers: adminHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({
+            title,
+            body: body || 'N/A',
+            // Keep the existing attachment unless a new file was uploaded just now
+            file_url: fileUrl || editingExistingFileUrl
+          })
+        });
+        await parseJsonResponse(res);
+        showStatus('Note updated!', true);
+      } else {
+        showStatus('Saving note...', true);
+        const res = await fetch(`${API_BASE}/api/admin/short-notes`, {
+          method: 'POST',
+          headers: adminHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({
+            unit_id: unitId,
+            title,
+            body: body || 'N/A',
+            file_url: fileUrl
+          })
+        });
+        await parseJsonResponse(res);
+        showStatus('Note created!', true);
+      }
+
+      resetForm();
+      await loadNotesList(unitId);
+
+    } catch (err) {
+      showStatus('Error: ' + err.message, false);
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  loadSubjects();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browse Notes - College Subject Notes</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f5f7;
+    margin: 0;
+    padding: 40px 16px;
+    color: #1a1a1a;
+  }
+  .card {
+    max-width: 720px;
+    margin: 0 auto 24px;
+    background: #fff;
+    border: 2px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 24px 28px;
+  }
+  h1 {
+    font-size: 22px;
+    text-align: center;
+    margin: 0 0 24px;
+  }
+  h2 {
+    font-size: 16px;
+    margin: 0 0 14px;
+  }
+  label {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    margin: 0 0 6px;
+  }
+  select {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+  select:disabled { background: #eee; color: #999; }
+
+  .breadcrumb {
+    max-width: 720px;
+    margin: 0 auto 16px;
+    font-size: 13px;
+    color: #555;
+  }
+  .breadcrumb span.sep { margin: 0 6px; color: #bbb; }
+
+  .subject-list, .unit-list, .topic-list {
+    max-width: 720px;
+    margin: 0 auto 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .row-btn {
+    text-align: left;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .row-btn:hover { border-color: #1a1a1a; background: #fafafa; }
+  .row-btn .code { color: #777; font-size: 12px; margin-left: 6px; }
+  .row-btn .hours { color: #999; font-size: 12px; float: right; }
+
+  .note-card {
+    max-width: 720px;
+    margin: 0 auto 14px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 16px 20px;
+  }
+  .note-card h3 { margin: 0 0 8px; font-size: 15px; }
+  .note-card p { margin: 0 0 8px; font-size: 14px; line-height: 1.5; color: #333; }
+  .note-card a.file-link {
+    display: inline-block;
+    font-size: 13px;
+    color: #1a4fd6;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .note-card a.file-link:hover { text-decoration: underline; }
+  .note-card .meta { font-size: 12px; color: #999; margin-top: 8px; }
+
+  .empty {
+    max-width: 720px;
+    margin: 0 auto 24px;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    padding: 20px;
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: #1a4fd6;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 14px;
+    font-family: inherit;
+  }
+  .back-btn:hover { text-decoration: underline; }
+
+  #status {
+    max-width: 720px;
+    margin: 0 auto 16px;
+    font-size: 14px;
+    text-align: center;
+    color: #c62828;
+  }
+</style>
+</head>
+<body>
+
+<h1>📚 Browse Notes</h1>
+
+<div class="breadcrumb" id="breadcrumb"></div>
+<div id="status"></div>
+
+<div class="card" id="semesterCard">
+  <label for="semesterSelect">Select a Semester</label>
+  <select id="semesterSelect">
+    <option value="">Loading semesters...</option>
+  </select>
+</div>
+
+<div class="subject-list" id="subjectList"></div>
+<div class="unit-list" id="unitList"></div>
+<div class="topic-list" id="topicList"></div>
+<div id="notesArea"></div>
+
+<script>
+  // Your Express API always runs on port 5000. Hardcoding this means
+  // this page works whether it's opened via Live Server, file://, or
+  // served directly by Express itself.
+  const API_BASE = 'http://localhost:5000';
+
+  const semesterSelect = document.getElementById('semesterSelect');
+  const subjectListEl = document.getElementById('subjectList');
+  const unitListEl = document.getElementById('unitList');
+  const topicListEl = document.getElementById('topicList');
+  const notesAreaEl = document.getElementById('notesArea');
+  const breadcrumbEl = document.getElementById('breadcrumb');
+  const statusEl = document.getElementById('status');
+
+  // Tracks where the student currently is in the drill-down
+  let state = {
+    semesterId: null, semesterName: null,
+    subjectId: null, subjectName: null,
+    unitId: null, unitName: null,
+    contentId: null, contentName: null
+  };
+
+  function showError(msg) {
+    statusEl.textContent = msg;
+  }
+  function clearError() {
+    statusEl.textContent = '';
+  }
+
+  async function parseJsonResponse(res) {
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      throw new Error(`Server returned status ${res.status} (not JSON) at ${res.url}`);
+    }
+    if (!res.ok) {
+      throw new Error(data.message || `Server error (status ${res.status})`);
+    }
+    return data;
+  }
+
+  function renderBreadcrumb() {
+    const parts = [];
+    if (state.semesterName) parts.push(state.semesterName);
+    if (state.subjectName) parts.push(state.subjectName);
+    if (state.unitName) parts.push(state.unitName);
+    if (state.contentName) parts.push(state.contentName);
+
+    breadcrumbEl.innerHTML = parts
+      .map(p => `<span>${p}</span>`)
+      .join('<span class="sep">&rsaquo;</span>');
+  }
+
+  function clearFrom(level) {
+    // level: 'subject' | 'unit' | 'topic' | 'notes'
+    if (level === 'subject') {
+      state.subjectId = null; state.subjectName = null;
+      state.unitId = null; state.unitName = null;
+      state.contentId = null; state.contentName = null;
+      subjectListEl.innerHTML = '';
+      unitListEl.innerHTML = '';
+      topicListEl.innerHTML = '';
+      notesAreaEl.innerHTML = '';
+    } else if (level === 'unit') {
+      state.unitId = null; state.unitName = null;
+      state.contentId = null; state.contentName = null;
+      unitListEl.innerHTML = '';
+      topicListEl.innerHTML = '';
+      notesAreaEl.innerHTML = '';
+    } else if (level === 'topic') {
+      state.contentId = null; state.contentName = null;
+      topicListEl.innerHTML = '';
+      notesAreaEl.innerHTML = '';
+    } else if (level === 'notes') {
+      notesAreaEl.innerHTML = '';
+    }
+    renderBreadcrumb();
+  }
+
+  // ---- Step 0: load semesters ----
+  async function loadSemesters() {
+    try {
+      const res = await fetch(`${API_BASE}/api/subjects/semesters`);
+      const data = await parseJsonResponse(res);
+      if (!data.success) throw new Error(data.message || 'Failed to load semesters');
+
+      semesterSelect.innerHTML = '<option value="">Select a semester...</option>';
+      data.semesters.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.dataset.name = s.semester_name;
+        opt.textContent = s.semester_name;
+        semesterSelect.appendChild(opt);
+      });
+    } catch (err) {
+      semesterSelect.innerHTML = '<option value="">Could not load semesters</option>';
+      showError('Could not load semesters: ' + err.message);
+    }
+  }
+
+  // ---- Step 1: semester picked -> load subjects ----
+  semesterSelect.addEventListener('change', async () => {
+    clearError();
+    clearFrom('subject');
+
+    const semesterId = semesterSelect.value;
+    const selectedOption = semesterSelect.options[semesterSelect.selectedIndex];
+    state.semesterId = semesterId || null;
+    state.semesterName = semesterId ? selectedOption.dataset.name : null;
+    renderBreadcrumb();
+
+    if (!semesterId) return;
+
+    subjectListEl.innerHTML = '<div class="empty">Loading subjects...</div>';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/subjects/semester/${semesterId}`);
+      const data = await parseJsonResponse(res);
+      if (!data.success) throw new Error(data.message || 'Failed to load subjects');
+
+      if (!data.subjects || data.subjects.length === 0) {
+        subjectListEl.innerHTML = '<div class="empty">No subjects found for this semester yet.</div>';
+        return;
+      }
+
+      subjectListEl.innerHTML = '';
+      data.subjects.forEach(sub => {
+        const btn = document.createElement('button');
+        btn.className = 'row-btn';
+        btn.innerHTML = `${sub.subject_name} <span class="code">${sub.subject_code || ''}</span>`;
+        btn.addEventListener('click', () => selectSubject(sub.id, sub.subject_name));
+        subjectListEl.appendChild(btn);
+      });
+    } catch (err) {
+      subjectListEl.innerHTML = '';
+      showError('Could not load subjects: ' + err.message);
+    }
+  });
+
+  // ---- Step 2: subject picked -> load units ----
+  async function selectSubject(subjectId, subjectName) {
+    clearError();
+    clearFrom('unit');
+    state.subjectId = subjectId;
+    state.subjectName = subjectName;
+    renderBreadcrumb();
+
+    unitListEl.innerHTML = '<div class="empty">Loading units...</div>';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/subjects/${subjectId}/units`);
+      const data = await parseJsonResponse(res);
+      if (!data.success) throw new Error(data.message || 'Failed to load units');
+
+      if (!data.units || data.units.length === 0) {
+        unitListEl.innerHTML = '<div class="empty">No units added for this subject yet.</div>';
+        return;
+      }
+
+      unitListEl.innerHTML = '';
+      const backBtn = document.createElement('button');
+      backBtn.className = 'back-btn';
+      backBtn.textContent = '← Back to subjects';
+      backBtn.addEventListener('click', () => clearFrom('unit'));
+      unitListEl.appendChild(backBtn);
+
+      data.units.forEach(u => {
+        const btn = document.createElement('button');
+        btn.className = 'row-btn';
+        btn.innerHTML = `Unit ${u.unit_number}: ${u.unit_name} <span class="hours">${u.description || ''}</span>`;
+        btn.addEventListener('click', () => selectUnit(u.id, `Unit ${u.unit_number}: ${u.unit_name}`));
+        unitListEl.appendChild(btn);
+      });
+    } catch (err) {
+      unitListEl.innerHTML = '';
+      showError('Could not load units: ' + err.message);
+    }
+  }
+
+  // ---- Step 3: unit picked -> load topics (contents) ----
+  async function selectUnit(unitId, unitName) {
+    clearError();
+    clearFrom('topic');
+    state.unitId = unitId;
+    state.unitName = unitName;
+    renderBreadcrumb();
+
+    topicListEl.innerHTML = '<div class="empty">Loading topics...</div>';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/subjects/unit/${unitId}/contents`);
+      const data = await parseJsonResponse(res);
+      if (!data.success) throw new Error(data.message || 'Failed to load topics');
+
+      if (!data.contents || data.contents.length === 0) {
+        topicListEl.innerHTML = '<div class="empty">No topics added for this unit yet.</div>';
+        return;
+      }
+
+      topicListEl.innerHTML = '';
+      const backBtn = document.createElement('button');
+      backBtn.className = 'back-btn';
+      backBtn.textContent = '← Back to units';
+      backBtn.addEventListener('click', () => clearFrom('topic'));
+      topicListEl.appendChild(backBtn);
+
+      data.contents.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'row-btn';
+        btn.textContent = `${c.content_number}. ${c.content_name}`;
+        btn.addEventListener('click', () => selectTopic(c.id, c.content_name));
+        topicListEl.appendChild(btn);
+      });
+    } catch (err) {
+      topicListEl.innerHTML = '';
+      showError('Could not load topics: ' + err.message);
+    }
+  }
+
+  // ---- Step 4: topic picked -> load notes ----
+  async function selectTopic(contentId, contentName) {
+    clearError();
+    clearFrom('notes');
+    state.contentId = contentId;
+    state.contentName = contentName;
+    renderBreadcrumb();
+
+    notesAreaEl.innerHTML = '<div class="empty">Loading notes...</div>';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/subjects/content/${contentId}/notes`);
+      const data = await parseJsonResponse(res);
+      if (!data.success) throw new Error(data.message || 'Failed to load notes');
+
+      if (!data.notes || data.notes.length === 0) {
+        notesAreaEl.innerHTML = '<div class="empty">No notes uploaded for this topic yet.</div>';
+        return;
+      }
+
+      notesAreaEl.innerHTML = '';
+      const backBtn = document.createElement('button');
+      backBtn.className = 'back-btn';
+      backBtn.textContent = '← Back to topics';
+      backBtn.style.maxWidth = '720px';
+      backBtn.style.display = 'block';
+      backBtn.style.margin = '0 auto 14px';
+      backBtn.addEventListener('click', () => clearFrom('notes'));
+      notesAreaEl.appendChild(backBtn);
+
+      data.notes.forEach(n => {
+        const div = document.createElement('div');
+        div.className = 'note-card';
+        const date = new Date(n.created_at).toLocaleDateString();
+        div.innerHTML = `
+          <h3>${n.title}</h3>
+          ${n.body ? `<p>${n.body}</p>` : ''}
+          ${n.file_url ? `<a class="file-link" href="${API_BASE}${n.file_url}" target="_blank" rel="noopener">📎 View attached file</a>` : ''}
+          <div class="meta">Uploaded ${date}</div>
+        `;
+        notesAreaEl.appendChild(div);
+      });
+    } catch (err) {
+      notesAreaEl.innerHTML = '';
+      showError('Could not load notes: ' + err.message);
+    }
+  }
+
+  loadSemesters();
+</script>
+
+</body>
+</html>

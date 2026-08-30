@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Note - College Subject Notes</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 40px 16px;
+    color: #1a1a1a;
+    min-height: 100vh;
+
+    background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+    background-size: 400% 400%;
+    animation: gradientShift 14s ease infinite;
+
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .bg-shape {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(2px);
+    background: rgba(255,255,255,0.12);
+    animation: floaty 8s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .bg-shape.s1 { width: 260px; height: 260px; top: -80px; left: -80px; }
+  .bg-shape.s2 { width: 340px; height: 340px; bottom: -110px; right: -100px; animation-delay: 2s; }
+  .bg-shape.s3 { width: 140px; height: 140px; top: 60%; left: 5%; animation-delay: 4s; }
+  .bg-shape.s4 { width: 100px; height: 100px; top: 12%; right: 12%; animation-delay: 1s; }
+
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-28px); }
+  }
+
+  .card {
+    max-width: 520px;
+    margin: 0 auto;
+    background: #fff;
+    border: 2px solid #1a1a1a;
+    border-radius: 14px;
+    padding: 28px 32px 32px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    animation: cardAppear 0.6s ease;
+  }
+
+  @keyframes cardAppear {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h1 {
+    font-size: 22px;
+    text-align: center;
+    margin: 0 0 24px;
+  }
+  label {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    margin: 16px 0 6px;
+  }
+  select, input[type="text"], textarea, input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 17px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+  select:disabled { background: #eee; color: #999; }
+  textarea { min-height: 100px; resize: vertical; }
+  button {
+    margin-top: 22px;
+    width: 100%;
+    padding: 11px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  button:hover:not(:disabled) { background: #333; }
+  #status {
+    margin-top: 14px;
+    font-size: 14px;
+    text-align: center;
+    min-height: 18px;
+  }
+  .status-ok { color: #1a7a3c; }
+  .status-err { color: #c62828; }
+
+  .scope-toggle {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .scope-toggle label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px 12px;
+    cursor: pointer;
+    margin: 0;
+  }
+  .scope-toggle input[type="radio"] {
+    width: auto;
+  }
+  .scope-toggle label.active {
+    border-color: #1a1a1a;
+    background: #f0f0f0;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-shape s1"></div>
+<div class="bg-shape s2"></div>
+<div class="bg-shape s3"></div>
+<div class="bg-shape s4"></div>
+
+<div class="card">
+  <h1>Upload Notes</h1>
+
+  <form id="uploadForm">
+    <label for="subjectSelect">Subject</label>
+    <select id="subjectSelect" required>
+      <option value="">Loading subjects...</option>
+    </select>
+
+    <label>Upload this note for:</label>
+    <div class="scope-toggle">
+      <label id="scopeUnitLabel" class="active">
+        <input type="radio" name="scope" value="unit" checked>
+        A specific unit
+      </label>
+      <label id="scopeSubjectLabel">
+        <input type="radio" name="scope" value="subject">
+        The whole subject
+      </label>
+    </div>
+
+    <div id="unitFieldWrap">
+      <label for="unitSelect">Unit</label>
+      <select id="unitSelect" required disabled>
+        <option value="">Select a subject first</option>
+      </select>
+    </div>
+
+    <label for="titleInput">Title</label>
+    <input type="text" id="titleInput" placeholder="e.g. Unit 1 Full Notes" required>
+
+    <label for="contentInput">Body text (optional)</label>
+    <textarea id="contentInput" placeholder="Any notes, description, or context..."></textarea>
+
+    <label for="fileInput">File (PDF or image)</label>
+    <input type="file" id="fileInput" accept="application/pdf,image/png,image/jpeg,image/webp">
+
+    <button type="submit" id="submitBtn">Submit</button>
+    <div id="status"></div>
+  </form>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5000';
+
+  const subjectSelect = document.getElementById('subjectSelect');
+  const unitSelect = document.getElementById('unitSelect');
+  const unitFieldWrap = document.getElementById('unitFieldWrap');
+  const uploadForm = document.getElementById('uploadForm');
+  const fileInput = document.getElementById('fileInput');
+  const statusEl = document.getElementById('status');
+  const submitBtn = document.getElementById('submitBtn');
+  const scopeRadios = document.querySelectorAll('input[name="scope"]');
+  const scopeUnitLabel = document.getElementById('scopeUnitLabel');
+  const scopeSubjectLabel = document.getElementById('scopeSubjectLabel');
+
+  function showStatus(msg, ok) {
+    statusEl.textContent = msg;
+    statusEl.className = ok ? 'status-ok' : 'status-err';
+  }
+
+  function getScope() {
+    return document.querySelector('input[name="scope"]:checked').value;
+  }
+
+  function updateScopeUI() {
+    const scope = getScope();
+    scopeUnitLabel.classList.toggle('active', scope === 'unit');
+    scopeSubjectLabel.classList.toggle('active', scope === 'subject');
+
+    if (scope === 'unit') {
+      unitFieldWrap.style.display = 'block';
+      unitSelect.required = true;
+    } else {
+      unitFieldWrap.style.display = 'none';
+      unitSelect.required = false;
+    }
+  }
+
+  scopeRadios.forEach(r => r.addEventListener('change', updateScopeUI));
+  updateScopeUI();
+
+  async function parseJsonResponse(res) {
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      throw new Error(`Server returned status ${res.status} (not JSON) at ${res.url}`);
+    }
+    if (!res.ok) {
+      throw new Error(data.message || `Server error (status ${res.status})`);
+    }
+    return data;
+  }
+
+  // ---- Step 1: load subjects ----
+  async function loadSubjects() {
+    try {
+      const res = await fetch(`${API_BASE}/api/subjects`);
+      const data = await parseJsonResponse(res);
+      if (!data.success) throw new Error(data.message || 'Failed to load subjects');
+
+      if (!data.subjects || data.subjects.length === 0) {
+        subjectSelect.innerHTML = '<option value="">No subjects found</option>';
+        return;
+      }
+
+      subjectSelect.innerHTML = '<option value="">Select a subject...</option>';
+      data.subjects.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.subject_name;
+        subjectSelect.appendChild(opt);
+      });
+    } catch (err) {
+      subjectSelect.innerHTML = '<option value="">Could not load subjects</option>';
+      showStatus('Could not load subjects: ' + err.message, false);
+    }
+  }
+
+  // ---- Step 2: when a subject is picked, load its units (only needed for unit scope) ----
+  subjectSelect.addEventListener('change', async () => {
+    const subjectId = subjectSelect.value;
+    unitSelect.innerHTML = '<option value="">Loading units...</option>';
+    unitSelect.disabled = true;
+
+    if (!subjectId) {
+      unitSelect.innerHTML = '<option value="">Select a subject first</option>';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/subjects/${subjectId}/units`);
+      const data = await parseJsonResponse(res);
+      if (!data.success) throw new Error(data.message || 'Failed to load units');
+
+      if (!data.units || data.units.length === 0) {
+        unitSelect.innerHTML = '<option value="">No units found for this subject</option>';
+        return;
+      }
+
+      unitSelect.innerHTML = '<option value="">Select a unit...</option>';
+      data.units.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = 'Unit ' + u.unit_number + ': ' + u.unit_name;
+        unitSelect.appendChild(opt);
+      });
+      unitSelect.disabled = false;
+    } catch (err) {
+      unitSelect.innerHTML = '<option value="">Could not load units</option>';
+      showStatus('Could not load units: ' + err.message, false);
+    }
+  });
+
+  // ---- Submit: upload file (if any), then create the note ----
+  uploadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+
+    const scope = getScope();
+    const subjectId = subjectSelect.value;
+    const unitId = unitSelect.value;
+    const title = document.getElementById('titleInput').value.trim();
+    const content = document.getElementById('contentInput').value.trim();
+    const file = fileInput.files[0];
+
+    if (!subjectId || !title) {
+      showStatus('Please choose a subject and enter a title.', false);
+      submitBtn.disabled = false;
+      return;
+    }
+
+    if (scope === 'unit' && !unitId) {
+      showStatus('Please choose a unit, or switch to "The whole subject".', false);
+      submitBtn.disabled = false;
+      return;
+    }
+
+    try {
+      let fileUrl = null;
+
+      if (file) {
+        showStatus('Uploading file...', true);
+        const fileFormData = new FormData();
+        fileFormData.append('file', file);
+
+        const uploadRes = await fetch(`${API_BASE}/api/subjects/notes/upload`, {
+          method: 'POST',
+          body: fileFormData
+        });
+        const uploadData = await parseJsonResponse(uploadRes);
+        if (!uploadData.success) throw new Error(uploadData.message || 'File upload failed');
+        fileUrl = uploadData.file_url;
+      }
+
+      showStatus('Saving note...', true);
+
+      let noteRes;
+
+      if (scope === 'unit') {
+        noteRes = await fetch(`${API_BASE}/api/subjects/short-notes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            unit_id: unitId,
+            title: title,
+            body: content || "N/A",
+            file_url: fileUrl
+          })
+        });
+      } else {
+        noteRes = await fetch(`${API_BASE}/api/subjects/subject-notes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            subject_id: subjectId,
+            title: title,
+            body: content || "N/A",
+            file_url: fileUrl
+          })
+        });
+      }
+
+      const noteData = await parseJsonResponse(noteRes);
+      if (!noteData.success) throw new Error(noteData.message || 'Saving note failed');
+
+      showStatus(
+        scope === 'unit' ? 'Unit note uploaded successfully!' : 'Subject note uploaded successfully!',
+        true
+      );
+      uploadForm.reset();
+      unitSelect.innerHTML = '<option value="">Select a subject first</option>';
+      unitSelect.disabled = true;
+      updateScopeUI();
+
+    } catch (err) {
+      showStatus('Error: ' + err.message, false);
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  loadSubjects();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>College Subject Notes</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
+            color: #1a1a1a;
+            min-height: 100vh;
+
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 400% 400%;
+            animation: gradientShift 14s ease infinite;
+
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(2px);
+            background: rgba(255,255,255,0.12);
+            animation: floaty 8s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-shape.s1 { width: 260px; height: 260px; top: -80px; left: -80px; }
+        .bg-shape.s2 { width: 340px; height: 340px; bottom: -110px; right: -100px; animation-delay: 2s; }
+        .bg-shape.s3 { width: 140px; height: 140px; top: 60%; left: 5%; animation-delay: 4s; }
+        .bg-shape.s4 { width: 100px; height: 100px; top: 12%; right: 12%; animation-delay: 1s; }
+
+        @keyframes floaty {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-28px); }
+        }
+
+        h1, section {
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.18);
+        }
+
+        section h2 {
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.18);
+        }
+
+        #subjectContainer,
+        #unitContainer {
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        .subject-card,
+        .unit-card {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: cardAppear 0.5s ease backwards;
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .subject-card:hover,
+        .unit-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
+        }
+
+        .subject-card h3,
+        .unit-card h3 {
+            margin-top: 0;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+            transform: scale(1.03);
+        }
+
+        .unit-number {
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 8px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="bg-shape s1"></div>
+    <div class="bg-shape s2"></div>
+    <div class="bg-shape s3"></div>
+    <div class="bg-shape s4"></div>
+
+    <h1>College Subject Notes</h1>
+
+
+    <!-- ============================= -->
+    <!-- SUBJECTS -->
+    <!-- ============================= -->
+
+    <section>
+
+        <h2>Subjects</h2>
+
+        <div id="subjectContainer">
+
+            <!-- Subjects will appear here -->
+
+        </div>
+
+    </section>
+
+
+    <!-- ============================= -->
+    <!-- UNITS -->
+    <!-- ============================= -->
+
+    <section>
+
+        <div id="unitContainer">
+
+            <!-- Units will appear here -->
+
+        </div>
+
+    </section>
+
+
+    <!-- ============================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================= -->
+
+<script src="/Frontend/js/subjects.js?v=2"></script>
+
+</body>
+
+</html>
