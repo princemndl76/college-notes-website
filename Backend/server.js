@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -21,6 +20,7 @@ const adminRoutes =
     require("./routes/adminRoutes");
 
 const app = express();
+app.set("trust proxy", 1);
 
 // Wrap express in an http server so socket.io can attach to it
 const server = http.createServer(app);
