@@ -153,9 +153,13 @@
 
   document.getElementById('adminWrap').style.display = 'block';
 
-  // Every admin request must carry this header so the backend can verify the role.
+  // Every admin request must carry this header so the backend can verify the role,
+  // plus the JWT so requests pass the token-based auth middleware.
   function adminHeaders(extra) {
-    return Object.assign({ 'x-user-email': currentUser.email }, extra || {});
+    const token = localStorage.getItem('token');
+    const base = { 'x-user-email': currentUser.email };
+    if (token) base['Authorization'] = 'Bearer ' + token;
+    return Object.assign(base, extra || {});
   }
 
   const subjectSelect = document.getElementById('subjectSelect');
