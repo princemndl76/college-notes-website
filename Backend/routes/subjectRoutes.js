@@ -242,7 +242,7 @@ router.post("/notes/upload", upload.single("file"), (req, res) => {
         });
     }
 
-    const fileUrl = `/uploads/notes/${req.file.filename}`;
+    const fileUrl = req.file.path; // full Cloudinary URL
 
     res.json({
         success: true,

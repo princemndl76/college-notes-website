@@ -1,39 +1,38 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 
 
 // ==========================================
-// MAKE SURE UPLOAD FOLDER EXISTS
+// CLOUDINARY CONFIG
 // ==========================================
 
-const uploadDir = path.join(__dirname, "..", "uploads", "notes");
-
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 
 // ==========================================
 // STORAGE CONFIG
+// (files go to Cloudinary instead of local disk)
 // ==========================================
 
-const storage = multer.diskStorage({
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "notes",
+        resource_type: "auto", // handles PDFs and images correctly
+        public_id: (req, file) => {
+            const safeName =
+                file.originalname
+                    .replace(/\.[^/.]+$/, "") // strip extension
+                    .replace(/\s+/g, "_");     // remove spaces
 
-    destination: function (req, file, cb) {
-        cb(null, uploadDir);
-    },
-
-    filename: function (req, file, cb) {
-
-        // Unique name: timestamp + original name (spaces removed)
-        const safeName =
-            Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
-
-        cb(null, safeName);
-
+            return Date.now() + "-" + safeName;
+        }
     }
-
 });
 
 
