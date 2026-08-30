@@ -55,8 +55,13 @@ if (user.role === "admin") {
 // API BASES
 // ==========================================
 
-const ACADEMIC_API = "http://localhost:5000/api/academic";
-const SUBJECTS_API = "http://localhost:5000/api/subjects";
+const API_BASE_URL =
+    window.location.hostname === "localhost"
+        ? "http://localhost:5000"
+        : "https://college-notes-website-f64v.onrender.com";
+
+const ACADEMIC_API = `${API_BASE_URL}/api/academic`;
+const SUBJECTS_API = `${API_BASE_URL}/api/subjects`;
 
 
 // ==========================================

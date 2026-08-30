@@ -1,3 +1,9 @@
+const API_BASE_URL =
+    window.location.hostname === "localhost"
+        ? "http://localhost:5000"
+        : "https://college-notes-website-f64v.onrender.com";
+
+
 // ==========================================
 // GET UNIT ID FROM URL
 // ==========================================
@@ -27,7 +33,7 @@ async function loadContents() {
     try {
 
         const response = await fetch(
-            `http://localhost:5000/api/subjects/unit/${unitId}/contents`
+            `${API_BASE_URL}/api/subjects/unit/${unitId}/contents`
         );
 
         const data = await response.json();

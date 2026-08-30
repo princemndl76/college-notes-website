@@ -1,4 +1,9 @@
-const API = "http://localhost:5000/api/subjects";
+const API_BASE_URL =
+    window.location.hostname === "localhost"
+        ? "http://localhost:5000"
+        : "https://college-notes-website-f64v.onrender.com";
+
+const API = `${API_BASE_URL}/api/subjects`;
 
 
 // ==========================================
