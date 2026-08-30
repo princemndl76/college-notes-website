@@ -208,20 +208,38 @@ router.delete("/short-notes/:id", (req, res) => {
 // FILE UPLOAD (admin) - reuses same upload middleware
 // POST /api/admin/notes/upload
 //
-// FIX: file_url now includes the "notes" subfolder to
-// match where upload.js middleware actually saves files
-// (Backend/uploads/notes/...). Previously this was
-// missing "notes", causing 404s when opening files.
+// FIX: files now go to Cloudinary (see middleware/upload.js),
+// so file_url must be the actual Cloudinary URL returned by
+// multer-storage-cloudinary (req.file.path), not a local
+// /uploads/notes/... path.
+//
+// Also: upload.single("file") is now called manually inside
+// the handler (instead of as route middleware) so any error
+// it throws (bad file type, Cloudinary auth/config issue,
+// network failure, etc.) is caught and returned as JSON
+// instead of crashing into Express's generic HTML 500 page.
 // ==================================================
 
-router.post("/notes/upload", upload.single("file"), (req, res) => {
+router.post("/notes/upload", (req, res) => {
 
-    if (!req.file) {
-        return res.status(400).json({ success: false, message: "No file received" });
-    }
+    upload.single("file")(req, res, (err) => {
 
-    res.json({ success: true, file_url: `/uploads/notes/${req.file.filename}` });
+        if (err) {
+            console.error("Upload Middleware Error:", err.message);
+            return res.status(500).json({
+                success: false,
+                message: "Upload failed",
+                debug: err.message
+            });
+        }
 
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "No file received" });
+        }
+
+        res.json({ success: true, file_url: req.file.path });
+
+    });
 
 });
 
