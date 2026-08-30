@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const rateLimit = require("express-rate-limit");
-
+const jwt = require("jsonwebtoken");
 const db = require("../config/db");
 
 const router = express.Router();
@@ -299,9 +299,14 @@ router.post("/login", loginLimiter, async (req, res) => {
                 }
 
 
-                // Login successful
-                // role is now included so the frontend
-                // knows whether this user is an admin
+                // Login successful — create a JWT so the
+                // frontend can prove who's logged in later
+
+                const token = jwt.sign(
+                    { id: user.id, role: user.role },
+                    process.env.JWT_SECRET,
+                    { expiresIn: "7d" }
+                );
 
                 res.json({
 
@@ -309,6 +314,8 @@ router.post("/login", loginLimiter, async (req, res) => {
 
                     message:
                         "Login successful!",
+
+                    token: token,
 
                     user: {
 
@@ -326,7 +333,6 @@ router.post("/login", loginLimiter, async (req, res) => {
                     }
 
                 });
-
             }
         );
 

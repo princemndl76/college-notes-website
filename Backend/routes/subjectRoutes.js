@@ -1,3 +1,4 @@
+const { verifyToken } = require("../middleware/auth");
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
@@ -232,7 +233,7 @@ router.get("/unit/:unitId/contents", (req, res) => {
 // Expects multipart/form-data with field name "file"
 // ==================================================
 
-router.post("/notes/upload", upload.single("file"), (req, res) => {
+router.post("/notes/upload", verifyToken, upload.single("file"), (req, res) => {
 
     if (!req.file) {
 
