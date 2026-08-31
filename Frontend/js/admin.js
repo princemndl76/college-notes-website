@@ -995,3 +995,232 @@ document.getElementById("cancelNoteEdit")
 // ==========================================================
 
 loadSubjectsAdmin();
+// ==========================================================
+// PYQ UPLOAD
+// ==========================================================
+
+const pyqForm = document.getElementById("pyqForm");
+const pyqSubjectSelect = document.getElementById("pyqSubjectSelect");
+const pyqUploadBtn = document.getElementById("pyqUploadBtn");
+
+
+// Load subjects into PYQ dropdown
+function loadPYQSubjects() {
+
+    if (!pyqSubjectSelect) return;
+
+    populateSelect(
+        pyqSubjectSelect,
+        allSubjects,
+        "id",
+        s => `${s.subject_name} (${s.subject_code})`,
+        "-- Select Subject --"
+    );
+
+}
+
+
+// Upload PYQ
+if (pyqForm) {
+
+    pyqForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const semesterId =
+            document.getElementById("pyqSemesterId").value;
+
+        const subjectId =
+            document.getElementById("pyqSubjectSelect").value;
+
+        const examYear =
+            document.getElementById("pyqExamYear").value;
+
+        const paperTitle =
+            document.getElementById("pyqPaperTitle")
+                .value
+                .trim();
+
+        const description =
+            document.getElementById("pyqDescription")
+                .value
+                .trim();
+
+        const file =
+            document.getElementById("pyqFile")
+                .files[0];
+
+
+        // Validation
+        if (!semesterId) {
+
+            showStatus(
+                "pyqStatus",
+                "Please enter semester ID.",
+                true
+            );
+
+            return;
+        }
+
+        if (!subjectId) {
+
+            showStatus(
+                "pyqStatus",
+                "Please select a subject.",
+                true
+            );
+
+            return;
+        }
+
+        if (!examYear) {
+
+            showStatus(
+                "pyqStatus",
+                "Please enter exam year.",
+                true
+            );
+
+            return;
+        }
+
+        if (!paperTitle) {
+
+            showStatus(
+                "pyqStatus",
+                "Please enter paper title.",
+                true
+            );
+
+            return;
+        }
+
+        if (!file) {
+
+            showStatus(
+                "pyqStatus",
+                "Please select a PDF file.",
+                true
+            );
+
+            return;
+        }
+
+
+        // PDF validation
+        if (file.type !== "application/pdf") {
+
+            showStatus(
+                "pyqStatus",
+                "Only PDF files are allowed.",
+                true
+            );
+
+            return;
+        }
+
+
+        try {
+
+            pyqUploadBtn.disabled = true;
+
+            showStatus(
+                "pyqStatus",
+                "Uploading PYQ to Cloudinary...",
+                false
+            );
+
+
+            const formData = new FormData();
+
+            formData.append(
+                "paperFile",
+                file
+            );
+
+            formData.append(
+                "semesterId",
+                semesterId
+            );
+
+            formData.append(
+                "subjectId",
+                subjectId
+            );
+
+            formData.append(
+                "examYear",
+                examYear
+            );
+
+            formData.append(
+                "paperTitle",
+                paperTitle
+            );
+
+            formData.append(
+                "description",
+                description
+            );
+
+
+            const res = await fetch(
+                `${API_BASE_URL}/api/pyq/upload`,
+                {
+                    method: "POST",
+
+                    headers: authHeaders(),
+
+                    body: formData
+                }
+            );
+
+
+            const data = await res.json();
+
+
+            if (!res.ok || !data.success) {
+
+                throw new Error(
+                    data.message ||
+                    "PYQ upload failed."
+                );
+
+            }
+
+
+            showStatus(
+                "pyqStatus",
+                "PYQ uploaded successfully!",
+                false
+            );
+
+
+            // Reset form
+            pyqForm.reset();
+
+
+        } catch (error) {
+
+            console.error(
+                "PYQ Upload Error:",
+                error
+            );
+
+            showStatus(
+                "pyqStatus",
+                error.message ||
+                "Unable to upload PYQ.",
+                true
+            );
+
+        } finally {
+
+            pyqUploadBtn.disabled = false;
+
+        }
+
+    });
+
+}
