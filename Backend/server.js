@@ -19,6 +19,9 @@ const academicRoutes =
 const adminRoutes =
     require("./routes/adminRoutes");
 
+const pyqRoutes =
+    require("./routes/pyqRoutes");
+
 const app = express();
 app.set("trust proxy", 1);
 
@@ -84,6 +87,8 @@ app.use("/api/subjects", subjectRoutes);
 app.use("/api/academic", academicRoutes);
 
 app.use("/api/admin", adminRoutes);
+
+app.use("/api/pyq", pyqRoutes);
 
 
 // ======================================
