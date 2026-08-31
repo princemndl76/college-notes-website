@@ -327,22 +327,38 @@ async function showSubjects(semester) {
     sectionTitleEl.textContent = `${semester.semester_name} — My Subjects`;
     browseContainer.innerHTML = "<p class='empty-msg'>Loading subjects...</p>";
 
+    const pyqButtonHtml = `
+        <div style="margin-bottom: 20px;">
+            <button onclick="openPYQ(${semester.id}, '${semester.semester_name}')" style="
+                padding: 10px 20px;
+                border: none;
+                border-radius: 10px;
+                background: rgba(255,255,255,0.92);
+                color: #4338ca;
+                font-weight: 600;
+                cursor: pointer;
+            ">
+                📝 Previous Year Questions
+            </button>
+        </div>
+    `;
+
     try {
 
         const res = await fetch(`${SUBJECTS_API}/semester/${semester.id}`);
         const data = await res.json();
 
         if (!data.success) {
-            browseContainer.innerHTML = "<p class='empty-msg'>Unable to load subjects.</p>";
+            browseContainer.innerHTML = pyqButtonHtml + "<p class='empty-msg'>Unable to load subjects.</p>";
             return;
         }
 
         if (data.subjects.length === 0) {
-            browseContainer.innerHTML = "<p class='empty-msg'>No subjects added yet for this semester.</p>";
+            browseContainer.innerHTML = pyqButtonHtml + "<p class='empty-msg'>No subjects added yet for this semester.</p>";
             return;
         }
 
-        browseContainer.innerHTML = "";
+        browseContainer.innerHTML = pyqButtonHtml;
 
         data.subjects.forEach(function (subject) {
 
@@ -365,10 +381,19 @@ async function showSubjects(semester) {
     } catch (error) {
 
         console.error(error);
-        browseContainer.innerHTML = "<p class='empty-msg'>Unable to connect to server.</p>";
+        browseContainer.innerHTML = pyqButtonHtml + "<p class='empty-msg'>Unable to connect to server.</p>";
 
     }
 
+}
+
+
+// ==========================================
+// OPEN PYQ PAGE
+// ==========================================
+
+function openPYQ(semesterId, semesterName) {
+    window.location.href = `pyq.html?semesterId=${semesterId}&semesterName=${encodeURIComponent(semesterName)}`;
 }
 
 

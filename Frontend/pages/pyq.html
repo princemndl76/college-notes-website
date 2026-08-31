@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previous Year Questions</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
+            color: #1a1a1a;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 400% 400%;
+            animation: gradientShift 14s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1, h2 { color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.15); }
+
+        .back-button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.9);
+            font-weight: bold;
+        }
+
+        #yearGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            max-width: 700px;
+            margin: 20px 0 30px;
+        }
+
+        .year-btn {
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            background: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .year-btn:hover { transform: translateY(-3px); }
+
+        .year-btn.has-papers {
+            background: #4f46e5;
+            color: white;
+        }
+
+        #papersContainer {
+            max-width: 800px;
+        }
+
+        .paper-card {
+            background: white;
+            padding: 18px 20px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .paper-card h3 { margin: 0 0 6px; }
+        .paper-card a {
+            display: inline-block;
+            margin-top: 8px;
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>📝 Previous Year Questions</h1>
+        <button class="back-button" onclick="window.history.back()">← Back</button>
+    </div>
+
+    <h2 id="semesterTitle">Loading...</h2>
+
+    <div id="yearGrid"></div>
+
+    <div id="papersContainer"></div>
+
+    <script src="/Frontend/js/pyq.js"></script>
+</body>
+</html>
