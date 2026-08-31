@@ -38,7 +38,7 @@ function renderYearButtons(availableYears) {
 
         const btn = document.createElement("button");
         btn.className = "year-btn" + (availableYears.includes(year) ? " has-papers" : "");
-        btn.textContent = year;
+        btn.textContent = `${year}-${year + 1}`;
         btn.addEventListener("click", () => loadPapers(year));
 
         yearGrid.appendChild(btn);
@@ -59,7 +59,7 @@ async function loadPapers(year) {
         }
 
         if (!data.papers || data.papers.length === 0) {
-            papersContainer.innerHTML = `<p style='color:white;'>No papers uploaded yet for ${year}.</p>`;
+            papersContainer.innerHTML = `<p style='color:white;'>No papers uploaded yet for ${year}-${year + 1}.</p>`;
             return;
         }
 
