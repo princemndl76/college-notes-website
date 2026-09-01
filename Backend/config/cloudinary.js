@@ -26,7 +26,7 @@ const notesStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: "college-notes/notes",
-        resource_type: "raw",
+        resource_type: "auto",
         allowed_formats: ["pdf"],
         public_id: (req, file) => {
             const cleanName = file.originalname.replace(/\.[^/.]+$/, "").replace(/\s+/g, "_");
