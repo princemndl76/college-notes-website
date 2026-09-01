@@ -42,6 +42,55 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     }
 
+    // ==========================================
+    // INLINE FILE VIEWER
+    // Replaces target="_blank" links with a toggle
+    // button that shows the file in an iframe on
+    // the same page.
+    // ==========================================
+
+    let fileViewerCounter = 0;
+
+    function renderFileButton(fileUrl) {
+
+        if (!fileUrl) return "";
+
+        fileViewerCounter++;
+        const uid = `file-view-${fileViewerCounter}`;
+
+        return `
+            <div style="margin-top:8px;">
+                <button onclick="toggleFileView('${uid}', '${fileUrl}')" style="padding:4px 10px; font-size:13px;">
+                    📄 Open File
+                </button>
+                <div id="${uid}" style="display:none; margin-top:10px;"></div>
+            </div>
+        `;
+
+    }
+
+    window.toggleFileView = function (uid, fileUrl) {
+
+        const container = document.getElementById(uid);
+
+        // Already open — close it
+        if (container.style.display === "block") {
+            container.style.display = "none";
+            container.innerHTML = "";
+            return;
+        }
+
+        // Open it and load the file inline
+        container.style.display = "block";
+        container.innerHTML = `
+            <iframe
+                src="${fileUrl}"
+                style="width:100%; height:600px; border:1px solid #ccc; border-radius:6px;"
+            ></iframe>
+        `;
+
+    };
+
     // Fetches and renders notes uploaded directly to the whole subject
     // (not tied to any specific unit).
     async function loadSubjectNotes(subjectId) {
@@ -63,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div style="background:#fff7e6; padding:10px; border-radius:6px; margin-top:6px;">
                             <strong>${note.title}</strong>
                             ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
-                            ${note.file_url ? `<a href="${note.file_url}" target="_blank">📄 Open File</a>` : ""}
+                            ${renderFileButton(note.file_url)}
                         </div>
                     `).join("")}
                 </div>
@@ -141,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div style="background:#f0f4ff; padding:10px; border-radius:6px; margin-top:6px;">
                                 <strong>${note.title}</strong>
                                 ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
-                                ${note.file_url ? `<a href="${note.file_url}" target="_blank">📄 Open File</a>` : ""}
+                                ${renderFileButton(note.file_url)}
                             </div>
                         `).join("")}
                     </div>
@@ -205,7 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div style="background:#f0f4ff; padding:10px; border-radius:6px; margin-bottom:6px;">
                     <strong>${note.title}</strong>
                     ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
-                    ${note.file_url ? `<a href="${note.file_url}" target="_blank">📄 Open File</a>` : ""}
+                    ${renderFileButton(note.file_url)}
                 </div>
             `).join("");
         } catch (error) {
