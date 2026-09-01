@@ -229,15 +229,15 @@ registerForm.addEventListener(
 
             if (data.success) {
 
-                alert(
-                    "Account created successfully!"
-                );
+                // Show the REAL message from the server
+                // (tells the user to check their email)
+
+                alert(data.message);
 
 
-                // Go to login page
-
-                window.location.href =
-                    "login.html";
+                // Do NOT redirect to login yet —
+                // the account isn't verified until
+                // they click the link in their email
 
             }
 
