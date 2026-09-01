@@ -12,7 +12,7 @@ const pyqStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: "college-notes/pyq",
-        resource_type: "raw", // needed for PDFs (non-image files)
+        resource_type: "auto",   // ← changed from "raw"
         allowed_formats: ["pdf"],
         public_id: (req, file) => {
             const cleanName = file.originalname.replace(/\.[^/.]+$/, "").replace(/\s+/g, "_");
