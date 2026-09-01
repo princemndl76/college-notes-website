@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 const multer = require("multer");
-const { pyqStorage } = require("../config/cloudinary");
+const { pyqStorage, cloudinary } = require("../config/cloudinary");
 const upload = multer({ storage: pyqStorage });
 
 // ==================================================
@@ -90,6 +90,49 @@ router.post("/upload", upload.single("paperFile"), (req, res) => {
             return res.status(500).json({ success: false, message: "Upload failed" });
         }
         res.json({ success: true, message: "Paper uploaded", fileUrl });
+    });
+});
+
+
+// ==================================================
+// DELETE A PYQ PAPER
+// DELETE /api/pyq/:id
+// ==================================================
+router.delete("/:id", (req, res) => {
+
+    const { id } = req.params;
+
+    db.query("SELECT file_url FROM previous_year_papers WHERE id = ?", [id], (error, results) => {
+
+        if (error) {
+            console.error("PYQ Fetch Before Delete Error:", error);
+            return res.status(500).json({ success: false, message: "Unable to find paper" });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: "Paper not found" });
+        }
+
+        const fileUrl = results[0].file_url;
+
+        const matches = fileUrl.match(/college-notes\/pyq\/[^./]+/);
+        const publicId = matches ? matches[0] : null;
+
+        db.query("DELETE FROM previous_year_papers WHERE id = ?", [id], (deleteError) => {
+
+            if (deleteError) {
+                console.error("PYQ Delete Error:", deleteError);
+                return res.status(500).json({ success: false, message: "Delete failed" });
+            }
+
+            if (publicId) {
+                cloudinary.uploader.destroy(publicId, { resource_type: "auto" }, (cloudErr) => {
+                    if (cloudErr) console.error("Cloudinary Delete Error:", cloudErr);
+                });
+            }
+
+            res.json({ success: true, message: "Paper deleted" });
+        });
     });
 });
 
