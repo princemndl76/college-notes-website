@@ -6,3361 +6,1921 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-```
-<title>Admin Portal - College Notes</title>
+    <title>Admin Portal - College Notes</title>
 
-<style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        background: #f5f5f7;
-        margin: 0;
-        padding: 30px 16px;
-        color: #1a1a1a;
-    }
-
-    .wrap {
-        max-width: 1100px;
-        margin: 0 auto;
-    }
-
-    h1 {
-        text-align: center;
-        margin-bottom: 6px;
-        font-size: 30px;
-    }
-
-    .subtitle {
-        text-align: center;
-        color: #666;
-        margin-bottom: 25px;
-    }
-
-    /* ==============================
-       TABS
-    ============================== */
-
-    .tabs {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
-        background: #fff;
-        padding: 10px;
-        border: 2px solid #1a1a1a;
-        border-radius: 8px;
-    }
-
-    .tab-button {
-        background: #eee;
-        color: #111;
-        border: none;
-        padding: 12px 22px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 15px;
-    }
-
-    .tab-button:hover {
-        background: #ddd;
-    }
-
-    .tab-button.active {
-        background: #1a1a1a;
-        color: white;
-    }
-
-    .tab-panel {
-        display: none;
-    }
-
-    .tab-panel.active {
-        display: block;
-    }
-
-    /* ==============================
-       CARD
-    ============================== */
-
-    .card {
-        background: #fff;
-        border: 2px solid #1a1a1a;
-        border-radius: 8px;
-        padding: 25px;
-        margin-bottom: 20px;
-    }
-
-    .card h2 {
-        margin-top: 0;
-        font-size: 21px;
-    }
-
-    /* ==============================
-       FORMS
-    ============================== */
-
-    label {
-        display: block;
-        font-weight: bold;
-        margin: 15px 0 7px;
-    }
-
-    input,
-    select,
-    textarea {
-        width: 100%;
-        padding: 11px 13px;
-        font-size: 16px;
-        border: 1px solid #bbb;
-        border-radius: 5px;
-        font-family: inherit;
-    }
-
-    textarea {
-        min-height: 100px;
-        resize: vertical;
-    }
-
-    input[type="file"] {
-        background: #fff;
-    }
-
-    button {
-        padding: 11px 18px;
-        background: #1a1a1a;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        font-size: 15px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    button:hover {
-        opacity: 0.9;
-    }
-
-    button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    .edit-btn {
-        background: #444;
-    }
-
-    .delete-btn {
-        background: #c62828;
-    }
-
-    .secondary {
-        background: #666;
-    }
-
-    .form-actions {
-        margin-top: 20px;
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    /* ==============================
-       STATUS
-    ============================== */
-
-    .status-message {
-        margin-top: 12px;
-        min-height: 20px;
-        font-weight: bold;
-    }
-
-    .success {
-        color: #16803c;
-    }
-
-    .error {
-        color: #c62828;
-    }
-
-    /* ==============================
-       TABLE
-    ============================== */
-
-    .table-container {
-        overflow-x: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
-
-    th,
-    td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: left;
-    }
-
-    th {
-        background: #f0f0f0;
-    }
-
-    .row-actions {
-        display: flex;
-        gap: 7px;
-        flex-wrap: wrap;
-    }
-
-    /* ==============================
-       ACCESS DENIED
-    ============================== */
-
-    #accessDenied {
-        text-align: center;
-        padding: 70px 20px;
-    }
-
-    #accessDenied h2 {
-        font-size: 25px;
-    }
-
-    #accessDenied a {
-        color: #0066cc;
-    }
-
-    /* ==============================
-       PYQ
-    ============================== */
-
-    .pyq-info {
-        background: #f3f3f3;
-        border-left: 4px solid #1a1a1a;
-        padding: 12px;
-        margin-bottom: 20px;
-        border-radius: 4px;
-    }
-
-    .required {
-        color: #c62828;
-    }
-
-    /* ==============================
-       MOBILE
-    ============================== */
-
-    @media (max-width: 700px) {
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
         body {
-            padding: 20px 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f5f7;
+            margin: 0;
+            padding: 30px 16px;
+            color: #1a1a1a;
         }
 
-        .card {
-            padding: 18px;
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
         }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 6px;
+            font-size: 30px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        /* ==============================
+           TABS
+        ============================== */
 
         .tabs {
-            flex-direction: column;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 10px;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
         }
 
         .tab-button {
+            background: #eee;
+            color: #111;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .tab-button:hover {
+            background: #ddd;
+        }
+
+        .tab-button.active {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ==============================
+           CARD
+        ============================== */
+
+        .card {
+            background: #fff;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 21px;
+        }
+
+        /* ==============================
+           FORMS
+        ============================== */
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 15px 0 7px;
+        }
+
+        input,
+        select,
+        textarea {
             width: 100%;
+            padding: 11px 13px;
+            font-size: 16px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input[type="file"] {
+            background: #fff;
+        }
+
+        button {
+            padding: 11px 18px;
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .edit-btn {
+            background: #444;
+        }
+
+        .delete-btn {
+            background: #c62828;
+        }
+
+        .secondary {
+            background: #666;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ==============================
+           STATUS
+        ============================== */
+
+        .status-message {
+            margin-top: 12px;
+            min-height: 20px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #16803c;
+        }
+
+        .error {
+            color: #c62828;
+        }
+
+        /* ==============================
+           TABLE
+        ============================== */
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #f0f0f0;
         }
 
         .row-actions {
-            flex-direction: column;
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
         }
 
-        .row-actions button {
-            width: 100%;
-        }
-    }
-</style>
-```
+        /* ==============================
+           ACCESS DENIED
+        ============================== */
 
+        #accessDenied {
+            text-align: center;
+            padding: 70px 20px;
+        }
+
+        #accessDenied h2 {
+            font-size: 25px;
+        }
+
+        #accessDenied a {
+            color: #0066cc;
+        }
+
+        /* ==============================
+           PYQ
+        ============================== */
+
+        .pyq-info {
+            background: #f3f3f3;
+            border-left: 4px solid #1a1a1a;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .required {
+            color: #c62828;
+        }
+
+        /* ==============================
+           MOBILE
+        ============================== */
+
+        @media (max-width: 700px) {
+
+            body {
+                padding: 20px 10px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
+            }
+
+            .row-actions {
+                flex-direction: column;
+            }
+
+            .row-actions button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-```
-<!-- =========================================
-     ACCESS DENIED
-========================================== -->
+    <!-- =========================================
+         ACCESS DENIED
+    ========================================== -->
 
-<div id="accessDenied" style="display:none;">
+    <div id="accessDenied" style="display:none;">
 
-    <h2>Admins Only</h2>
+        <h2>Admins Only</h2>
 
-    <p>
-        You need to be logged in as an admin to view this page.
-    </p>
+        <p>
+            You need to be logged in as an admin to view this page.
+        </p>
 
-    <a href="login.html">
-        Go to Login
-    </a>
-
-</div>
-
-
-<!-- =========================================
-     ADMIN PANEL
-========================================== -->
-
-<div class="wrap" id="adminWrap" style="display:none;">
-
-    <h1>Admin Portal</h1>
-
-    <div class="subtitle">
-        Manage Subjects, Units, Contents, Notes and PYQs
-    </div>
-
-
-    <!-- =====================================
-         TABS
-    ====================================== -->
-
-    <div class="tabs">
-
-        <button class="tab-button active" data-tab="subjects">
-            Subjects
-        </button>
-
-        <button class="tab-button" data-tab="units">
-            Units
-        </button>
-
-        <button class="tab-button" data-tab="contents">
-            Contents
-        </button>
-
-        <button class="tab-button" data-tab="notes">
-            Notes
-        </button>
-
-        <button class="tab-button" data-tab="pyq">
-            PYQ
-        </button>
+        <a href="login.html">
+            Go to Login
+        </a>
 
     </div>
 
 
-    <!-- =====================================
-         SUBJECTS TAB
-    ====================================== -->
+    <!-- =========================================
+         ADMIN PANEL
+    ========================================== -->
 
-    <div id="tab-subjects" class="tab-panel active">
+    <div class="wrap" id="adminWrap" style="display:none;">
 
-        <div class="card">
+        <h1>Admin Portal</h1>
 
-            <h2 id="subjectFormTitle">
-                Add Subject
-            </h2>
-
-            <form id="subjectForm">
-
-                <input
-                    type="hidden"
-                    id="subjectId"
-                >
-
-                <label>
-                    Subject Name
-                </label>
-
-                <input
-                    type="text"
-                    id="subjectName"
-                    placeholder="e.g. Engineering Physics"
-                    required
-                >
-
-                <label>
-                    Subject Code
-                </label>
-
-                <input
-                    type="text"
-                    id="subjectCode"
-                    placeholder="e.g. PH3101"
-                    required
-                >
-
-                <label>
-                    Description
-                </label>
-
-                <textarea
-                    id="subjectDescription"
-                    placeholder="Subject description"
-                ></textarea>
-
-                <div class="form-actions">
-
-                    <button type="submit">
-                        Save Subject
-                    </button>
-
-                    <button
-                        type="button"
-                        id="cancelSubjectEdit"
-                        class="secondary"
-                    >
-                        Cancel
-                    </button>
-
-                </div>
-
-                <div
-                    id="subjectStatus"
-                    class="status-message"
-                ></div>
-
-            </form>
-
+        <div class="subtitle">
+            Manage Subjects, Units, Contents, Notes and PYQs
         </div>
 
 
-        <div class="card">
+        <!-- =====================================
+             TABS
+        ====================================== -->
 
-            <h2>
-                All Subjects
-            </h2>
+        <div class="tabs">
 
-            <div class="table-container">
+            <button class="tab-button active" data-tab="subjects">
+                Subjects
+            </button>
 
-                <table>
-
-                    <thead>
-
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Code</th>
-                            <th>Description</th>
-                            <th>Actions</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="subjectsTableBody">
-
-                        <tr>
-                            <td colspan="5">
-                                Loading...
-                            </td>
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================
-         UNITS TAB
-    ====================================== -->
-
-    <div id="tab-units" class="tab-panel">
-
-        <div class="card">
-
-            <h2 id="unitFormTitle">
-                Add Unit
-            </h2>
-
-            <form id="unitForm">
-
-                <input
-                    type="hidden"
-                    id="unitId"
-                >
-
-                <label>
-                    Subject
-                </label>
-
-                <select id="unitSubjectSelect" required>
-
-                    <option value="">
-                        -- Select Subject --
-                    </option>
-
-                </select>
-
-                <label>
-                    Unit Number
-                </label>
-
-                <input
-                    type="number"
-                    id="unitNumber"
-                    min="1"
-                    placeholder="e.g. 1"
-                    required
-                >
-
-                <label>
-                    Unit Name
-                </label>
-
-                <input
-                    type="text"
-                    id="unitName"
-                    placeholder="e.g. Relativistic Mechanics"
-                    required
-                >
-
-                <div class="form-actions">
-
-                    <button type="submit">
-                        Save Unit
-                    </button>
-
-                    <button
-                        type="button"
-                        id="cancelUnitEdit"
-                        class="secondary"
-                    >
-                        Cancel
-                    </button>
-
-                </div>
-
-                <div
-                    id="unitStatus"
-                    class="status-message"
-                ></div>
-
-            </form>
-
-        </div>
-
-
-        <div class="card">
-
-            <h2>
+            <button class="tab-button" data-tab="units">
                 Units
-            </h2>
+            </button>
 
-            <label>
-                Filter by Subject
-            </label>
-
-            <select id="unitsFilterSelect">
-
-                <option value="">
-                    -- Select Subject --
-                </option>
-
-            </select>
-
-            <div class="table-container">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-                            <th>ID</th>
-                            <th>Unit No.</th>
-                            <th>Unit Name</th>
-                            <th>Actions</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="unitsTableBody">
-
-                        <tr>
-                            <td colspan="4">
-                                Select a subject above
-                            </td>
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================
-         CONTENTS TAB
-    ====================================== -->
-
-    <div id="tab-contents" class="tab-panel">
-
-        <div class="card">
-
-            <h2 id="contentFormTitle">
-                Add Content
-            </h2>
-
-            <form id="contentForm">
-
-                <input
-                    type="hidden"
-                    id="contentId"
-                >
-
-                <label>
-                    Unit
-                </label>
-
-                <select
-                    id="contentUnitSelect"
-                    required
-                >
-
-                    <option value="">
-                        -- Select Unit --
-                    </option>
-
-                </select>
-
-                <label>
-                    Content Number
-                </label>
-
-                <input
-                    type="number"
-                    id="contentNumber"
-                    min="1"
-                    placeholder="e.g. 1"
-                    required
-                >
-
-                <label>
-                    Content Name
-                </label>
-
-                <input
-                    type="text"
-                    id="contentName"
-                    placeholder="e.g. Inertial and Non-Inertial Frames"
-                    required
-                >
-
-                <div class="form-actions">
-
-                    <button type="submit">
-                        Save Content
-                    </button>
-
-                    <button
-                        type="button"
-                        id="cancelContentEdit"
-                        class="secondary"
-                    >
-                        Cancel
-                    </button>
-
-                </div>
-
-                <div
-                    id="contentStatus"
-                    class="status-message"
-                ></div>
-
-            </form>
-
-        </div>
-
-
-        <div class="card">
-
-            <h2>
+            <button class="tab-button" data-tab="contents">
                 Contents
-            </h2>
+            </button>
 
-            <label>
-                Filter by Unit
-            </label>
-
-            <select id="contentsFilterSelect">
-
-                <option value="">
-                    -- Select Unit --
-                </option>
-
-            </select>
-
-            <div class="table-container">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-                            <th>ID</th>
-                            <th>No.</th>
-                            <th>Name</th>
-                            <th>Actions</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="contentsTableBody">
-
-                        <tr>
-                            <td colspan="4">
-                                Select a unit above
-                            </td>
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================
-         NOTES TAB
-    ====================================== -->
-
-    <div id="tab-notes" class="tab-panel">
-
-        <div class="card">
-
-            <h2 id="noteFormTitle">
-                Add Note
-            </h2>
-
-            <form id="noteForm">
-
-                <input
-                    type="hidden"
-                    id="noteId"
-                >
-
-                <input
-                    type="hidden"
-                    id="noteFileUrl"
-                >
-
-                <label>
-                    Content
-                </label>
-
-                <select
-                    id="noteContentSelect"
-                    required
-                >
-
-                    <option value="">
-                        -- Select Content --
-                    </option>
-
-                </select>
-
-                <label>
-                    Note Title
-                </label>
-
-                <input
-                    type="text"
-                    id="noteTitle"
-                    placeholder="e.g. Inertial Frames Notes"
-                    required
-                >
-
-                <label>
-                    Body
-                </label>
-
-                <textarea
-                    id="noteBody"
-                    placeholder="Write notes or description..."
-                ></textarea>
-
-                <label>
-                    PDF File
-                </label>
-
-                <input
-                    type="file"
-                    id="noteFileInput"
-                    accept="application/pdf"
-                >
-
-                <div
-                    id="currentFileLabel"
-                    style="margin-top:8px;color:#666;"
-                ></div>
-
-                <div class="form-actions">
-
-                    <button type="submit">
-                        Save Note
-                    </button>
-
-                    <button
-                        type="button"
-                        id="cancelNoteEdit"
-                        class="secondary"
-                    >
-                        Cancel
-                    </button>
-
-                </div>
-
-                <div
-                    id="uploadStatus"
-                    class="status-message"
-                ></div>
-
-                <div
-                    id="noteStatus"
-                    class="status-message"
-                ></div>
-
-            </form>
-
-        </div>
-
-
-        <div class="card">
-
-            <h2>
+            <button class="tab-button" data-tab="notes">
                 Notes
-            </h2>
+            </button>
 
-            <label>
-                Filter by Content
-            </label>
-
-            <select id="notesFilterSelect">
-
-                <option value="">
-                    -- Select Content --
-                </option>
-
-            </select>
-
-            <div class="form-actions">
-
-                <button
-                    type="button"
-                    id="deleteSelectedNotesBtn"
-                    class="delete-btn"
-                >
-                    Delete Selected
-                </button>
-
-            </div>
-
-            <div class="table-container">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                <input
-                                    type="checkbox"
-                                    id="selectAllNotes"
-                                >
-                            </th>
-
-                            <th>ID</th>
-                            <th>Title</th>
-                            <th>Body</th>
-                            <th>Actions</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="notesTableBody">
-
-                        <tr>
-
-                            <td colspan="5">
-                                Select a content above
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
+            <button class="tab-button" data-tab="pyq">
+                PYQ
+            </button>
 
         </div>
 
-    </div>
 
+        <!-- =====================================
+             SUBJECTS TAB
+        ====================================== -->
 
-    <!-- =====================================
-         PYQ TAB
-    ====================================== -->
+        <div id="tab-subjects" class="tab-panel active">
 
-    <div id="tab-pyq" class="tab-panel">
+            <div class="card">
 
-        <div class="card">
+                <h2 id="subjectFormTitle">
+                    Add Subject
+                </h2>
 
-            <h2>
-                Upload Previous Year Question Paper
-            </h2>
+                <form id="subjectForm">
 
-            <div class="pyq-info">
+                    <input type="hidden" id="subjectId">
 
-                <strong>PYQ Upload</strong>
+                    <label>Subject Name</label>
 
-                <p>
-                    Upload a PDF question paper and associate it
-                    with a semester, subject and examination year.
-                </p>
+                    <input type="text" id="subjectName" placeholder="e.g. Engineering Physics" required>
 
-                <p>
-                    The PDF will be uploaded to Cloudinary.
-                </p>
+                    <label>Subject Code</label>
+
+                    <input type="text" id="subjectCode" placeholder="e.g. PH3101" required>
+
+                    <label>Description</label>
+
+                    <textarea id="subjectDescription" placeholder="Subject description"></textarea>
+
+                    <div class="form-actions">
+
+                        <button type="submit">Save Subject</button>
+
+                        <button type="button" id="cancelSubjectEdit" class="secondary">Cancel</button>
+
+                    </div>
+
+                    <div id="subjectStatus" class="status-message"></div>
+
+                </form>
 
             </div>
 
 
-            <form id="pyqForm">
+            <div class="card">
 
-                <!-- SEMESTER ID -->
+                <h2>All Subjects</h2>
 
-                <label for="pyqSemesterId">
-                    Semester ID <span class="required">*</span>
-                </label>
+                <div class="table-container">
 
-                <input
-                    type="number"
-                    id="pyqSemesterId"
-                    min="1"
-                    placeholder="e.g. 1"
-                    required
-                >
+                    <table>
 
+                        <thead>
 
-                <!-- SUBJECT -->
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
 
-                <label for="pyqSubjectSelect">
-                    Subject <span class="required">*</span>
-                </label>
+                        </thead>
 
-                <select
-                    id="pyqSubjectSelect"
-                    required
-                >
+                        <tbody id="subjectsTableBody">
 
-                    <option value="">
-                        Loading subjects...
-                    </option>
+                            <tr>
+                                <td colspan="5">Loading...</td>
+                            </tr>
 
-                </select>
+                        </tbody>
 
-
-                <!-- YEAR -->
-
-                <label for="pyqExamYear">
-                    Exam Year <span class="required">*</span>
-                </label>
-
-                <input
-                    type="number"
-                    id="pyqExamYear"
-                    min="2000"
-                    max="2100"
-                    placeholder="e.g. 2025"
-                    required
-                >
-
-
-                <!-- TITLE -->
-
-                <label for="pyqPaperTitle">
-                    Paper Title <span class="required">*</span>
-                </label>
-
-                <input
-                    type="text"
-                    id="pyqPaperTitle"
-                    placeholder="e.g. Engineering Physics 2025 PYQ"
-                    required
-                >
-
-
-                <!-- DESCRIPTION -->
-
-                <label for="pyqDescription">
-                    Description
-                </label>
-
-                <textarea
-                    id="pyqDescription"
-                    placeholder="Optional description..."
-                ></textarea>
-
-
-                <!-- PDF -->
-
-                <label for="pyqFile">
-                    PDF File <span class="required">*</span>
-                </label>
-
-                <input
-                    type="file"
-                    id="pyqFile"
-                    accept="application/pdf"
-                    required
-                >
-
-
-                <!-- BUTTON -->
-
-                <div class="form-actions">
-
-                    <button
-                        type="submit"
-                        id="pyqUploadBtn"
-                    >
-                        Upload PYQ
-                    </button>
-
-                    <button
-                        type="button"
-                        id="pyqResetBtn"
-                        class="secondary"
-                    >
-                        Reset
-                    </button>
+                    </table>
 
                 </div>
 
+            </div>
 
-                <!-- STATUS -->
+        </div>
 
-                <div
-                    id="pyqStatus"
-                    class="status-message"
-                ></div>
 
-            </form>
+        <!-- =====================================
+             UNITS TAB
+        ====================================== -->
+
+        <div id="tab-units" class="tab-panel">
+
+            <div class="card">
+
+                <h2 id="unitFormTitle">Add Unit</h2>
+
+                <form id="unitForm">
+
+                    <input type="hidden" id="unitId">
+
+                    <label>Subject</label>
+
+                    <select id="unitSubjectSelect" required>
+                        <option value="">-- Select Subject --</option>
+                    </select>
+
+                    <label>Unit Number</label>
+
+                    <input type="number" id="unitNumber" min="1" placeholder="e.g. 1" required>
+
+                    <label>Unit Name</label>
+
+                    <input type="text" id="unitName" placeholder="e.g. Relativistic Mechanics" required>
+
+                    <div class="form-actions">
+
+                        <button type="submit">Save Unit</button>
+
+                        <button type="button" id="cancelUnitEdit" class="secondary">Cancel</button>
+
+                    </div>
+
+                    <div id="unitStatus" class="status-message"></div>
+
+                </form>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>Units</h2>
+
+                <label>Filter by Subject</label>
+
+                <select id="unitsFilterSelect">
+                    <option value="">-- Select Subject --</option>
+                </select>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>ID</th>
+                                <th>Unit No.</th>
+                                <th>Unit Name</th>
+                                <th>Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="unitsTableBody">
+
+                            <tr>
+                                <td colspan="4">Select a subject above</td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             CONTENTS TAB
+        ====================================== -->
+
+        <div id="tab-contents" class="tab-panel">
+
+            <div class="card">
+
+                <h2 id="contentFormTitle">Add Content</h2>
+
+                <form id="contentForm">
+
+                    <input type="hidden" id="contentId">
+
+                    <label>Unit</label>
+
+                    <select id="contentUnitSelect" required>
+                        <option value="">-- Select Unit --</option>
+                    </select>
+
+                    <label>Content Number</label>
+
+                    <input type="number" id="contentNumber" min="1" placeholder="e.g. 1" required>
+
+                    <label>Content Name</label>
+
+                    <input type="text" id="contentName" placeholder="e.g. Inertial and Non-Inertial Frames" required>
+
+                    <div class="form-actions">
+
+                        <button type="submit">Save Content</button>
+
+                        <button type="button" id="cancelContentEdit" class="secondary">Cancel</button>
+
+                    </div>
+
+                    <div id="contentStatus" class="status-message"></div>
+
+                </form>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>Contents</h2>
+
+                <label>Filter by Unit</label>
+
+                <select id="contentsFilterSelect">
+                    <option value="">-- Select Unit --</option>
+                </select>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>ID</th>
+                                <th>No.</th>
+                                <th>Name</th>
+                                <th>Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="contentsTableBody">
+
+                            <tr>
+                                <td colspan="4">Select a unit above</td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             NOTES TAB
+        ====================================== -->
+
+        <div id="tab-notes" class="tab-panel">
+
+            <div class="card">
+
+                <h2 id="noteFormTitle">Add Note</h2>
+
+                <form id="noteForm">
+
+                    <input type="hidden" id="noteId">
+
+                    <input type="hidden" id="noteFileUrl">
+
+                    <label>Content</label>
+
+                    <select id="noteContentSelect" required>
+                        <option value="">-- Select Content --</option>
+                    </select>
+
+                    <label>Note Title</label>
+
+                    <input type="text" id="noteTitle" placeholder="e.g. Inertial Frames Notes" required>
+
+                    <label>Body</label>
+
+                    <textarea id="noteBody" placeholder="Write notes or description..."></textarea>
+
+                    <label>PDF File</label>
+
+                    <input type="file" id="noteFileInput" accept="application/pdf">
+
+                    <div id="currentFileLabel" style="margin-top:8px;color:#666;"></div>
+
+                    <div class="form-actions">
+
+                        <button type="submit">Save Note</button>
+
+                        <button type="button" id="cancelNoteEdit" class="secondary">Cancel</button>
+
+                    </div>
+
+                    <div id="uploadStatus" class="status-message"></div>
+
+                    <div id="noteStatus" class="status-message"></div>
+
+                </form>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>Notes</h2>
+
+                <label>Filter by Content</label>
+
+                <select id="notesFilterSelect">
+                    <option value="">-- Select Content --</option>
+                </select>
+
+                <div class="form-actions">
+
+                    <button type="button" id="deleteSelectedNotesBtn" class="delete-btn">Delete Selected</button>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th><input type="checkbox" id="selectAllNotes"></th>
+
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Body</th>
+                                <th>Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="notesTableBody">
+
+                            <tr>
+
+                                <td colspan="5">Select a content above</td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             PYQ TAB
+        ====================================== -->
+
+        <div id="tab-pyq" class="tab-panel">
+
+            <div class="card">
+
+                <h2>Upload Previous Year Question Paper</h2>
+
+                <div class="pyq-info">
+
+                    <strong>PYQ Upload</strong>
+
+                    <p>Upload a PDF question paper and associate it with a semester, subject and examination year.</p>
+
+                    <p>The PDF will be uploaded to Cloudinary.</p>
+
+                </div>
+
+                <form id="pyqForm">
+
+                    <!-- SEMESTER ID -->
+
+                    <label for="pyqSemesterId">Semester ID <span class="required">*</span></label>
+
+                    <input type="number" id="pyqSemesterId" min="1" placeholder="e.g. 1" required>
+
+
+                    <!-- SUBJECT -->
+
+                    <label for="pyqSubjectSelect">Subject <span class="required">*</span></label>
+
+                    <select id="pyqSubjectSelect" required>
+                        <option value="">Loading subjects...</option>
+                    </select>
+
+
+                    <!-- YEAR -->
+
+                    <label for="pyqExamYear">Exam Year <span class="required">*</span></label>
+
+                    <input type="number" id="pyqExamYear" min="2000" max="2100" placeholder="e.g. 2025" required>
+
+
+                    <!-- TITLE -->
+
+                    <label for="pyqPaperTitle">Paper Title <span class="required">*</span></label>
+
+                    <input type="text" id="pyqPaperTitle" placeholder="e.g. Engineering Physics 2025 PYQ" required>
+
+
+                    <!-- DESCRIPTION -->
+
+                    <label for="pyqDescription">Description</label>
+
+                    <textarea id="pyqDescription" placeholder="Optional description..."></textarea>
+
+
+                    <!-- PDF -->
+
+                    <label for="pyqFile">PDF File <span class="required">*</span></label>
+
+                    <input type="file" id="pyqFile" accept="application/pdf" required>
+
+
+                    <!-- BUTTON -->
+
+                    <div class="form-actions">
+
+                        <button type="submit" id="pyqUploadBtn">Upload PYQ</button>
+
+                        <button type="button" id="pyqResetBtn" class="secondary">Reset</button>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div id="pyqStatus" class="status-message"></div>
+
+                </form>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>Manage PYQ Papers</h2>
+
+                <label>Semester ID</label>
+                <input type="number" id="pyqListSemesterId" placeholder="e.g. 1">
+
+                <label>Exam Year</label>
+                <input type="number" id="pyqListYear" placeholder="e.g. 2025">
+
+                <div class="form-actions">
+                    <button type="button" id="pyqLoadListBtn">Load Papers</button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Subject</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pyqTableBody">
+                            <tr><td colspan="4">Enter semester + year, then Load Papers</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
-</div>
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script>
+
+        /* =====================================================
+           API
+        ===================================================== */
+
+        const API_BASE_URL =
+            window.location.hostname === "localhost"
+                ? "http://localhost:5000"
+                : "https://college-notes-website-f64v.onrender.com";
+
+        const SUBJECT_API = `${API_BASE_URL}/api/subjects`;
+
+        const PYQ_API = `${API_BASE_URL}/api/pyq`;
 
 
-<!-- =========================================
-     JAVASCRIPT
-========================================== -->
+        /* =====================================================
+           CURRENT USER
+        ===================================================== */
 
-<script>
-
-    /* =====================================================
-       API
-    ===================================================== */
-
-    const API_BASE_URL =
-        window.location.hostname === "localhost"
-            ? "http://localhost:5000"
-            : "https://college-notes-website-f64v.onrender.com";
-
-    const SUBJECT_API =
-        `${API_BASE_URL}/api/subjects`;
-
-    const PYQ_API =
-        `${API_BASE_URL}/api/pyq`;
-
-
-    /* =====================================================
-       CURRENT USER
-    ===================================================== */
-
-    let currentUser = null;
-
-    try {
-
-        currentUser =
-            JSON.parse(localStorage.getItem("user"));
-
-    } catch (error) {
-
-        currentUser = null;
-
-    }
-
-
-    /* =====================================================
-       ADMIN SECURITY
-    ===================================================== */
-
-    if (
-        !currentUser ||
-        currentUser.role !== "admin"
-    ) {
-
-        document.getElementById(
-            "accessDenied"
-        ).style.display = "block";
-
-        throw new Error(
-            "Admin access only"
-        );
-    }
-
-
-    document.getElementById(
-        "adminWrap"
-    ).style.display = "block";
-
-
-    /* =====================================================
-       AUTH HEADERS
-    ===================================================== */
-
-    function authHeaders(extra = {}) {
-
-        const token =
-            localStorage.getItem("token");
-
-        const headers = {
-            ...extra
-        };
-
-        if (token) {
-
-            headers["Authorization"] =
-                "Bearer " + token;
-
-        }
-
-        /*
-         * Your previous admin page used x-user-email.
-         * Keep it because your backend may use it
-         * for admin verification.
-         */
-
-        if (currentUser.email) {
-
-            headers["x-user-email"] =
-                currentUser.email;
-
-        }
-
-        return headers;
-    }
-
-
-    /* =====================================================
-       JSON RESPONSE HELPER
-    ===================================================== */
-
-    async function getJson(response) {
-
-        let data;
+        let currentUser = null;
 
         try {
-
-            data = await response.json();
-
+            currentUser = JSON.parse(localStorage.getItem("user"));
         } catch (error) {
-
-            throw new Error(
-                `Server returned status ${response.status}`
-            );
-
+            currentUser = null;
         }
 
-        if (!response.ok) {
 
-            throw new Error(
-                data.message ||
-                `Server error ${response.status}`
-            );
+        /* =====================================================
+           ADMIN SECURITY
+        ===================================================== */
 
+        if (!currentUser || currentUser.role !== "admin") {
+
+            document.getElementById("accessDenied").style.display = "block";
+
+            throw new Error("Admin access only");
         }
 
-        return data;
-    }
+
+        document.getElementById("adminWrap").style.display = "block";
 
 
-    /* =====================================================
-       STATUS
-    ===================================================== */
+        /* =====================================================
+           AUTH HEADERS
+        ===================================================== */
 
-    function showStatus(
-        elementId,
-        message,
-        isError = false
-    ) {
+        function authHeaders(extra = {}) {
 
-        const element =
-            document.getElementById(elementId);
+            const token = localStorage.getItem("token");
 
-        if (!element) return;
+            const headers = { ...extra };
 
-        element.textContent = message;
+            if (token) {
+                headers["Authorization"] = "Bearer " + token;
+            }
 
-        element.className =
-            "status-message " +
-            (isError
-                ? "error"
-                : "success");
-    }
+            /*
+             * Your previous admin page used x-user-email.
+             * Keep it because your backend may use it
+             * for admin verification.
+             */
 
+            if (currentUser.email) {
+                headers["x-user-email"] = currentUser.email;
+            }
 
-    /* =====================================================
-       TAB SWITCHING
-    ===================================================== */
-
-    const tabButtons =
-        document.querySelectorAll(
-            ".tab-button"
-        );
-
-    const tabPanels =
-        document.querySelectorAll(
-            ".tab-panel"
-        );
+            return headers;
+        }
 
 
-    tabButtons.forEach(button => {
+        /* =====================================================
+           JSON RESPONSE HELPER
+        ===================================================== */
 
-        button.addEventListener(
-            "click",
-            function () {
+        async function getJson(response) {
 
-                tabButtons.forEach(btn =>
-                    btn.classList.remove("active")
-                );
+            let data;
 
-                tabPanels.forEach(panel =>
-                    panel.classList.remove("active")
-                );
+            try {
+                data = await response.json();
+            } catch (error) {
+                throw new Error(`Server returned status ${response.status}`);
+            }
 
+            if (!response.ok) {
+                throw new Error(data.message || `Server error ${response.status}`);
+            }
+
+            return data;
+        }
+
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        function showStatus(elementId, message, isError = false) {
+
+            const element = document.getElementById(elementId);
+
+            if (!element) return;
+
+            element.textContent = message;
+
+            element.className = "status-message " + (isError ? "error" : "success");
+        }
+
+
+        /* =====================================================
+           TAB SWITCHING
+        ===================================================== */
+
+        const tabButtons = document.querySelectorAll(".tab-button");
+
+        const tabPanels = document.querySelectorAll(".tab-panel");
+
+
+        tabButtons.forEach(button => {
+
+            button.addEventListener("click", function () {
+
+                tabButtons.forEach(btn => btn.classList.remove("active"));
+
+                tabPanels.forEach(panel => panel.classList.remove("active"));
 
                 this.classList.add("active");
 
+                const tabName = this.dataset.tab;
 
-                const tabName =
-                    this.dataset.tab;
-
-                const panel =
-                    document.getElementById(
-                        "tab-" + tabName
-                    );
+                const panel = document.getElementById("tab-" + tabName);
 
                 if (panel) {
-
                     panel.classList.add("active");
-
                 }
 
-            }
-        );
-
-    });
-
-
-    /* =====================================================
-       SELECT HELPER
-    ===================================================== */
-
-    function populateSelect(
-        selectElement,
-        items,
-        valueKey,
-        labelFunction,
-        placeholder
-    ) {
-
-        selectElement.innerHTML = "";
-
-        const placeholderOption =
-            document.createElement("option");
-
-        placeholderOption.value = "";
-        placeholderOption.textContent =
-            placeholder;
-
-        selectElement.appendChild(
-            placeholderOption
-        );
-
-
-        items.forEach(item => {
-
-            const option =
-                document.createElement("option");
-
-            option.value =
-                item[valueKey];
-
-            option.textContent =
-                labelFunction(item);
-
-            selectElement.appendChild(
-                option
-            );
+            });
 
         });
 
-    }
 
+        /* =====================================================
+           SELECT HELPER
+        ===================================================== */
 
-    /* =====================================================
-       SUBJECTS
-    ===================================================== */
+        function populateSelect(selectElement, items, valueKey, labelFunction, placeholder) {
 
-    const subjectForm =
-        document.getElementById(
-            "subjectForm"
-        );
+            selectElement.innerHTML = "";
 
-    const subjectsTableBody =
-        document.getElementById(
-            "subjectsTableBody"
-        );
+            const placeholderOption = document.createElement("option");
 
-    let allSubjects = [];
+            placeholderOption.value = "";
+            placeholderOption.textContent = placeholder;
 
+            selectElement.appendChild(placeholderOption);
 
-    async function loadSubjectsAdmin() {
+            items.forEach(item => {
 
-        try {
+                const option = document.createElement("option");
 
-            const response =
-                await fetch(
-                    SUBJECT_API
-                );
+                option.value = item[valueKey];
 
-            const data =
-                await getJson(response);
+                option.textContent = labelFunction(item);
 
+                selectElement.appendChild(option);
 
-            if (!data.success) {
-
-                throw new Error(
-                    data.message ||
-                    "Unable to load subjects"
-                );
-
-            }
-
-
-            allSubjects =
-                data.subjects || [];
-
-
-            renderSubjectsTable();
-
-
-            /* UNIT SUBJECT */
-
-            populateSelect(
-
-                document.getElementById(
-                    "unitSubjectSelect"
-                ),
-
-                allSubjects,
-
-                "id",
-
-                subject =>
-                    `${subject.subject_name} (${subject.subject_code})`,
-
-                "-- Select Subject --"
-
-            );
-
-
-            /* UNIT FILTER */
-
-            populateSelect(
-
-                document.getElementById(
-                    "unitsFilterSelect"
-                ),
-
-                allSubjects,
-
-                "id",
-
-                subject =>
-                    `${subject.subject_name} (${subject.subject_code})`,
-
-                "-- Select Subject --"
-
-            );
-
-
-            /* PYQ SUBJECT */
-
-            populateSelect(
-
-                document.getElementById(
-                    "pyqSubjectSelect"
-                ),
-
-                allSubjects,
-
-                "id",
-
-                subject =>
-                    `${subject.subject_name} (${subject.subject_code})`,
-
-                "-- Select Subject --"
-
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Subject error:",
-                error
-            );
-
-            subjectsTableBody.innerHTML =
-                `<tr>
-                    <td colspan="5">
-                        Unable to load subjects.
-                    </td>
-                </tr>`;
-
-
-            document.getElementById(
-                "pyqSubjectSelect"
-            ).innerHTML =
-                `<option value="">
-                    Could not load subjects
-                </option>`;
-
-        }
-
-    }
-
-
-    function renderSubjectsTable() {
-
-        subjectsTableBody.innerHTML = "";
-
-
-        if (allSubjects.length === 0) {
-
-            subjectsTableBody.innerHTML =
-                `<tr>
-                    <td colspan="5">
-                        No subjects yet.
-                    </td>
-                </tr>`;
-
-            return;
+            });
 
         }
 
 
-        allSubjects.forEach(subject => {
+        /* =====================================================
+           SUBJECTS
+        ===================================================== */
 
-            const row =
-                document.createElement("tr");
+        const subjectForm = document.getElementById("subjectForm");
 
+        const subjectsTableBody = document.getElementById("subjectsTableBody");
 
-            row.innerHTML = `
-
-                <td>
-                    ${subject.id}
-                </td>
-
-                <td>
-                    ${subject.subject_name}
-                </td>
-
-                <td>
-                    ${subject.subject_code}
-                </td>
-
-                <td>
-                    ${subject.description || ""}
-                </td>
-
-                <td class="row-actions">
-
-                    <button
-                        class="edit-btn"
-                        onclick="editSubject(${subject.id})"
-                    >
-                        Edit
-                    </button>
-
-                    <button
-                        class="delete-btn"
-                        onclick="deleteSubject(${subject.id})"
-                    >
-                        Delete
-                    </button>
-
-                </td>
-
-            `;
+        let allSubjects = [];
 
 
-            subjectsTableBody.appendChild(
-                row
-            );
-
-        });
-
-    }
-
-
-    subjectForm.addEventListener(
-        "submit",
-        async function (event) {
-
-            event.preventDefault();
-
-
-            const id =
-                document.getElementById(
-                    "subjectId"
-                ).value;
-
-
-            const payload = {
-
-                subject_name:
-                    document.getElementById(
-                        "subjectName"
-                    ).value.trim(),
-
-                subject_code:
-                    document.getElementById(
-                        "subjectCode"
-                    ).value.trim(),
-
-                description:
-                    document.getElementById(
-                        "subjectDescription"
-                    ).value.trim()
-
-            };
-
+        async function loadSubjectsAdmin() {
 
             try {
 
-                const response =
-                    await fetch(
+                const response = await fetch(SUBJECT_API);
 
-                        id
-                            ? `${SUBJECT_API}/${id}`
-                            : SUBJECT_API,
+                const data = await getJson(response);
 
-                        {
+                if (!data.success) {
+                    throw new Error(data.message || "Unable to load subjects");
+                }
 
-                            method:
-                                id
-                                    ? "PUT"
-                                    : "POST",
+                allSubjects = data.subjects || [];
 
-                            headers:
-                                authHeaders({
-                                    "Content-Type":
-                                        "application/json"
-                                }),
+                renderSubjectsTable();
 
-                            body:
-                                JSON.stringify(
-                                    payload
-                                )
+                /* UNIT SUBJECT */
 
-                        }
-
-                    );
-
-
-                const data =
-                    await getJson(
-                        response
-                    );
-
-
-                showStatus(
-                    "subjectStatus",
-                    id
-                        ? "Subject updated!"
-                        : "Subject created!"
+                populateSelect(
+                    document.getElementById("unitSubjectSelect"),
+                    allSubjects,
+                    "id",
+                    subject => `${subject.subject_name} (${subject.subject_code})`,
+                    "-- Select Subject --"
                 );
 
+                /* UNIT FILTER */
+
+                populateSelect(
+                    document.getElementById("unitsFilterSelect"),
+                    allSubjects,
+                    "id",
+                    subject => `${subject.subject_name} (${subject.subject_code})`,
+                    "-- Select Subject --"
+                );
+
+                /* PYQ SUBJECT */
+
+                populateSelect(
+                    document.getElementById("pyqSubjectSelect"),
+                    allSubjects,
+                    "id",
+                    subject => `${subject.subject_name} (${subject.subject_code})`,
+                    "-- Select Subject --"
+                );
+
+            } catch (error) {
+
+                console.error("Subject error:", error);
+
+                subjectsTableBody.innerHTML = `<tr><td colspan="5">Unable to load subjects.</td></tr>`;
+
+                document.getElementById("pyqSubjectSelect").innerHTML =
+                    `<option value="">Could not load subjects</option>`;
+
+            }
+
+        }
+
+
+        function renderSubjectsTable() {
+
+            subjectsTableBody.innerHTML = "";
+
+            if (allSubjects.length === 0) {
+                subjectsTableBody.innerHTML = `<tr><td colspan="5">No subjects yet.</td></tr>`;
+                return;
+            }
+
+            allSubjects.forEach(subject => {
+
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${subject.id}</td>
+                    <td>${subject.subject_name}</td>
+                    <td>${subject.subject_code}</td>
+                    <td>${subject.description || ""}</td>
+                    <td class="row-actions">
+                        <button class="edit-btn" onclick="editSubject(${subject.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteSubject(${subject.id})">Delete</button>
+                    </td>
+                `;
+
+                subjectsTableBody.appendChild(row);
+
+            });
+
+        }
+
+
+        subjectForm.addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+            const id = document.getElementById("subjectId").value;
+
+            const payload = {
+                subject_name: document.getElementById("subjectName").value.trim(),
+                subject_code: document.getElementById("subjectCode").value.trim(),
+                description: document.getElementById("subjectDescription").value.trim()
+            };
+
+            try {
+
+                const response = await fetch(
+                    id ? `${SUBJECT_API}/${id}` : SUBJECT_API,
+                    {
+                        method: id ? "PUT" : "POST",
+                        headers: authHeaders({ "Content-Type": "application/json" }),
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                await getJson(response);
+
+                showStatus("subjectStatus", id ? "Subject updated!" : "Subject created!");
 
                 resetSubjectForm();
 
                 await loadSubjectsAdmin();
 
+            } catch (error) {
+
+                console.error(error);
+
+                showStatus("subjectStatus", error.message, true);
+
+            }
+
+        });
+
+
+        function editSubject(id) {
+
+            const subject = allSubjects.find(item => item.id === id);
+
+            if (!subject) return;
+
+            document.getElementById("subjectFormTitle").textContent = "Edit Subject";
+
+            document.getElementById("subjectId").value = subject.id;
+
+            document.getElementById("subjectName").value = subject.subject_name;
+
+            document.getElementById("subjectCode").value = subject.subject_code;
+
+            document.getElementById("subjectDescription").value = subject.description || "";
+
+        }
+
+
+        async function deleteSubject(id) {
+
+            if (!confirm("Delete this subject? This may fail if it still has units.")) return;
+
+            try {
+
+                const response = await fetch(`${SUBJECT_API}/${id}`, {
+                    method: "DELETE",
+                    headers: authHeaders()
+                });
+
+                await getJson(response);
+
+                showStatus("subjectStatus", "Subject deleted.");
+
+                await loadSubjectsAdmin();
+
+            } catch (error) {
+                showStatus("subjectStatus", error.message, true);
+            }
+
+        }
+
+
+        function resetSubjectForm() {
+
+            document.getElementById("subjectFormTitle").textContent = "Add Subject";
+
+            document.getElementById("subjectId").value = "";
+
+            subjectForm.reset();
+
+        }
+
+
+        document.getElementById("cancelSubjectEdit").addEventListener("click", resetSubjectForm);
+
+
+        /* =====================================================
+           UNITS
+        ===================================================== */
+
+        const unitForm = document.getElementById("unitForm");
+
+        const unitsTableBody = document.getElementById("unitsTableBody");
+
+        const unitsFilterSelect = document.getElementById("unitsFilterSelect");
+
+        let currentUnits = [];
+
+
+        unitsFilterSelect.addEventListener("change", function () {
+            loadUnitsForSubject(this.value);
+        });
+
+
+        async function loadUnitsForSubject(subjectId) {
+
+            if (!subjectId) {
+                unitsTableBody.innerHTML = `<tr><td colspan="4">Select a subject above</td></tr>`;
+                currentUnits = [];
+                return;
+            }
+
+            try {
+
+                const response = await fetch(`${SUBJECT_API}/${subjectId}/units`);
+
+                const data = await getJson(response);
+
+                currentUnits = data.units || [];
+
+                renderUnitsTable();
+
+                populateSelect(
+                    document.getElementById("contentUnitSelect"),
+                    currentUnits,
+                    "id",
+                    unit => `Unit ${unit.unit_number}: ${unit.unit_name}`,
+                    "-- Select Unit --"
+                );
+
+                populateSelect(
+                    document.getElementById("contentsFilterSelect"),
+                    currentUnits,
+                    "id",
+                    unit => `Unit ${unit.unit_number}: ${unit.unit_name}`,
+                    "-- Select Unit --"
+                );
 
             } catch (error) {
 
                 console.error(error);
 
-                showStatus(
-                    "subjectStatus",
-                    error.message,
-                    true
-                );
+                unitsTableBody.innerHTML = `<tr><td colspan="4">Unable to load units.</td></tr>`;
 
             }
 
         }
-    );
 
 
-    function editSubject(id) {
+        function renderUnitsTable() {
 
-        const subject =
-            allSubjects.find(
-                item =>
-                    item.id === id
-            );
+            unitsTableBody.innerHTML = "";
 
-        if (!subject) return;
+            if (currentUnits.length === 0) {
+                unitsTableBody.innerHTML = `<tr><td colspan="4">No units yet.</td></tr>`;
+                return;
+            }
 
+            currentUnits.forEach(unit => {
 
-        document.getElementById(
-            "subjectFormTitle"
-        ).textContent =
-            "Edit Subject";
+                const row = document.createElement("tr");
 
-
-        document.getElementById(
-            "subjectId"
-        ).value =
-            subject.id;
-
-
-        document.getElementById(
-            "subjectName"
-        ).value =
-            subject.subject_name;
-
-
-        document.getElementById(
-            "subjectCode"
-        ).value =
-            subject.subject_code;
-
-
-        document.getElementById(
-            "subjectDescription"
-        ).value =
-            subject.description || "";
-
-    }
-
-
-    async function deleteSubject(id) {
-
-        if (
-            !confirm(
-                "Delete this subject? This may fail if it still has units."
-            )
-        ) return;
-
-
-        try {
-
-            const response =
-                await fetch(
-
-                    `${SUBJECT_API}/${id}`,
-
-                    {
-                        method: "DELETE",
-                        headers:
-                            authHeaders()
-                    }
-
-                );
-
-
-            const data =
-                await getJson(
-                    response
-                );
-
-
-            showStatus(
-                "subjectStatus",
-                "Subject deleted."
-            );
-
-
-            await loadSubjectsAdmin();
-
-
-        } catch (error) {
-
-            showStatus(
-                "subjectStatus",
-                error.message,
-                true
-            );
-
-        }
-
-    }
-
-
-    function resetSubjectForm() {
-
-        document.getElementById(
-            "subjectFormTitle"
-        ).textContent =
-            "Add Subject";
-
-
-        document.getElementById(
-            "subjectId"
-        ).value = "";
-
-
-        subjectForm.reset();
-
-    }
-
-
-    document.getElementById(
-        "cancelSubjectEdit"
-    ).addEventListener(
-        "click",
-        resetSubjectForm
-    );
-
-
-    /* =====================================================
-       UNITS
-    ===================================================== */
-
-    const unitForm =
-        document.getElementById(
-            "unitForm"
-        );
-
-    const unitsTableBody =
-        document.getElementById(
-            "unitsTableBody"
-        );
-
-    const unitsFilterSelect =
-        document.getElementById(
-            "unitsFilterSelect"
-        );
-
-    let currentUnits = [];
-
-
-    unitsFilterSelect.addEventListener(
-        "change",
-        function () {
-
-            loadUnitsForSubject(
-                this.value
-            );
-
-        }
-    );
-
-
-    async function loadUnitsForSubject(
-        subjectId
-    ) {
-
-        if (!subjectId) {
-
-            unitsTableBody.innerHTML =
-                `<tr>
-                    <td colspan="4">
-                        Select a subject above
+                row.innerHTML = `
+                    <td>${unit.id}</td>
+                    <td>${unit.unit_number}</td>
+                    <td>${unit.unit_name}</td>
+                    <td class="row-actions">
+                        <button class="edit-btn" onclick="editUnit(${unit.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteUnit(${unit.id})">Delete</button>
                     </td>
-                </tr>`;
+                `;
 
-            currentUnits = [];
+                unitsTableBody.appendChild(row);
 
-            return;
-
-        }
-
-
-        try {
-
-            const response =
-                await fetch(
-                    `${SUBJECT_API}/${subjectId}/units`
-                );
-
-
-            const data =
-                await getJson(
-                    response
-                );
-
-
-            currentUnits =
-                data.units || [];
-
-
-            renderUnitsTable();
-
-
-            populateSelect(
-
-                document.getElementById(
-                    "contentUnitSelect"
-                ),
-
-                currentUnits,
-
-                "id",
-
-                unit =>
-                    `Unit ${unit.unit_number}: ${unit.unit_name}`,
-
-                "-- Select Unit --"
-
-            );
-
-
-            populateSelect(
-
-                document.getElementById(
-                    "contentsFilterSelect"
-                ),
-
-                currentUnits,
-
-                "id",
-
-                unit =>
-                    `Unit ${unit.unit_number}: ${unit.unit_name}`,
-
-                "-- Select Unit --"
-
-            );
-
-
-        } catch (error) {
-
-            console.error(error);
-
-            unitsTableBody.innerHTML =
-                `<tr>
-                    <td colspan="4">
-                        Unable to load units.
-                    </td>
-                </tr>`;
-
-        }
-
-    }
-
-
-    function renderUnitsTable() {
-
-        unitsTableBody.innerHTML = "";
-
-
-        if (currentUnits.length === 0) {
-
-            unitsTableBody.innerHTML =
-                `<tr>
-                    <td colspan="4">
-                        No units yet.
-                    </td>
-                </tr>`;
-
-            return;
+            });
 
         }
 
 
-        currentUnits.forEach(unit => {
-
-            const row =
-                document.createElement("tr");
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${unit.id}
-                </td>
-
-                <td>
-                    ${unit.unit_number}
-                </td>
-
-                <td>
-                    ${unit.unit_name}
-                </td>
-
-                <td class="row-actions">
-
-                    <button
-                        class="edit-btn"
-                        onclick="editUnit(${unit.id})"
-                    >
-                        Edit
-                    </button>
-
-                    <button
-                        class="delete-btn"
-                        onclick="deleteUnit(${unit.id})"
-                    >
-                        Delete
-                    </button>
-
-                </td>
-
-            `;
-
-
-            unitsTableBody.appendChild(
-                row
-            );
-
-        });
-
-    }
-
-
-    unitForm.addEventListener(
-        "submit",
-        async function (event) {
+        unitForm.addEventListener("submit", async function (event) {
 
             event.preventDefault();
 
+            const id = document.getElementById("unitId").value;
 
-            const id =
-                document.getElementById(
-                    "unitId"
-                ).value;
-
-
-            const subjectId =
-                document.getElementById(
-                    "unitSubjectSelect"
-                ).value;
-
+            const subjectId = document.getElementById("unitSubjectSelect").value;
 
             if (!subjectId) {
-
-                showStatus(
-                    "unitStatus",
-                    "Please select a subject.",
-                    true
-                );
-
+                showStatus("unitStatus", "Please select a subject.", true);
                 return;
-
             }
 
-
             const payload = {
-
-                subject_id:
-                    subjectId,
-
-                unit_number:
-                    document.getElementById(
-                        "unitNumber"
-                    ).value,
-
-                unit_name:
-                    document.getElementById(
-                        "unitName"
-                    ).value.trim()
-
+                subject_id: subjectId,
+                unit_number: document.getElementById("unitNumber").value,
+                unit_name: document.getElementById("unitName").value.trim()
             };
-
 
             try {
 
-                const response =
-                    await fetch(
-
-                        id
-                            ? `${SUBJECT_API}/units/${id}`
-                            : `${SUBJECT_API}/units`,
-
-                        {
-
-                            method:
-                                id
-                                    ? "PUT"
-                                    : "POST",
-
-                            headers:
-                                authHeaders({
-                                    "Content-Type":
-                                        "application/json"
-                                }),
-
-                            body:
-                                JSON.stringify(
-                                    payload
-                                )
-
-                        }
-
-                    );
-
-
-                const data =
-                    await getJson(
-                        response
-                    );
-
-
-                showStatus(
-                    "unitStatus",
-                    id
-                        ? "Unit updated!"
-                        : "Unit created!"
+                const response = await fetch(
+                    id ? `${SUBJECT_API}/units/${id}` : `${SUBJECT_API}/units`,
+                    {
+                        method: id ? "PUT" : "POST",
+                        headers: authHeaders({ "Content-Type": "application/json" }),
+                        body: JSON.stringify(payload)
+                    }
                 );
 
+                await getJson(response);
+
+                showStatus("unitStatus", id ? "Unit updated!" : "Unit created!");
 
                 resetUnitForm();
 
-
-                if (
-                    unitsFilterSelect.value ===
-                    String(subjectId)
-                ) {
-
-                    await loadUnitsForSubject(
-                        subjectId
-                    );
-
+                if (unitsFilterSelect.value === String(subjectId)) {
+                    await loadUnitsForSubject(subjectId);
                 }
 
             } catch (error) {
-
-                showStatus(
-                    "unitStatus",
-                    error.message,
-                    true
-                );
-
+                showStatus("unitStatus", error.message, true);
             }
-
-        }
-    );
-
-
-    function editUnit(id) {
-
-        const unit =
-            currentUnits.find(
-                item =>
-                    item.id === id
-            );
-
-        if (!unit) return;
-
-
-        document.getElementById(
-            "unitFormTitle"
-        ).textContent =
-            "Edit Unit";
-
-
-        document.getElementById(
-            "unitId"
-        ).value =
-            unit.id;
-
-
-        document.getElementById(
-            "unitSubjectSelect"
-        ).value =
-            unit.subject_id;
-
-
-        document.getElementById(
-            "unitNumber"
-        ).value =
-            unit.unit_number;
-
-
-        document.getElementById(
-            "unitName"
-        ).value =
-            unit.unit_name;
-
-    }
-
-
-    async function deleteUnit(id) {
-
-        if (
-            !confirm(
-                "Delete this unit?"
-            )
-        ) return;
-
-
-        try {
-
-            const response =
-                await fetch(
-
-                    `${SUBJECT_API}/units/${id}`,
-
-                    {
-                        method: "DELETE",
-                        headers:
-                            authHeaders()
-                    }
-
-                );
-
-
-            await getJson(
-                response
-            );
-
-
-            showStatus(
-                "unitStatus",
-                "Unit deleted."
-            );
-
-
-            await loadUnitsForSubject(
-                unitsFilterSelect.value
-            );
-
-
-        } catch (error) {
-
-            showStatus(
-                "unitStatus",
-                error.message,
-                true
-            );
-
-        }
-
-    }
-
-
-    function resetUnitForm() {
-
-        document.getElementById(
-            "unitFormTitle"
-        ).textContent =
-            "Add Unit";
-
-
-        document.getElementById(
-            "unitId"
-        ).value = "";
-
-
-        unitForm.reset();
-
-    }
-
-
-    document.getElementById(
-        "cancelUnitEdit"
-    ).addEventListener(
-        "click",
-        resetUnitForm
-    );
-
-
-    /* =====================================================
-       CONTENTS
-    ===================================================== */
-
-    const contentForm =
-        document.getElementById(
-            "contentForm"
-        );
-
-    const contentsTableBody =
-        document.getElementById(
-            "contentsTableBody"
-        );
-
-    const contentsFilterSelect =
-        document.getElementById(
-            "contentsFilterSelect"
-        );
-
-    let currentContents = [];
-
-
-    contentsFilterSelect.addEventListener(
-        "change",
-        function () {
-
-            loadContentsForUnit(
-                this.value
-            );
-
-        }
-    );
-
-
-    async function loadContentsForUnit(
-        unitId
-    ) {
-
-        if (!unitId) {
-
-            contentsTableBody.innerHTML =
-                `<tr>
-                    <td colspan="4">
-                        Select a unit above
-                    </td>
-                </tr>`;
-
-            currentContents = [];
-
-            return;
-
-        }
-
-
-        try {
-
-            const response =
-                await fetch(
-                    `${SUBJECT_API}/unit/${unitId}/contents`
-                );
-
-
-            const data =
-                await getJson(
-                    response
-                );
-
-
-            currentContents =
-                data.contents || [];
-
-
-            renderContentsTable();
-
-
-            populateSelect(
-
-                document.getElementById(
-                    "noteContentSelect"
-                ),
-
-                currentContents,
-
-                "id",
-
-                content =>
-                    `${content.content_number}. ${content.content_name}`,
-
-                "-- Select Content --"
-
-            );
-
-
-            populateSelect(
-
-                document.getElementById(
-                    "notesFilterSelect"
-                ),
-
-                currentContents,
-
-                "id",
-
-                content =>
-                    `${content.content_number}. ${content.content_name}`,
-
-                "-- Select Content --"
-
-            );
-
-
-        } catch (error) {
-
-            console.error(error);
-
-            contentsTableBody.innerHTML =
-                `<tr>
-                    <td colspan="4">
-                        Unable to load contents.
-                    </td>
-                </tr>`;
-
-        }
-
-    }
-
-
-    function renderContentsTable() {
-
-        contentsTableBody.innerHTML = "";
-
-
-        if (currentContents.length === 0) {
-
-            contentsTableBody.innerHTML =
-                `<tr>
-                    <td colspan="4">
-                        No contents yet.
-                    </td>
-                </tr>`;
-
-            return;
-
-        }
-
-
-        currentContents.forEach(content => {
-
-            const row =
-                document.createElement("tr");
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${content.id}
-                </td>
-
-                <td>
-                    ${content.content_number}
-                </td>
-
-                <td>
-                    ${content.content_name}
-                </td>
-
-                <td class="row-actions">
-
-                    <button
-                        class="edit-btn"
-                        onclick="editContent(${content.id})"
-                    >
-                        Edit
-                    </button>
-
-                    <button
-                        class="delete-btn"
-                        onclick="deleteContent(${content.id})"
-                    >
-                        Delete
-                    </button>
-
-                </td>
-
-            `;
-
-
-            contentsTableBody.appendChild(
-                row
-            );
 
         });
 
-    }
+
+        function editUnit(id) {
+
+            const unit = currentUnits.find(item => item.id === id);
+
+            if (!unit) return;
+
+            document.getElementById("unitFormTitle").textContent = "Edit Unit";
+
+            document.getElementById("unitId").value = unit.id;
+
+            document.getElementById("unitSubjectSelect").value = unit.subject_id;
+
+            document.getElementById("unitNumber").value = unit.unit_number;
+
+            document.getElementById("unitName").value = unit.unit_name;
+
+        }
 
 
-    contentForm.addEventListener(
-        "submit",
-        async function (event) {
+        async function deleteUnit(id) {
 
-            event.preventDefault();
+            if (!confirm("Delete this unit?")) return;
+
+            try {
+
+                const response = await fetch(`${SUBJECT_API}/units/${id}`, {
+                    method: "DELETE",
+                    headers: authHeaders()
+                });
+
+                await getJson(response);
+
+                showStatus("unitStatus", "Unit deleted.");
+
+                await loadUnitsForSubject(unitsFilterSelect.value);
+
+            } catch (error) {
+                showStatus("unitStatus", error.message, true);
+            }
+
+        }
 
 
-            const id =
-                document.getElementById(
-                    "contentId"
-                ).value;
+        function resetUnitForm() {
+
+            document.getElementById("unitFormTitle").textContent = "Add Unit";
+
+            document.getElementById("unitId").value = "";
+
+            unitForm.reset();
+
+        }
 
 
-            const unitId =
-                document.getElementById(
-                    "contentUnitSelect"
-                ).value;
+        document.getElementById("cancelUnitEdit").addEventListener("click", resetUnitForm);
 
+
+        /* =====================================================
+           CONTENTS
+        ===================================================== */
+
+        const contentForm = document.getElementById("contentForm");
+
+        const contentsTableBody = document.getElementById("contentsTableBody");
+
+        const contentsFilterSelect = document.getElementById("contentsFilterSelect");
+
+        let currentContents = [];
+
+
+        contentsFilterSelect.addEventListener("change", function () {
+            loadContentsForUnit(this.value);
+        });
+
+
+        async function loadContentsForUnit(unitId) {
 
             if (!unitId) {
-
-                showStatus(
-                    "contentStatus",
-                    "Please select a unit.",
-                    true
-                );
-
+                contentsTableBody.innerHTML = `<tr><td colspan="4">Select a unit above</td></tr>`;
+                currentContents = [];
                 return;
-
             }
-
-
-            const payload = {
-
-                unit_id:
-                    unitId,
-
-                content_number:
-                    document.getElementById(
-                        "contentNumber"
-                    ).value,
-
-                content_name:
-                    document.getElementById(
-                        "contentName"
-                    ).value.trim()
-
-            };
-
 
             try {
 
-                const response =
-                    await fetch(
+                const response = await fetch(`${SUBJECT_API}/unit/${unitId}/contents`);
 
-                        id
-                            ? `${SUBJECT_API}/contents/${id}`
-                            : `${SUBJECT_API}/contents`,
+                const data = await getJson(response);
 
-                        {
+                currentContents = data.contents || [];
 
-                            method:
-                                id
-                                    ? "PUT"
-                                    : "POST",
+                renderContentsTable();
 
-                            headers:
-                                authHeaders({
-                                    "Content-Type":
-                                        "application/json"
-                                }),
-
-                            body:
-                                JSON.stringify(
-                                    payload
-                                )
-
-                        }
-
-                    );
-
-
-                await getJson(
-                    response
+                populateSelect(
+                    document.getElementById("noteContentSelect"),
+                    currentContents,
+                    "id",
+                    content => `${content.content_number}. ${content.content_name}`,
+                    "-- Select Content --"
                 );
 
-
-                showStatus(
-                    "contentStatus",
-                    id
-                        ? "Content updated!"
-                        : "Content created!"
+                populateSelect(
+                    document.getElementById("notesFilterSelect"),
+                    currentContents,
+                    "id",
+                    content => `${content.content_number}. ${content.content_name}`,
+                    "-- Select Content --"
                 );
-
-
-                resetContentForm();
-
-
-                if (
-                    contentsFilterSelect.value ===
-                    String(unitId)
-                ) {
-
-                    await loadContentsForUnit(
-                        unitId
-                    );
-
-                }
-
-            } catch (error) {
-
-                showStatus(
-                    "contentStatus",
-                    error.message,
-                    true
-                );
-
-            }
-
-        }
-    );
-
-
-    function editContent(id) {
-
-        const content =
-            currentContents.find(
-                item =>
-                    item.id === id
-            );
-
-        if (!content) return;
-
-
-        document.getElementById(
-            "contentFormTitle"
-        ).textContent =
-            "Edit Content";
-
-
-        document.getElementById(
-            "contentId"
-        ).value =
-            content.id;
-
-
-        document.getElementById(
-            "contentUnitSelect"
-        ).value =
-            content.unit_id;
-
-
-        document.getElementById(
-            "contentNumber"
-        ).value =
-            content.content_number;
-
-
-        document.getElementById(
-            "contentName"
-        ).value =
-            content.content_name;
-
-    }
-
-
-    async function deleteContent(id) {
-
-        if (
-            !confirm(
-                "Delete this content?"
-            )
-        ) return;
-
-
-        try {
-
-            const response =
-                await fetch(
-
-                    `${SUBJECT_API}/contents/${id}`,
-
-                    {
-                        method: "DELETE",
-                        headers:
-                            authHeaders()
-                    }
-
-                );
-
-
-            await getJson(
-                response
-            );
-
-
-            showStatus(
-                "contentStatus",
-                "Content deleted."
-            );
-
-
-            await loadContentsForUnit(
-                contentsFilterSelect.value
-            );
-
-
-        } catch (error) {
-
-            showStatus(
-                "contentStatus",
-                error.message,
-                true
-            );
-
-        }
-
-    }
-
-
-    function resetContentForm() {
-
-        document.getElementById(
-            "contentFormTitle"
-        ).textContent =
-            "Add Content";
-
-
-        document.getElementById(
-            "contentId"
-        ).value = "";
-
-
-        contentForm.reset();
-
-    }
-
-
-    document.getElementById(
-        "cancelContentEdit"
-    ).addEventListener(
-        "click",
-        resetContentForm
-    );
-
-
-    /* =====================================================
-       NOTES
-    ===================================================== */
-
-    const noteForm =
-        document.getElementById(
-            "noteForm"
-        );
-
-    const notesTableBody =
-        document.getElementById(
-            "notesTableBody"
-        );
-
-    const notesFilterSelect =
-        document.getElementById(
-            "notesFilterSelect"
-        );
-
-    const noteFileInput =
-        document.getElementById(
-            "noteFileInput"
-        );
-
-    let currentNotes = [];
-
-
-    notesFilterSelect.addEventListener(
-        "change",
-        function () {
-
-            loadNotesForContent(
-                this.value
-            );
-
-        }
-    );
-
-
-    async function loadNotesForContent(
-        contentId
-    ) {
-
-        if (!contentId) {
-
-            notesTableBody.innerHTML =
-                `<tr>
-                    <td colspan="5">
-                        Select a content above
-                    </td>
-                </tr>`;
-
-            currentNotes = [];
-
-            return;
-
-        }
-
-
-        try {
-
-            const response =
-                await fetch(
-                    `${SUBJECT_API}/content/${contentId}/notes`
-                );
-
-
-            const data =
-                await getJson(
-                    response
-                );
-
-
-            currentNotes =
-                data.notes || [];
-
-
-            renderNotesTable();
-
-
-        } catch (error) {
-
-            console.error(error);
-
-            notesTableBody.innerHTML =
-                `<tr>
-                    <td colspan="5">
-                        Unable to load notes.
-                    </td>
-                </tr>`;
-
-        }
-
-    }
-
-
-    function renderNotesTable() {
-
-        notesTableBody.innerHTML = "";
-
-
-        if (currentNotes.length === 0) {
-
-            notesTableBody.innerHTML =
-                `<tr>
-                    <td colspan="5">
-                        No notes yet.
-                    </td>
-                </tr>`;
-
-            return;
-
-        }
-
-
-        currentNotes.forEach(note => {
-
-            const row =
-                document.createElement("tr");
-
-
-            const shortBody =
-                (note.body || "").length > 80
-                    ? note.body.substring(
-                        0,
-                        80
-                    ) + "..."
-                    : note.body || "";
-
-
-            row.innerHTML = `
-
-                <td>
-                    <input
-                        type="checkbox"
-                        class="noteCheckbox"
-                        value="${note.id}"
-                    >
-                </td>
-
-                <td>
-                    ${note.id}
-                </td>
-
-                <td>
-                    ${note.title}
-                </td>
-
-                <td>
-                    ${shortBody}
-                </td>
-
-                <td class="row-actions">
-
-                    <button
-                        class="edit-btn"
-                        onclick="editNote(${note.id})"
-                    >
-                        Edit
-                    </button>
-
-                    <button
-                        class="delete-btn"
-                        onclick="deleteNote(${note.id})"
-                    >
-                        Delete
-                    </button>
-
-                </td>
-
-            `;
-
-
-            notesTableBody.appendChild(
-                row
-            );
-
-        });
-
-
-        const selectAll =
-            document.getElementById(
-                "selectAllNotes"
-            );
-
-
-        if (selectAll) {
-
-            selectAll.checked = false;
-
-        }
-
-    }
-
-
-    document.getElementById(
-        "selectAllNotes"
-    ).addEventListener(
-        "change",
-        function () {
-
-            document
-                .querySelectorAll(
-                    ".noteCheckbox"
-                )
-                .forEach(
-                    checkbox =>
-                        checkbox.checked =
-                            this.checked
-                );
-
-        }
-    );
-
-
-    document.getElementById(
-        "deleteSelectedNotesBtn"
-    ).addEventListener(
-        "click",
-        async function () {
-
-            const selectedIds =
-                Array.from(
-                    document.querySelectorAll(
-                        ".noteCheckbox:checked"
-                    )
-                ).map(
-                    checkbox =>
-                        checkbox.value
-                );
-
-
-            if (
-                selectedIds.length === 0
-            ) {
-
-                showStatus(
-                    "noteStatus",
-                    "No notes selected.",
-                    true
-                );
-
-                return;
-
-            }
-
-
-            if (
-                !confirm(
-                    `Delete ${selectedIds.length} selected note(s)?`
-                )
-            ) return;
-
-
-            try {
-
-                for (
-                    const id
-                    of selectedIds
-                ) {
-
-                    const response =
-                        await fetch(
-
-                            `${SUBJECT_API}/notes/${id}`,
-
-                            {
-                                method:
-                                    "DELETE",
-
-                                headers:
-                                    authHeaders()
-                            }
-
-                        );
-
-
-                    await getJson(
-                        response
-                    );
-
-                }
-
-
-                showStatus(
-                    "noteStatus",
-                    "Selected notes deleted."
-                );
-
-
-                await loadNotesForContent(
-                    notesFilterSelect.value
-                );
-
-
-            } catch (error) {
-
-                showStatus(
-                    "noteStatus",
-                    error.message,
-                    true
-                );
-
-            }
-
-        }
-    );
-
-
-    async function uploadNoteFile() {
-
-        const file =
-            noteFileInput.files[0];
-
-
-        const existingUrl =
-            document.getElementById(
-                "noteFileUrl"
-            ).value;
-
-
-        if (!file) {
-
-            return existingUrl;
-
-        }
-
-
-        const formData =
-            new FormData();
-
-
-        formData.append(
-            "file",
-            file
-        );
-
-
-        showStatus(
-            "uploadStatus",
-            "Uploading PDF..."
-        );
-
-
-        const response =
-            await fetch(
-
-                `${SUBJECT_API}/notes/upload`,
-
-                {
-                    method: "POST",
-
-                    headers:
-                        authHeaders(),
-
-                    body:
-                        formData
-                }
-
-            );
-
-
-        const data =
-            await getJson(
-                response
-            );
-
-
-        return data.file_url;
-
-    }
-
-
-    noteForm.addEventListener(
-        "submit",
-        async function (event) {
-
-            event.preventDefault();
-
-
-            const id =
-                document.getElementById(
-                    "noteId"
-                ).value;
-
-
-            const contentId =
-                document.getElementById(
-                    "noteContentSelect"
-                ).value;
-
-
-            if (!contentId) {
-
-                showStatus(
-                    "noteStatus",
-                    "Please select content.",
-                    true
-                );
-
-                return;
-
-            }
-
-
-            try {
-
-                const fileUrl =
-                    await uploadNoteFile();
-
-
-                const payload = {
-
-                    content_id:
-                        contentId,
-
-                    title:
-                        document.getElementById(
-                            "noteTitle"
-                        ).value.trim(),
-
-                    body:
-                        document.getElementById(
-                            "noteBody"
-                        ).value.trim(),
-
-                    file_url:
-                        fileUrl
-
-                };
-
-
-                const response =
-                    await fetch(
-
-                        id
-                            ? `${SUBJECT_API}/notes/${id}`
-                            : `${SUBJECT_API}/notes`,
-
-                        {
-
-                            method:
-                                id
-                                    ? "PUT"
-                                    : "POST",
-
-                            headers:
-                                authHeaders({
-                                    "Content-Type":
-                                        "application/json"
-                                }),
-
-                            body:
-                                JSON.stringify(
-                                    payload
-                                )
-
-                        }
-
-                    );
-
-
-                await getJson(
-                    response
-                );
-
-
-                showStatus(
-                    "noteStatus",
-                    id
-                        ? "Note updated!"
-                        : "Note created!"
-                );
-
-
-                resetNoteForm();
-
-
-                await loadNotesForContent(
-                    contentId
-                );
-
 
             } catch (error) {
 
                 console.error(error);
 
-                showStatus(
-                    "noteStatus",
-                    error.message,
-                    true
-                );
+                contentsTableBody.innerHTML = `<tr><td colspan="4">Unable to load contents.</td></tr>`;
 
             }
 
         }
-    );
 
 
-    function editNote(id) {
+        function renderContentsTable() {
 
-        const note =
-            currentNotes.find(
-                item =>
-                    item.id === id
-            );
+            contentsTableBody.innerHTML = "";
 
-        if (!note) return;
+            if (currentContents.length === 0) {
+                contentsTableBody.innerHTML = `<tr><td colspan="4">No contents yet.</td></tr>`;
+                return;
+            }
 
+            currentContents.forEach(content => {
 
-        document.getElementById(
-            "noteFormTitle"
-        ).textContent =
-            "Edit Note";
+                const row = document.createElement("tr");
 
+                row.innerHTML = `
+                    <td>${content.id}</td>
+                    <td>${content.content_number}</td>
+                    <td>${content.content_name}</td>
+                    <td class="row-actions">
+                        <button class="edit-btn" onclick="editContent(${content.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteContent(${content.id})">Delete</button>
+                    </td>
+                `;
 
-        document.getElementById(
-            "noteId"
-        ).value =
-            note.id;
+                contentsTableBody.appendChild(row);
 
-
-        document.getElementById(
-            "noteContentSelect"
-        ).value =
-            note.content_id;
-
-
-        document.getElementById(
-            "noteTitle"
-        ).value =
-            note.title;
-
-
-        document.getElementById(
-            "noteBody"
-        ).value =
-            note.body || "";
-
-
-        document.getElementById(
-            "noteFileUrl"
-        ).value =
-            note.file_url || "";
-
-
-        noteFileInput.value = "";
-
-
-        document.getElementById(
-            "currentFileLabel"
-        ).textContent =
-            note.file_url
-                ? "Current file exists. Choose a new PDF to replace it."
-                : "";
-
-    }
-
-
-    async function deleteNote(id) {
-
-        if (
-            !confirm(
-                "Delete this note?"
-            )
-        ) return;
-
-
-        try {
-
-            const response =
-                await fetch(
-
-                    `${SUBJECT_API}/notes/${id}`,
-
-                    {
-                        method: "DELETE",
-                        headers:
-                            authHeaders()
-                    }
-
-                );
-
-
-            await getJson(
-                response
-            );
-
-
-            showStatus(
-                "noteStatus",
-                "Note deleted."
-            );
-
-
-            await loadNotesForContent(
-                notesFilterSelect.value
-            );
-
-
-        } catch (error) {
-
-            showStatus(
-                "noteStatus",
-                error.message,
-                true
-            );
+            });
 
         }
 
-    }
+
+        contentForm.addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+            const id = document.getElementById("contentId").value;
+
+            const unitId = document.getElementById("contentUnitSelect").value;
+
+            if (!unitId) {
+                showStatus("contentStatus", "Please select a unit.", true);
+                return;
+            }
+
+            const payload = {
+                unit_id: unitId,
+                content_number: document.getElementById("contentNumber").value,
+                content_name: document.getElementById("contentName").value.trim()
+            };
+
+            try {
+
+                const response = await fetch(
+                    id ? `${SUBJECT_API}/contents/${id}` : `${SUBJECT_API}/contents`,
+                    {
+                        method: id ? "PUT" : "POST",
+                        headers: authHeaders({ "Content-Type": "application/json" }),
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                await getJson(response);
+
+                showStatus("contentStatus", id ? "Content updated!" : "Content created!");
+
+                resetContentForm();
+
+                if (contentsFilterSelect.value === String(unitId)) {
+                    await loadContentsForUnit(unitId);
+                }
+
+            } catch (error) {
+                showStatus("contentStatus", error.message, true);
+            }
+
+        });
 
 
-    function resetNoteForm() {
+        function editContent(id) {
 
-        document.getElementById(
-            "noteFormTitle"
-        ).textContent =
-            "Add Note";
+            const content = currentContents.find(item => item.id === id);
 
+            if (!content) return;
 
-        document.getElementById(
-            "noteId"
-        ).value = "";
+            document.getElementById("contentFormTitle").textContent = "Edit Content";
 
+            document.getElementById("contentId").value = content.id;
 
-        document.getElementById(
-            "noteFileUrl"
-        ).value = "";
+            document.getElementById("contentUnitSelect").value = content.unit_id;
 
+            document.getElementById("contentNumber").value = content.content_number;
 
-        document.getElementById(
-            "currentFileLabel"
-        ).textContent = "";
+            document.getElementById("contentName").value = content.content_name;
+
+        }
 
 
-        noteForm.reset();
+        async function deleteContent(id) {
 
-    }
+            if (!confirm("Delete this content?")) return;
 
+            try {
 
-    document.getElementById(
-        "cancelNoteEdit"
-    ).addEventListener(
-        "click",
-        resetNoteForm
-    );
+                const response = await fetch(`${SUBJECT_API}/contents/${id}`, {
+                    method: "DELETE",
+                    headers: authHeaders()
+                });
 
+                await getJson(response);
 
-    /* =====================================================
-       PYQ UPLOAD
-    ===================================================== */
+                showStatus("contentStatus", "Content deleted.");
 
-    const pyqForm =
-        document.getElementById(
-            "pyqForm"
-        );
+                await loadContentsForUnit(contentsFilterSelect.value);
 
+            } catch (error) {
+                showStatus("contentStatus", error.message, true);
+            }
 
-    const pyqUploadBtn =
-        document.getElementById(
-            "pyqUploadBtn"
-        );
+        }
 
 
-    const pyqFile =
-        document.getElementById(
-            "pyqFile"
-        );
+        function resetContentForm() {
+
+            document.getElementById("contentFormTitle").textContent = "Add Content";
+
+            document.getElementById("contentId").value = "";
+
+            contentForm.reset();
+
+        }
 
 
-    /* =====================================================
-       PYQ FILE VALIDATION
-    ===================================================== */
+        document.getElementById("cancelContentEdit").addEventListener("click", resetContentForm);
 
-    pyqFile.addEventListener(
-        "change",
-        function () {
 
-            const file =
-                this.files[0];
+        /* =====================================================
+           NOTES
+        ===================================================== */
 
+        const noteForm = document.getElementById("noteForm");
+
+        const notesTableBody = document.getElementById("notesTableBody");
+
+        const notesFilterSelect = document.getElementById("notesFilterSelect");
+
+        const noteFileInput = document.getElementById("noteFileInput");
+
+        let currentNotes = [];
+
+
+        notesFilterSelect.addEventListener("change", function () {
+            loadNotesForContent(this.value);
+        });
+
+
+        async function loadNotesForContent(contentId) {
+
+            if (!contentId) {
+                notesTableBody.innerHTML = `<tr><td colspan="5">Select a content above</td></tr>`;
+                currentNotes = [];
+                return;
+            }
+
+            try {
+
+                const response = await fetch(`${SUBJECT_API}/content/${contentId}/notes`);
+
+                const data = await getJson(response);
+
+                currentNotes = data.notes || [];
+
+                renderNotesTable();
+
+            } catch (error) {
+
+                console.error(error);
+
+                notesTableBody.innerHTML = `<tr><td colspan="5">Unable to load notes.</td></tr>`;
+
+            }
+
+        }
+
+
+        function renderNotesTable() {
+
+            notesTableBody.innerHTML = "";
+
+            if (currentNotes.length === 0) {
+                notesTableBody.innerHTML = `<tr><td colspan="5">No notes yet.</td></tr>`;
+                return;
+            }
+
+            currentNotes.forEach(note => {
+
+                const row = document.createElement("tr");
+
+                const shortBody = (note.body || "").length > 80
+                    ? note.body.substring(0, 80) + "..."
+                    : note.body || "";
+
+                row.innerHTML = `
+                    <td><input type="checkbox" class="noteCheckbox" value="${note.id}"></td>
+                    <td>${note.id}</td>
+                    <td>${note.title}</td>
+                    <td>${shortBody}</td>
+                    <td class="row-actions">
+                        <button class="edit-btn" onclick="editNote(${note.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteNote(${note.id})">Delete</button>
+                    </td>
+                `;
+
+                notesTableBody.appendChild(row);
+
+            });
+
+            const selectAll = document.getElementById("selectAllNotes");
+
+            if (selectAll) {
+                selectAll.checked = false;
+            }
+
+        }
+
+
+        document.getElementById("selectAllNotes").addEventListener("change", function () {
+
+            document.querySelectorAll(".noteCheckbox").forEach(
+                checkbox => checkbox.checked = this.checked
+            );
+
+        });
+
+
+        document.getElementById("deleteSelectedNotesBtn").addEventListener("click", async function () {
+
+            const selectedIds = Array.from(
+                document.querySelectorAll(".noteCheckbox:checked")
+            ).map(checkbox => checkbox.value);
+
+            if (selectedIds.length === 0) {
+                showStatus("noteStatus", "No notes selected.", true);
+                return;
+            }
+
+            if (!confirm(`Delete ${selectedIds.length} selected note(s)?`)) return;
+
+            try {
+
+                for (const id of selectedIds) {
+
+                    const response = await fetch(`${SUBJECT_API}/notes/${id}`, {
+                        method: "DELETE",
+                        headers: authHeaders()
+                    });
+
+                    await getJson(response);
+
+                }
+
+                showStatus("noteStatus", "Selected notes deleted.");
+
+                await loadNotesForContent(notesFilterSelect.value);
+
+            } catch (error) {
+                showStatus("noteStatus", error.message, true);
+            }
+
+        });
+
+
+        async function uploadNoteFile() {
+
+            const file = noteFileInput.files[0];
+
+            const existingUrl = document.getElementById("noteFileUrl").value;
+
+            if (!file) {
+                return existingUrl;
+            }
+
+            const formData = new FormData();
+
+            formData.append("file", file);
+
+            showStatus("uploadStatus", "Uploading PDF...");
+
+            const response = await fetch(`${SUBJECT_API}/notes/upload`, {
+                method: "POST",
+                headers: authHeaders(),
+                body: formData
+            });
+
+            const data = await getJson(response);
+
+            return data.file_url;
+
+        }
+
+
+        noteForm.addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+            const id = document.getElementById("noteId").value;
+
+            const contentId = document.getElementById("noteContentSelect").value;
+
+            if (!contentId) {
+                showStatus("noteStatus", "Please select content.", true);
+                return;
+            }
+
+            try {
+
+                const fileUrl = await uploadNoteFile();
+
+                const payload = {
+                    content_id: contentId,
+                    title: document.getElementById("noteTitle").value.trim(),
+                    body: document.getElementById("noteBody").value.trim(),
+                    file_url: fileUrl
+                };
+
+                const response = await fetch(
+                    id ? `${SUBJECT_API}/notes/${id}` : `${SUBJECT_API}/notes`,
+                    {
+                        method: id ? "PUT" : "POST",
+                        headers: authHeaders({ "Content-Type": "application/json" }),
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                await getJson(response);
+
+                showStatus("noteStatus", id ? "Note updated!" : "Note created!");
+
+                resetNoteForm();
+
+                await loadNotesForContent(contentId);
+
+            } catch (error) {
+
+                console.error(error);
+
+                showStatus("noteStatus", error.message, true);
+
+            }
+
+        });
+
+
+        function editNote(id) {
+
+            const note = currentNotes.find(item => item.id === id);
+
+            if (!note) return;
+
+            document.getElementById("noteFormTitle").textContent = "Edit Note";
+
+            document.getElementById("noteId").value = note.id;
+
+            document.getElementById("noteContentSelect").value = note.content_id;
+
+            document.getElementById("noteTitle").value = note.title;
+
+            document.getElementById("noteBody").value = note.body || "";
+
+            document.getElementById("noteFileUrl").value = note.file_url || "";
+
+            noteFileInput.value = "";
+
+            document.getElementById("currentFileLabel").textContent = note.file_url
+                ? "Current file exists. Choose a new PDF to replace it."
+                : "";
+
+        }
+
+
+        async function deleteNote(id) {
+
+            if (!confirm("Delete this note?")) return;
+
+            try {
+
+                const response = await fetch(`${SUBJECT_API}/notes/${id}`, {
+                    method: "DELETE",
+                    headers: authHeaders()
+                });
+
+                await getJson(response);
+
+                showStatus("noteStatus", "Note deleted.");
+
+                await loadNotesForContent(notesFilterSelect.value);
+
+            } catch (error) {
+                showStatus("noteStatus", error.message, true);
+            }
+
+        }
+
+
+        function resetNoteForm() {
+
+            document.getElementById("noteFormTitle").textContent = "Add Note";
+
+            document.getElementById("noteId").value = "";
+
+            document.getElementById("noteFileUrl").value = "";
+
+            document.getElementById("currentFileLabel").textContent = "";
+
+            noteForm.reset();
+
+        }
+
+
+        document.getElementById("cancelNoteEdit").addEventListener("click", resetNoteForm);
+
+
+        /* =====================================================
+           PYQ UPLOAD
+        ===================================================== */
+
+        const pyqForm = document.getElementById("pyqForm");
+
+        const pyqUploadBtn = document.getElementById("pyqUploadBtn");
+
+        const pyqFile = document.getElementById("pyqFile");
+
+
+        /* =====================================================
+           PYQ FILE VALIDATION
+        ===================================================== */
+
+        pyqFile.addEventListener("change", function () {
+
+            const file = this.files[0];
 
             if (!file) return;
 
+            if (file.type !== "application/pdf") {
 
-            if (
-                file.type !==
-                "application/pdf"
-            ) {
-
-                showStatus(
-                    "pyqStatus",
-                    "Only PDF files are allowed.",
-                    true
-                );
+                showStatus("pyqStatus", "Only PDF files are allowed.", true);
 
                 this.value = "";
 
                 return;
 
             }
-
 
             /*
              * 20 MB browser-side limit.
              * Cloudinary/server can impose its own limit too.
              */
 
-            if (
-                file.size >
-                20 * 1024 * 1024
-            ) {
+            if (file.size > 20 * 1024 * 1024) {
 
-                showStatus(
-                    "pyqStatus",
-                    "PDF must be smaller than 20 MB.",
-                    true
-                );
+                showStatus("pyqStatus", "PDF must be smaller than 20 MB.", true);
 
                 this.value = "";
 
@@ -3368,153 +1928,68 @@
 
             }
 
-        }
-    );
+        });
 
 
-    /* =====================================================
-       PYQ SUBMIT
-    ===================================================== */
+        /* =====================================================
+           PYQ SUBMIT
+        ===================================================== */
 
-    pyqForm.addEventListener(
-        "submit",
-        async function (event) {
+        pyqForm.addEventListener("submit", async function (event) {
 
             event.preventDefault();
 
+            const semesterId = document.getElementById("pyqSemesterId").value;
 
-            const semesterId =
-                document.getElementById(
-                    "pyqSemesterId"
-                ).value;
+            const subjectId = document.getElementById("pyqSubjectSelect").value;
 
+            const examYear = document.getElementById("pyqExamYear").value;
 
-            const subjectId =
-                document.getElementById(
-                    "pyqSubjectSelect"
-                ).value;
+            const paperTitle = document.getElementById("pyqPaperTitle").value.trim();
 
+            const description = document.getElementById("pyqDescription").value.trim();
 
-            const examYear =
-                document.getElementById(
-                    "pyqExamYear"
-                ).value;
-
-
-            const paperTitle =
-                document.getElementById(
-                    "pyqPaperTitle"
-                ).value.trim();
-
-
-            const description =
-                document.getElementById(
-                    "pyqDescription"
-                ).value.trim();
-
-
-            const file =
-                pyqFile.files[0];
-
+            const file = pyqFile.files[0];
 
             /* VALIDATION */
 
             if (!semesterId) {
-
-                showStatus(
-                    "pyqStatus",
-                    "Please enter Semester ID.",
-                    true
-                );
-
+                showStatus("pyqStatus", "Please enter Semester ID.", true);
                 return;
-
             }
-
 
             if (!subjectId) {
-
-                showStatus(
-                    "pyqStatus",
-                    "Please select a subject.",
-                    true
-                );
-
+                showStatus("pyqStatus", "Please select a subject.", true);
                 return;
-
             }
-
 
             if (!examYear) {
-
-                showStatus(
-                    "pyqStatus",
-                    "Please enter exam year.",
-                    true
-                );
-
+                showStatus("pyqStatus", "Please enter exam year.", true);
                 return;
-
             }
-
 
             if (!paperTitle) {
-
-                showStatus(
-                    "pyqStatus",
-                    "Please enter paper title.",
-                    true
-                );
-
+                showStatus("pyqStatus", "Please enter paper title.", true);
                 return;
-
             }
-
 
             if (!file) {
-
-                showStatus(
-                    "pyqStatus",
-                    "Please select a PDF file.",
-                    true
-                );
-
+                showStatus("pyqStatus", "Please select a PDF file.", true);
                 return;
-
             }
 
-
-            if (
-                file.type !==
-                "application/pdf"
-            ) {
-
-                showStatus(
-                    "pyqStatus",
-                    "Only PDF files are allowed.",
-                    true
-                );
-
+            if (file.type !== "application/pdf") {
+                showStatus("pyqStatus", "Only PDF files are allowed.", true);
                 return;
-
             }
-
 
             try {
 
-                pyqUploadBtn.disabled =
-                    true;
+                pyqUploadBtn.disabled = true;
 
+                pyqUploadBtn.textContent = "Uploading...";
 
-                pyqUploadBtn.textContent =
-                    "Uploading...";
-
-
-                showStatus(
-                    "pyqStatus",
-                    "Uploading PDF to Cloudinary..."
-                );
-
+                showStatus("pyqStatus", "Uploading PDF to Cloudinary...");
 
                 /*
                  * IMPORTANT:
@@ -3529,156 +2004,167 @@
                  * description
                  */
 
-                const formData =
-                    new FormData();
+                const formData = new FormData();
 
+                formData.append("paperFile", file);
 
-                formData.append(
-                    "paperFile",
-                    file
-                );
+                formData.append("semesterId", semesterId);
 
+                formData.append("subjectId", subjectId);
 
-                formData.append(
-                    "semesterId",
-                    semesterId
-                );
+                formData.append("examYear", examYear);
 
+                formData.append("paperTitle", paperTitle);
 
-                formData.append(
-                    "subjectId",
-                    subjectId
-                );
+                formData.append("description", description);
 
+                const response = await fetch(`${PYQ_API}/upload`, {
 
-                formData.append(
-                    "examYear",
-                    examYear
-                );
+                    method: "POST",
 
+                    /*
+                     * DO NOT manually set
+                     * Content-Type here.
+                     *
+                     * Browser automatically
+                     * creates multipart/form-data
+                     * boundary.
+                     */
 
-                formData.append(
-                    "paperTitle",
-                    paperTitle
-                );
+                    headers: authHeaders(),
 
+                    body: formData
 
-                formData.append(
-                    "description",
-                    description
-                );
+                });
 
+                const data = await getJson(response);
 
-                const response =
-                    await fetch(
+                console.log("PYQ upload response:", data);
 
-                        `${PYQ_API}/upload`,
-
-                        {
-                            method:
-                                "POST",
-
-                            /*
-                             * DO NOT manually set
-                             * Content-Type here.
-                             *
-                             * Browser automatically
-                             * creates multipart/form-data
-                             * boundary.
-                             */
-
-                            headers:
-                                authHeaders(),
-
-                            body:
-                                formData
-
-                        }
-
-                    );
-
-
-                const data =
-                    await getJson(
-                        response
-                    );
-
-
-                console.log(
-                    "PYQ upload response:",
-                    data
-                );
-
-
-                showStatus(
-                    "pyqStatus",
-                    "PYQ uploaded successfully!"
-                );
-
+                showStatus("pyqStatus", "PYQ uploaded successfully!");
 
                 pyqForm.reset();
 
-
             } catch (error) {
 
-                console.error(
-                    "PYQ upload error:",
-                    error
-                );
+                console.error("PYQ upload error:", error);
 
-
-                showStatus(
-                    "pyqStatus",
-                    "PYQ upload failed: " +
-                    error.message,
-                    true
-                );
+                showStatus("pyqStatus", "PYQ upload failed: " + error.message, true);
 
             } finally {
 
-                pyqUploadBtn.disabled =
-                    false;
+                pyqUploadBtn.disabled = false;
 
-
-                pyqUploadBtn.textContent =
-                    "Upload PYQ";
+                pyqUploadBtn.textContent = "Upload PYQ";
 
             }
 
-        }
-    );
+        });
 
 
-    /* =====================================================
-       PYQ RESET
-    ===================================================== */
+        /* =====================================================
+           PYQ RESET
+        ===================================================== */
 
-    document.getElementById(
-        "pyqResetBtn"
-    ).addEventListener(
-        "click",
-        function () {
+        document.getElementById("pyqResetBtn").addEventListener("click", function () {
 
             pyqForm.reset();
 
+            showStatus("pyqStatus", "");
 
-            showStatus(
-                "pyqStatus",
-                ""
-            );
+        });
+
+
+        /* =====================================================
+           PYQ LIST + DELETE
+        ===================================================== */
+
+        let currentPyqPapers = [];
+
+        document.getElementById("pyqLoadListBtn").addEventListener("click", loadPyqList);
+
+        async function loadPyqList() {
+
+            const semesterId = document.getElementById("pyqListSemesterId").value;
+            const year = document.getElementById("pyqListYear").value;
+            const tbody = document.getElementById("pyqTableBody");
+
+            if (!semesterId || !year) {
+                showStatus("pyqStatus", "Enter semester ID and year to load papers.", true);
+                return;
+            }
+
+            tbody.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
+
+            try {
+
+                const response = await fetch(`${PYQ_API}/semester/${semesterId}/year/${year}`);
+                const data = await getJson(response);
+
+                currentPyqPapers = data.papers || [];
+
+                if (currentPyqPapers.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4">No papers found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = "";
+
+                currentPyqPapers.forEach(paper => {
+
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${paper.id}</td>
+                        <td>${paper.paper_title}</td>
+                        <td>${paper.subject_name} (${paper.subject_code})</td>
+                        <td class="row-actions">
+                            <button class="delete-btn" onclick="deletePyq(${paper.id})">Delete</button>
+                        </td>
+                    `;
+
+                    tbody.appendChild(row);
+
+                });
+
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="4">Unable to load papers.</td></tr>`;
+            }
 
         }
-    );
+
+        async function deletePyq(id) {
+
+            if (!confirm("Delete this PYQ paper? This cannot be undone.")) return;
+
+            try {
+
+                const response = await fetch(`${PYQ_API}/${id}`, {
+                    method: "DELETE",
+                    headers: authHeaders()
+                });
+
+                await getJson(response);
+
+                showStatus("pyqStatus", "Paper deleted.");
+
+                await loadPyqList();
+
+            } catch (error) {
+                showStatus("pyqStatus", error.message, true);
+            }
+
+        }
 
 
-    /* =====================================================
-       START APPLICATION
-    ===================================================== */
+        /* =====================================================
+           START APPLICATION
+        ===================================================== */
 
-    loadSubjectsAdmin();
+        loadSubjectsAdmin();
 
-</script>
-```
+    </script>
 
 </body>
 
