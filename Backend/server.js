@@ -22,6 +22,10 @@ const adminRoutes =
 const pyqRoutes =
     require("./routes/pyqRoutes");
 
+    
+const aiRoutes =
+    require("./routes/aiRoutes");
+
 const app = express();
 app.set("trust proxy", 1);
 
@@ -89,6 +93,9 @@ app.use("/api/academic", academicRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.use("/api/pyq", pyqRoutes);
+
+
+app.use("/api/ai", aiRoutes);
 
 
 // ======================================
