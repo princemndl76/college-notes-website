@@ -201,7 +201,8 @@ router.post("/verify-signup-otp", otpLimiter, (req, res) => {
 
 
 // ==========================================
-// LOGIN — STEP 1: check password, then send login OTP
+// LOGIN — password only, issues JWT directly
+// (OTP is no longer required on login, only at signup)
 // ==========================================
 
 router.post("/login", loginLimiter, async (req, res) => {
@@ -254,35 +255,25 @@ router.post("/login", loginLimiter, async (req, res) => {
                 });
             }
 
-            // Password correct — now issue a login OTP instead of the JWT
-            const otp = generateOtp();
-            const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
-
-            db.query(
-                "UPDATE users SET login_otp = ?, login_otp_expiry = ? WHERE id = ?",
-                [otp, otpExpiry, user.id],
-                (updateError) => {
-
-                    if (updateError) {
-                        console.error(updateError);
-                        return res.status(500).json({ success: false, message: "Unable to start login. Please try again." });
-                    }
-
-                    sendOtpEmail(user.email, otp, "login", (mailError) => {
-                        if (mailError) {
-                            console.error("Login OTP email send failed:", mailError);
-                        }
-                    });
-
-                    res.json({
-                        success: true,
-                        requiresOtp: true,
-                        message: "We've emailed you a login code. Enter it to finish signing in.",
-                        email: user.email
-                    });
-
-                }
+            // Password correct and account verified — issue JWT directly
+            const token = jwt.sign(
+                { id: user.id, role: user.role },
+                process.env.JWT_SECRET,
+                { expiresIn: "7d" }
             );
+
+            res.json({
+                success: true,
+                message: "Login successful!",
+                token: token,
+                user: {
+                    id: user.id,
+                    full_name: user.full_name,
+                    email: user.email,
+                    role: user.role
+                }
+            });
+
         });
 
     } catch (error) {
@@ -292,78 +283,6 @@ router.post("/login", loginLimiter, async (req, res) => {
             message: "Server error."
         });
     }
-
-});
-
-
-// ==========================================
-// LOGIN — STEP 2: verify login OTP, then issue JWT
-// Body: { email, otp }
-// ==========================================
-
-router.post("/login/verify-otp", otpLimiter, (req, res) => {
-
-    const { email, otp } = req.body;
-
-    if (!email || !otp) {
-        return res.status(400).json({ success: false, message: "Email and code are required." });
-    }
-
-    const sql = "SELECT * FROM users WHERE email = ?";
-
-    db.query(sql, [email], (error, results) => {
-
-        if (error) {
-            console.error(error);
-            return res.status(500).json({ success: false, message: "Database error." });
-        }
-
-        if (results.length === 0) {
-            return res.status(404).json({ success: false, message: "Account not found." });
-        }
-
-        const user = results[0];
-
-        if (!user.login_otp || user.login_otp !== otp) {
-            return res.status(400).json({ success: false, message: "Incorrect code." });
-        }
-
-        if (new Date(user.login_otp_expiry) < new Date()) {
-            return res.status(400).json({ success: false, message: "This code has expired. Please log in again." });
-        }
-
-        // Clear the OTP so it can't be reused, then issue the real session token
-        db.query(
-            "UPDATE users SET login_otp = NULL, login_otp_expiry = NULL WHERE id = ?",
-            [user.id],
-            (clearError) => {
-
-                if (clearError) {
-                    console.error(clearError);
-                }
-
-                const token = jwt.sign(
-                    { id: user.id, role: user.role },
-                    process.env.JWT_SECRET,
-                    { expiresIn: "7d" }
-                );
-
-                res.json({
-                    success: true,
-                    message: "Login successful!",
-                    token: token,
-                    user: {
-                        id: user.id,
-                        full_name: user.full_name,
-                        email: user.email,
-                        role: user.role
-                    }
-                });
-
-            }
-        );
-
-    });
 
 });
 
