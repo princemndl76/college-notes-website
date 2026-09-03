@@ -10,6 +10,140 @@
             box-sizing: border-box;
         }
 
+
+/* ===== GLOBAL SEARCH BAR ===== */
+
+#topbar {
+    gap: 20px;
+}
+
+.brand-section {
+    flex: 0 0 auto;
+}
+
+.search-wrapper {
+    position: relative;
+    flex: 1;
+    max-width: 520px;
+    min-width: 280px;
+}
+
+.search-box {
+    width: 100%;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 0 10px 0 14px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-box:focus-within {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+}
+
+.search-icon {
+    font-size: 18px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+#globalSearch {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #1f2937;
+    font-size: 14px;
+}
+
+#globalSearch::placeholder {
+    color: #9ca3af;
+}
+
+#clearSearch {
+    display: none;
+    border: 0;
+    background: transparent;
+    color: #9ca3af;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+#clearSearch:hover {
+    background: #f3f4f6;
+    color: #ef4444;
+    transform: none;
+}
+
+.search-hint {
+    position: absolute;
+    right: 12px;
+    top: 52px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.9);
+    pointer-events: none;
+}
+
+.search-status {
+    display: none;
+    margin: 0 0 18px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.92);
+    border-radius: 10px;
+    color: #4b5563;
+    font-size: 13px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.10);
+}
+
+.search-empty {
+    display: none;
+    grid-column: 1 / -1;
+    text-align: center;
+    background: rgba(255,255,255,0.94);
+    color: #6b7280;
+    padding: 28px 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.14);
+}
+
+@media (max-width: 800px) {
+    #topbar {
+        align-items: stretch;
+        padding: 14px 16px;
+        gap: 10px;
+    }
+
+    .brand-section {
+        flex: 1;
+    }
+
+    .search-wrapper {
+        order: 3;
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .search-hint {
+        display: none;
+    }
+
+    #logoutButton {
+        align-self: center;
+    }
+}
+
         @media (max-width: 640px) {
 
     #topbar {
@@ -355,16 +489,40 @@
     <div class="bg-shape s4"></div>
 
     <div id="topbar">
-        <div>
+        <div class="brand-section">
             <h1>📚 College Notes</h1>
             <p id="welcomeMessage">Welcome!</p>
         </div>
+
+        <div class="search-wrapper">
+            <div class="search-box">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input
+                    type="search"
+                    id="globalSearch"
+                    placeholder="Search courses, years, semesters..."
+                    aria-label="Search college notes"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <button
+                    type="button"
+                    id="clearSearch"
+                    aria-label="Clear search"
+                    title="Clear search"
+                >✕</button>
+            </div>
+            <span class="search-hint">Press Ctrl + K to search</span>
+        </div>
+
         <button id="logoutButton">Logout</button>
     </div>
 
     <div id="content">
 
         <div id="count">Loading…</div>
+
+        <div id="searchStatus" class="search-status" aria-live="polite"></div>
 
         <!-- Breadcrumb: Course > Year > Semester -->
         <div id="breadcrumb"></div>
@@ -373,6 +531,11 @@
 
         <div id="browseContainer">
             <p class="empty-msg">Loading...</p>
+            <div id="searchEmpty" class="search-empty">
+                🔎 No matching results found.
+                <br>
+                <small>Try a different course, year, or semester name.</small>
+            </div>
         </div>
 
         <div class="bottom-actions">
@@ -432,6 +595,125 @@
     </script>
 
     <script src="/Frontend/js/dashboard.js"></script>
+
+    <!-- ===== GLOBAL SEARCH ===== -->
+    <script>
+    (function () {
+        "use strict";
+
+        const searchInput = document.getElementById("globalSearch");
+        const clearButton = document.getElementById("clearSearch");
+        const container = document.getElementById("browseContainer");
+        const status = document.getElementById("searchStatus");
+        const empty = document.getElementById("searchEmpty");
+
+        if (!searchInput || !clearButton || !container) return;
+
+        let observerRunning = false;
+        let lastQuery = "";
+
+        function normalize(value) {
+            return String(value || "")
+                .toLowerCase()
+                .normalize("NFKD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
+        function getSearchableItems() {
+            return Array.from(container.children).filter(function (el) {
+                return el.id !== "searchEmpty" &&
+                       !el.classList.contains("empty-msg");
+            });
+        }
+
+        function applySearch() {
+            const query = normalize(searchInput.value);
+            lastQuery = query;
+
+            clearButton.style.display = query ? "block" : "none";
+
+            const items = getSearchableItems();
+
+            if (!query) {
+                items.forEach(function (item) {
+                    item.style.display = "";
+                });
+                status.style.display = "none";
+                empty.style.display = "none";
+                return;
+            }
+
+            let matches = 0;
+
+            items.forEach(function (item) {
+                const searchableText = normalize(item.textContent);
+                const matched = searchableText.includes(query);
+
+                item.style.display = matched ? "" : "none";
+
+                if (matched) matches++;
+            });
+
+            status.textContent =
+                matches === 0
+                    ? "No results for “" + searchInput.value.trim() + "”"
+                    : matches + (matches === 1 ? " result" : " results") +
+                      " found for “" + searchInput.value.trim() + "”";
+
+            status.style.display = "block";
+            empty.style.display = matches === 0 ? "block" : "none";
+        }
+
+        searchInput.addEventListener("input", applySearch);
+
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            applySearch();
+            searchInput.focus();
+        });
+
+        searchInput.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                searchInput.value = "";
+                applySearch();
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+                event.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+        });
+
+        /*
+         * dashboard.js dynamically replaces the cards when the user moves
+         * Course → Year → Semester. Observe those changes and re-apply
+         * the current search without modifying dashboard.js.
+         */
+        const observer = new MutationObserver(function () {
+            if (observerRunning) return;
+            observerRunning = true;
+
+            requestAnimationFrame(function () {
+                observerRunning = false;
+
+                if (lastQuery) {
+                    applySearch();
+                }
+            });
+        });
+
+        observer.observe(container, {
+            childList: true,
+            subtree: true
+        });
+    })();
+    </script>
+
 <script src="../js/dark-mode.js"></script>
 <script src="../js/ask-ai.js"></script>
 </body>
