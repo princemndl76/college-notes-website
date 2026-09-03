@@ -109,157 +109,218 @@
 
             <div class="register-section">
 
-                <h2>
-                    Create Account
-                </h2>
+                <!-- ================== STEP 1: ACCOUNT DETAILS ================== -->
+                <div id="registerStep">
 
-                <p class="subtitle">
-                    Create your account to continue
-                </p>
-
-
-                <form id="registerForm">
-
-
-                    <!-- NAME -->
-
-                    <div class="input-group">
-
-                        <label for="name">
-                            Full Name
-                        </label>
-
-                        <input
-                            type="text"
-                            id="name"
-                            placeholder="Enter your full name"
-                            required
-                        >
-
-                    </div>
-
-
-                    <!-- EMAIL -->
-
-                    <div class="input-group">
-
-                        <label for="email">
-                            Email Address
-                        </label>
-
-                        <input
-                            type="email"
-                            id="email"
-                            placeholder="Enter your email"
-                            required
-                        >
-
-                    </div>
-
-
-                    <!-- PASSWORD -->
-
-                    <div class="input-group">
-
-                        <label for="password">
-                            Password
-                        </label>
-
-                        <div class="password-box">
-
-                            <input
-                                type="password"
-                                id="password"
-                                placeholder="Create a password"
-                                required
-                            >
-
-                            <button
-                                type="button"
-                                id="togglePassword">
-                                👁
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- CONFIRM PASSWORD -->
-
-                    <div class="input-group">
-
-                        <label for="confirmPassword">
-                            Confirm Password
-                        </label>
-
-                        <div class="password-box">
-
-                            <input
-                                type="password"
-                                id="confirmPassword"
-                                placeholder="Confirm your password"
-                                required
-                            >
-
-                            <button
-                                type="button"
-                                id="toggleConfirmPassword">
-                                👁
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- TERMS -->
-
-                    <div class="terms">
-
-                        <label>
-
-                            <input
-                                type="checkbox"
-                                id="terms"
-                                required
-                            >
-
-                            I agree to the
-                            <a href="#">
-                                Terms &amp; Conditions
-                            </a>
-
-                        </label>
-
-                    </div>
-
-
-                    <!-- BUTTON -->
-
-                    <button
-                        type="submit"
-                        class="register-btn">
-
+                    <h2>
                         Create Account
+                    </h2>
 
-                    </button>
-
-
-                    <!-- LOGIN LINK -->
-
-                    <p class="login-link">
-
-                        Already have an account?
-
-                        <a href="login.html">
-                            Login
-                        </a>
-
+                    <p class="subtitle">
+                        Create your account to continue
                     </p>
 
 
-                </form>
+                    <form id="registerForm">
+
+
+                        <!-- NAME -->
+
+                        <div class="input-group">
+
+                            <label for="name">
+                                Full Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="name"
+                                placeholder="Enter your full name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+
+                        <div class="input-group">
+
+                            <label for="email">
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                placeholder="Enter your email"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- PASSWORD -->
+
+                        <div class="input-group">
+
+                            <label for="password">
+                                Password
+                            </label>
+
+                            <div class="password-box">
+
+                                <input
+                                    type="password"
+                                    id="password"
+                                    placeholder="Create a password"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    id="togglePassword">
+                                    👁
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CONFIRM PASSWORD -->
+
+                        <div class="input-group">
+
+                            <label for="confirmPassword">
+                                Confirm Password
+                            </label>
+
+                            <div class="password-box">
+
+                                <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    placeholder="Confirm your password"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    id="toggleConfirmPassword">
+                                    👁
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- TERMS -->
+
+                        <div class="terms">
+
+                            <label>
+
+                                <input
+                                    type="checkbox"
+                                    id="terms"
+                                    required
+                                >
+
+                                I agree to the
+                                <a href="#">
+                                    Terms &amp; Conditions
+                                </a>
+
+                            </label>
+
+                        </div>
+
+
+                        <!-- BUTTON -->
+
+                        <button
+                            type="submit"
+                            class="register-btn"
+                            id="registerSubmitBtn">
+
+                            Create Account
+
+                        </button>
+
+                        <p class="status-msg" id="registerStatusMsg"></p>
+
+
+                        <!-- LOGIN LINK -->
+
+                        <p class="login-link">
+
+                            Already have an account?
+
+                            <a href="login.html">
+                                Login
+                            </a>
+
+                        </p>
+
+
+                    </form>
+
+                </div>
+
+
+                <!-- ================== STEP 2: VERIFY EMAIL OTP ================== -->
+                <div id="otpStep" style="display:none;">
+
+                    <h2>
+                        Verify Your Email
+                    </h2>
+
+                    <p class="subtitle" id="otpSubtitle">
+                        We've emailed a 6-digit code to your inbox. Enter it below to activate your account.
+                    </p>
+
+                    <form id="otpForm">
+
+                        <div class="input-group">
+
+                            <label for="otpInput">
+                                6-Digit Code
+                            </label>
+
+                            <input
+                                type="text"
+                                id="otpInput"
+                                placeholder="Enter the code"
+                                inputmode="numeric"
+                                maxlength="6"
+                                autocomplete="one-time-code"
+                                required
+                            >
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="register-btn"
+                            id="otpSubmitBtn">
+
+                            Verify Account
+
+                        </button>
+
+                        <p class="status-msg" id="otpStatusMsg"></p>
+
+                        <p class="login-link">
+                            <a href="#" id="backToRegisterLink">
+                                &larr; Back
+                            </a>
+                        </p>
+
+                    </form>
+
+                </div>
 
             </div>
 
@@ -269,6 +330,7 @@
 
 
     <script src="../js/register.js"></script>
+    <script src="../js/ask-ai.js"></script>
 
 </body>
 

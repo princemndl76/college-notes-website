@@ -58,99 +58,154 @@
             <!-- Login Section -->
             <div class="login-section">
 
-                <h2>Welcome Back!</h2>
+                <!-- ================== STEP 1: EMAIL + PASSWORD ================== -->
+                <div id="loginStep">
 
-                <p class="login-text">
-                    Login to continue learning
-                </p>
+                    <h2>Welcome Back!</h2>
 
-
-                <form id="loginForm">
-
-                    <!-- Email -->
-                    <div class="input-group">
-
-                        <label for="email">
-                            Email Address
-                        </label>
-
-                        <input
-                            type="email"
-                            id="email"
-                            placeholder="Enter your email"
-                            required
-                        >
-
-                    </div>
+                    <p class="login-text">
+                        Login to continue learning
+                    </p>
 
 
-                    <!-- Password -->
-                    <div class="input-group">
+                    <form id="loginForm">
 
-                        <label for="password">
-                            Password
-                        </label>
+                        <!-- Email -->
+                        <div class="input-group">
 
-                        <div class="password-box">
+                            <label for="email">
+                                Email Address
+                            </label>
 
                             <input
-                                type="password"
-                                id="password"
-                                placeholder="Enter your password"
+                                type="email"
+                                id="email"
+                                placeholder="Enter your email"
                                 required
                             >
 
-                            <button
-                                type="button"
-                                id="togglePassword"
-                            >
-                                👁
-                            </button>
+                        </div>
+
+
+                        <!-- Password -->
+                        <div class="input-group">
+
+                            <label for="password">
+                                Password
+                            </label>
+
+                            <div class="password-box">
+
+                                <input
+                                    type="password"
+                                    id="password"
+                                    placeholder="Enter your password"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    id="togglePassword"
+                                >
+                                    👁
+                                </button>
+
+                            </div>
 
                         </div>
 
-                    </div>
+
+                        <!-- Remember + Forgot -->
+                        <div class="options">
+
+                            <label>
+                                <input type="checkbox" id="rememberMe">
+                                Remember me
+                            </label>
+
+                            <a href="#">
+                                Forgot Password?
+                            </a>
+
+                        </div>
 
 
-                    <!-- Remember + Forgot -->
-                    <div class="options">
+                        <!-- Login Button -->
+                        <button
+                            type="submit"
+                            class="login-btn"
+                            id="submitBtn"
+                        >
+                            Login
+                        </button>
 
-                        <label>
-                            <input type="checkbox" id="rememberMe">
-                            Remember me
-                        </label>
-
-                        <a href="#">
-                            Forgot Password?
-                        </a>
-
-                    </div>
+                        <p class="status-msg" id="statusMsg"></p>
 
 
-                    <!-- Login Button -->
-                    <button
-                        type="submit"
-                        class="login-btn"
-                        id="submitBtn"
-                    >
-                        Login
-                    </button>
+                        <p class="register-text">
 
-                    <p class="status-msg" id="statusMsg"></p>
+                            Don't have an account?
+
+                            <a href="/Frontend/pages/register.html">
+                                Create Account
+                            </a>
 
 
-                    <p class="register-text">
+                        </p>
 
-                        Don't have an account?
+                    </form>
 
-<a href="/Frontend/pages/register.html">
-    Create Account
-</a>
+                </div>
 
 
+                <!-- ================== STEP 2: ENTER LOGIN OTP ================== -->
+                <div id="otpStep" style="display:none;">
+
+                    <h2>Verify It's You</h2>
+
+                    <p class="login-text" id="otpSubtitle">
+                        We've emailed a 6-digit code to your inbox. Enter it below to finish logging in.
                     </p>
 
-                </form>
+                    <form id="otpForm">
+
+                        <div class="input-group">
+
+                            <label for="otpInput">
+                                6-Digit Code
+                            </label>
+
+                            <input
+                                type="text"
+                                id="otpInput"
+                                placeholder="Enter the code"
+                                inputmode="numeric"
+                                maxlength="6"
+                                autocomplete="one-time-code"
+                                required
+                            >
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="login-btn"
+                            id="otpSubmitBtn"
+                        >
+                            Verify & Login
+                        </button>
+
+                        <p class="status-msg" id="otpStatusMsg"></p>
+
+                        <p class="register-text">
+                            <a href="#" id="backToLoginLink">
+                                &larr; Back to login
+                            </a>
+                        </p>
+
+                    </form>
+
+                </div>
 
             </div>
 

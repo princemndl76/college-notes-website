@@ -4,11 +4,50 @@ const API_BASE_URL =
         : "https://college-notes-website-f64v.onrender.com";
 
 // ======================================
+// STEPS
+// ======================================
+
+const registerStep = document.getElementById("registerStep");
+const otpStep = document.getElementById("otpStep");
+
+
+// ======================================
 // REGISTRATION FORM
 // ======================================
 
 const registerForm =
     document.getElementById("registerForm");
+
+const registerSubmitBtn =
+    document.getElementById("registerSubmitBtn");
+
+const registerStatusMsg =
+    document.getElementById("registerStatusMsg");
+
+
+// ======================================
+// OTP FORM
+// ======================================
+
+const otpForm =
+    document.getElementById("otpForm");
+
+const otpInput =
+    document.getElementById("otpInput");
+
+const otpSubmitBtn =
+    document.getElementById("otpSubmitBtn");
+
+const otpStatusMsg =
+    document.getElementById("otpStatusMsg");
+
+const otpSubtitle =
+    document.getElementById("otpSubtitle");
+
+const backToRegisterLink =
+    document.getElementById("backToRegisterLink");
+
+let pendingEmail = null;
 
 
 // ======================================
@@ -90,7 +129,41 @@ toggleConfirmPassword.addEventListener(
 
 
 // ======================================
-// REGISTER USER
+// SWITCH TO OTP STEP
+// ======================================
+
+function showOtpStep(email) {
+
+    pendingEmail = email;
+
+    otpSubtitle.textContent =
+        `We've emailed a 6-digit code to ${email}. Enter it below to activate your account.`;
+
+    registerStep.style.display = "none";
+    otpStep.style.display = "block";
+
+    otpInput.value = "";
+    otpStatusMsg.textContent = "";
+    otpInput.focus();
+
+}
+
+
+backToRegisterLink.addEventListener("click", function (event) {
+
+    event.preventDefault();
+
+    otpStep.style.display = "none";
+    registerStep.style.display = "block";
+
+    registerSubmitBtn.disabled = false;
+    registerSubmitBtn.textContent = "Create Account";
+
+});
+
+
+// ======================================
+// STEP 1 — REGISTER USER
 // ======================================
 
 registerForm.addEventListener(
@@ -99,8 +172,6 @@ registerForm.addEventListener(
 
         event.preventDefault();
 
-
-        // Get values
 
         const full_name =
             document.getElementById(
@@ -132,6 +203,8 @@ registerForm.addEventListener(
         // VALIDATION
         // ==================================
 
+        registerStatusMsg.textContent = "";
+
         if (
             !full_name ||
             !email ||
@@ -139,9 +212,8 @@ registerForm.addEventListener(
             !confirmPasswordValue
         ) {
 
-            alert(
-                "Please fill all fields."
-            );
+            registerStatusMsg.textContent =
+                "Please fill all fields.";
 
             return;
 
@@ -153,9 +225,8 @@ registerForm.addEventListener(
             confirmPasswordValue
         ) {
 
-            alert(
-                "Passwords do not match!"
-            );
+            registerStatusMsg.textContent =
+                "Passwords do not match!";
 
             return;
 
@@ -164,9 +235,8 @@ registerForm.addEventListener(
 
         if (passwordValue.length < 6) {
 
-            alert(
-                "Password must contain at least 6 characters."
-            );
+            registerStatusMsg.textContent =
+                "Password must contain at least 6 characters.";
 
             return;
 
@@ -175,13 +245,16 @@ registerForm.addEventListener(
 
         if (!terms) {
 
-            alert(
-                "Please agree to the Terms & Conditions."
-            );
+            registerStatusMsg.textContent =
+                "Please agree to the Terms & Conditions.";
 
             return;
 
         }
+
+
+        registerSubmitBtn.disabled = true;
+        registerSubmitBtn.textContent = "Creating account…";
 
 
         // ==================================
@@ -223,27 +296,18 @@ registerForm.addEventListener(
                 await response.json();
 
 
-            // ==================================
-            // SUCCESS
-            // ==================================
-
             if (data.success) {
 
-                // Show the REAL message from the server
-                // (tells the user to check their email)
-
-                alert(data.message);
-
-
-                // Do NOT redirect to login yet —
-                // the account isn't verified until
-                // they click the link in their email
+                // Move to the "enter your code" step
+                showOtpStep(data.email || email);
 
             }
 
             else {
 
-                alert(data.message);
+                registerSubmitBtn.disabled = false;
+                registerSubmitBtn.textContent = "Create Account";
+                registerStatusMsg.textContent = data.message;
 
             }
 
@@ -253,11 +317,77 @@ registerForm.addEventListener(
 
             console.error(error);
 
-            alert(
-                "Unable to connect to the server."
-            );
+            registerSubmitBtn.disabled = false;
+            registerSubmitBtn.textContent = "Create Account";
+            registerStatusMsg.textContent =
+                "Unable to connect to the server.";
 
         }
 
     }
 );
+
+
+// ======================================
+// STEP 2 — VERIFY SIGNUP OTP
+// ======================================
+
+otpForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const otp = otpInput.value.trim();
+
+    if (!otp) {
+        otpStatusMsg.textContent = "Please enter the code.";
+        return;
+    }
+
+    otpStatusMsg.textContent = "";
+    otpSubmitBtn.disabled = true;
+    otpSubmitBtn.textContent = "Verifying…";
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/verify-signup-otp`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: pendingEmail,
+                    otp: otp
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            otpStatusMsg.style.color = "#16803c";
+            otpStatusMsg.textContent = "Account verified! Redirecting to login…";
+
+            setTimeout(function () {
+                window.location.href = "login.html?verified=true";
+            }, 1200);
+
+        } else {
+
+            otpSubmitBtn.disabled = false;
+            otpSubmitBtn.textContent = "Verify Account";
+            otpStatusMsg.textContent = data.message || "Incorrect or expired code.";
+
+        }
+
+    } catch (error) {
+
+        console.error("OTP Verify Error:", error);
+
+        otpSubmitBtn.disabled = false;
+        otpSubmitBtn.textContent = "Verify Account";
+        otpStatusMsg.textContent = "Unable to connect to the server. Please try again.";
+
+    }
+
+});

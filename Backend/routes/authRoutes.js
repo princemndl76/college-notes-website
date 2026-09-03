@@ -1,15 +1,14 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
 const rateLimit = require("express-rate-limit");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
-const { sendVerificationEmail } = require("../config/mailer");
+const { sendOtpEmail } = require("../config/mailer");
 
 const router = express.Router();
 
 // ==========================================
-// RATE LIMITER (login only)
+// RATE LIMITERS
 // ==========================================
 
 const loginLimiter = rateLimit({
@@ -23,8 +22,31 @@ const loginLimiter = rateLimit({
     legacyHeaders: false
 });
 
+// Separate, stricter limiter for OTP verification endpoints
+// (prevents someone from brute-forcing a 6-digit code)
+const otpLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 6,
+    message: {
+        success: false,
+        message: "Too many verification attempts. Please try again in 15 minutes."
+    },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+
 // ==========================================
-// REGISTER USER
+// HELPER: GENERATE 6-DIGIT OTP
+// ==========================================
+
+function generateOtp() {
+    return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+
+// ==========================================
+// REGISTER USER  (sends signup OTP instead of a link)
 // ==========================================
 
 router.post("/register", async (req, res) => {
@@ -68,8 +90,8 @@ router.post("/register", async (req, res) => {
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            const verificationToken = crypto.randomBytes(32).toString("hex");
-            const tokenExpiry = new Date(Date.now() + 30 * 60 * 1000);
+            const otp = generateOtp();
+            const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
             const sql = `
                 INSERT INTO users
@@ -79,7 +101,7 @@ router.post("/register", async (req, res) => {
 
             db.query(
                 sql,
-                [full_name, email, hashedPassword, verificationToken, tokenExpiry],
+                [full_name, email, hashedPassword, otp, otpExpiry],
                 (error, result) => {
 
                     if (error) {
@@ -90,16 +112,16 @@ router.post("/register", async (req, res) => {
                         });
                     }
 
-                    sendVerificationEmail(email, verificationToken, (mailError) => {
+                    sendOtpEmail(email, otp, "signup", (mailError) => {
                         if (mailError) {
-                            console.error("Email send failed:", mailError);
+                            console.error("OTP email send failed:", mailError);
                         }
                     });
 
                     res.status(201).json({
                         success: true,
-                        message: "Account created! Please check your email to verify your account before logging in.",
-                        userId: result.insertId
+                        message: "Account created! We've emailed you a 6-digit code — enter it to verify your account.",
+                        email: email
                     });
                 }
             );
@@ -115,35 +137,45 @@ router.post("/register", async (req, res) => {
 
 });
 
+
 // ==========================================
-// VERIFY EMAIL
+// VERIFY SIGNUP OTP
+// Body: { email, otp }
 // ==========================================
 
-router.get("/verify-email", (req, res) => {
+router.post("/verify-signup-otp", otpLimiter, (req, res) => {
 
-    const { token } = req.query;
+    const { email, otp } = req.body;
 
-    if (!token) {
-        return res.status(400).send("Invalid verification link.");
+    if (!email || !otp) {
+        return res.status(400).json({ success: false, message: "Email and code are required." });
     }
 
-    const sql = "SELECT * FROM users WHERE verification_token = ?";
+    const sql = "SELECT * FROM users WHERE email = ?";
 
-    db.query(sql, [token], (error, results) => {
+    db.query(sql, [email], (error, results) => {
 
         if (error) {
             console.error(error);
-            return res.status(500).send("Something went wrong during verification.");
+            return res.status(500).json({ success: false, message: "Database error." });
         }
 
         if (results.length === 0) {
-            return res.status(400).send("Invalid or expired verification link.");
+            return res.status(404).json({ success: false, message: "Account not found." });
         }
 
         const user = results[0];
 
+        if (user.is_verified) {
+            return res.status(400).json({ success: false, message: "Account is already verified." });
+        }
+
+        if (!user.verification_token || user.verification_token !== otp) {
+            return res.status(400).json({ success: false, message: "Incorrect code." });
+        }
+
         if (new Date(user.token_expiry) < new Date()) {
-            return res.status(400).send("This verification link has expired. Please register again.");
+            return res.status(400).json({ success: false, message: "This code has expired. Please register again." });
         }
 
         const updateSql = `
@@ -156,17 +188,20 @@ router.get("/verify-email", (req, res) => {
 
             if (error) {
                 console.error(error);
-                return res.status(500).send("Verification failed. Please try again.");
+                return res.status(500).json({ success: false, message: "Verification failed. Please try again." });
             }
 
-            res.redirect("/Frontend/pages/login.html?verified=true");
+            res.json({ success: true, message: "Account verified! You can now log in." });
+
         });
+
     });
 
 });
 
+
 // ==========================================
-// LOGIN USER
+// LOGIN — STEP 1: check password, then send login OTP
 // ==========================================
 
 router.post("/login", loginLimiter, async (req, res) => {
@@ -215,27 +250,39 @@ router.post("/login", loginLimiter, async (req, res) => {
             if (!user.is_verified) {
                 return res.status(403).json({
                     success: false,
-                    message: "Please verify your email before logging in. Check your inbox."
+                    message: "Please verify your email before logging in."
                 });
             }
 
-            const token = jwt.sign(
-                { id: user.id, role: user.role },
-                process.env.JWT_SECRET,
-                { expiresIn: "7d" }
-            );
+            // Password correct — now issue a login OTP instead of the JWT
+            const otp = generateOtp();
+            const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
-            res.json({
-                success: true,
-                message: "Login successful!",
-                token: token,
-                user: {
-                    id: user.id,
-                    full_name: user.full_name,
-                    email: user.email,
-                    role: user.role
+            db.query(
+                "UPDATE users SET login_otp = ?, login_otp_expiry = ? WHERE id = ?",
+                [otp, otpExpiry, user.id],
+                (updateError) => {
+
+                    if (updateError) {
+                        console.error(updateError);
+                        return res.status(500).json({ success: false, message: "Unable to start login. Please try again." });
+                    }
+
+                    sendOtpEmail(user.email, otp, "login", (mailError) => {
+                        if (mailError) {
+                            console.error("Login OTP email send failed:", mailError);
+                        }
+                    });
+
+                    res.json({
+                        success: true,
+                        requiresOtp: true,
+                        message: "We've emailed you a login code. Enter it to finish signing in.",
+                        email: user.email
+                    });
+
                 }
-            });
+            );
         });
 
     } catch (error) {
@@ -247,6 +294,79 @@ router.post("/login", loginLimiter, async (req, res) => {
     }
 
 });
+
+
+// ==========================================
+// LOGIN — STEP 2: verify login OTP, then issue JWT
+// Body: { email, otp }
+// ==========================================
+
+router.post("/login/verify-otp", otpLimiter, (req, res) => {
+
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        return res.status(400).json({ success: false, message: "Email and code are required." });
+    }
+
+    const sql = "SELECT * FROM users WHERE email = ?";
+
+    db.query(sql, [email], (error, results) => {
+
+        if (error) {
+            console.error(error);
+            return res.status(500).json({ success: false, message: "Database error." });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: "Account not found." });
+        }
+
+        const user = results[0];
+
+        if (!user.login_otp || user.login_otp !== otp) {
+            return res.status(400).json({ success: false, message: "Incorrect code." });
+        }
+
+        if (new Date(user.login_otp_expiry) < new Date()) {
+            return res.status(400).json({ success: false, message: "This code has expired. Please log in again." });
+        }
+
+        // Clear the OTP so it can't be reused, then issue the real session token
+        db.query(
+            "UPDATE users SET login_otp = NULL, login_otp_expiry = NULL WHERE id = ?",
+            [user.id],
+            (clearError) => {
+
+                if (clearError) {
+                    console.error(clearError);
+                }
+
+                const token = jwt.sign(
+                    { id: user.id, role: user.role },
+                    process.env.JWT_SECRET,
+                    { expiresIn: "7d" }
+                );
+
+                res.json({
+                    success: true,
+                    message: "Login successful!",
+                    token: token,
+                    user: {
+                        id: user.id,
+                        full_name: user.full_name,
+                        email: user.email,
+                        role: user.role
+                    }
+                });
+
+            }
+        );
+
+    });
+
+});
+
 
 // ==========================================
 // EXPORT ROUTER

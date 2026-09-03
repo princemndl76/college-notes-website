@@ -35,4 +35,43 @@ function sendVerificationEmail(toEmail, token, callback) {
     });
 }
 
-module.exports = { sendVerificationEmail };
+
+// ==========================================
+// SEND OTP EMAIL (used for signup verification and login 2FA)
+// purpose: "signup" | "login"
+// ==========================================
+
+function sendOtpEmail(toEmail, otp, purpose, callback) {
+
+    const isLogin = purpose === "login";
+
+    const mailOptions = {
+        from: `"College Notes" <${process.env.EMAIL_USER}>`,
+        to: toEmail,
+        subject: isLogin
+            ? "Your Login Code - College Notes Website"
+            : "Verify Your Account - College Notes Website",
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto;">
+                <h2>${isLogin ? "Your Login Verification Code" : "Verify Your Account"}</h2>
+                <p>${isLogin
+                    ? "Use this code to complete your login:"
+                    : "Use this code to verify your account and finish creating it:"
+                }</p>
+                <div style="font-size: 32px; font-weight: bold; letter-spacing: 8px; background: #f3f3f3; padding: 16px 20px; border-radius: 8px; text-align: center; margin: 16px 0;">
+                    ${otp}
+                </div>
+                <p>This code expires in 10 minutes.</p>
+                <p>If you didn't request this, you can safely ignore this email.</p>
+            </div>
+        `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (callback) callback(error, info);
+    });
+
+}
+
+
+module.exports = { sendVerificationEmail, sendOtpEmail };
