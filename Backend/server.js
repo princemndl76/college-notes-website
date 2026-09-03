@@ -30,8 +30,10 @@ const app = express();
 app.set("trust proxy", 1);
 
 // Force any request to fail after 20 seconds instead of hanging forever
+// (AI requests get more time since they can legitimately take longer)
 app.use((req, res, next) => {
-    res.setTimeout(20000, () => {
+    const timeoutMs = req.path.startsWith("/api/ai") ? 45000 : 20000;
+    res.setTimeout(timeoutMs, () => {
         res.status(504).json({ success: false, message: "Request timed out" });
     });
     next();
