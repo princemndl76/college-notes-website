@@ -46,9 +46,9 @@
             bottom: 84px;
             right: 20px;
             z-index: 999999;
-            width: 360px;
+            width: 380px;
             max-width: calc(100vw - 40px);
-            height: 480px;
+            height: 500px;
             max-height: calc(100vh - 120px);
             background: #fff;
             border-radius: 14px;
@@ -93,8 +93,7 @@
 
         .askAiMsg {
             margin-bottom: 12px;
-            line-height: 1.4;
-            white-space: pre-wrap;
+            line-height: 1.5;
         }
 
         .askAiMsg.user {
@@ -109,15 +108,36 @@
             border-radius: 12px 12px 0 12px;
             max-width: 85%;
             text-align: left;
+            white-space: pre-wrap;
         }
 
         .askAiMsg.ai .bubble {
             background: #f0f0f5;
             color: #1a1a1a;
             display: inline-block;
-            padding: 8px 12px;
+            padding: 10px 14px;
             border-radius: 12px 12px 12px 0;
-            max-width: 90%;
+            max-width: 92%;
+        }
+
+        .askAiMsg.ai .bubble p {
+            margin: 0 0 8px 0;
+        }
+
+        .askAiMsg.ai .bubble ul,
+        .askAiMsg.ai .bubble ol {
+            margin: 4px 0 8px 0;
+            padding-left: 20px;
+        }
+
+        .askAiMsg.ai .bubble li {
+            margin-bottom: 5px;
+        }
+
+        .askAiMsg.ai .bubble p:last-child,
+        .askAiMsg.ai .bubble ul:last-child,
+        .askAiMsg.ai .bubble ol:last-child {
+            margin-bottom: 0;
         }
 
         .askAiMsg.loading .bubble {
@@ -204,7 +224,7 @@
             if (e.key === "Enter") sendQuestion();
         });
 
-        addMessage("ai", "Hi! I'm your study assistant. Ask me anything — a concept you're stuck on, a definition, or help understanding a topic.");
+        addAiMessage("Hi! I'm your study assistant. Ask me anything — a concept you're stuck on, a definition, or help understanding a topic.");
 
     }
 
@@ -214,12 +234,13 @@
     }
 
 
-    function addMessage(role, text) {
+    // ---------- PLAIN USER MESSAGE ----------
+    function addUserMessage(text) {
 
         const messages = document.getElementById("askAiMessages");
 
         const wrap = document.createElement("div");
-        wrap.className = "askAiMsg " + role;
+        wrap.className = "askAiMsg user";
 
         const bubble = document.createElement("div");
         bubble.className = "bubble";
@@ -230,7 +251,114 @@
 
         messages.scrollTop = messages.scrollHeight;
 
+    }
+
+
+    // ---------- LOADING MESSAGE ----------
+    function addLoadingMessage() {
+
+        const messages = document.getElementById("askAiMessages");
+
+        const wrap = document.createElement("div");
+        wrap.className = "askAiMsg loading";
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = "Thinking...";
+
+        wrap.appendChild(bubble);
+        messages.appendChild(wrap);
+
+        messages.scrollTop = messages.scrollHeight;
+
         return wrap;
+
+    }
+
+
+    // ---------- AI MESSAGE (renders **bold**, - bullets, 1. numbered lists) ----------
+    function addAiMessage(rawText) {
+
+        const messages = document.getElementById("askAiMessages");
+
+        const wrap = document.createElement("div");
+        wrap.className = "askAiMsg ai";
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.innerHTML = formatAiText(rawText);
+
+        wrap.appendChild(bubble);
+        messages.appendChild(wrap);
+
+        messages.scrollTop = messages.scrollHeight;
+
+    }
+
+
+    function escapeHtml(str) {
+        return str
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+
+
+    function inlineFormat(line) {
+        // **bold** -> <strong>bold</strong>
+        return escapeHtml(line).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    }
+
+
+    function formatAiText(text) {
+
+        const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+
+        let html = "";
+        let listType = null; // "ul" | "ol" | null
+
+        function closeList() {
+            if (listType) {
+                html += listType === "ul" ? "</ul>" : "</ol>";
+                listType = null;
+            }
+        }
+
+        lines.forEach((line) => {
+
+            const bulletMatch = line.match(/^[-*]\s+(.*)/);
+            const numberedMatch = line.match(/^\d+[\.\)]\s+(.*)/);
+
+            if (bulletMatch) {
+
+                if (listType !== "ul") {
+                    closeList();
+                    html += "<ul>";
+                    listType = "ul";
+                }
+                html += `<li>${inlineFormat(bulletMatch[1])}</li>`;
+
+            } else if (numberedMatch) {
+
+                if (listType !== "ol") {
+                    closeList();
+                    html += "<ol>";
+                    listType = "ol";
+                }
+                html += `<li>${inlineFormat(numberedMatch[1])}</li>`;
+
+            } else {
+
+                closeList();
+                html += `<p>${inlineFormat(line)}</p>`;
+
+            }
+
+        });
+
+        closeList();
+
+        return html || escapeHtml(text);
 
     }
 
@@ -244,12 +372,12 @@
 
         if (!question) return;
 
-        addMessage("user", question);
+        addUserMessage(question);
         input.value = "";
 
         sendBtn.disabled = true;
 
-        const loadingMsg = addMessage("loading", "Thinking...");
+        const loadingEl = addLoadingMessage();
 
         try {
 
@@ -261,18 +389,18 @@
 
             const data = await response.json();
 
-            loadingMsg.remove();
+            loadingEl.remove();
 
             if (!data.success) {
-                addMessage("ai", data.message || "Something went wrong. Please try again.");
+                addAiMessage(data.message || "Something went wrong. Please try again.");
             } else {
-                addMessage("ai", data.answer);
+                addAiMessage(data.answer);
             }
 
         } catch (error) {
 
-            loadingMsg.remove();
-            addMessage("ai", "Unable to reach the AI service right now. Please try again in a moment.");
+            loadingEl.remove();
+            addAiMessage("Unable to reach the AI service right now. Please try again in a moment.");
 
         } finally {
 
