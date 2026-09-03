@@ -579,76 +579,133 @@ body {
     }
 }
 /* ==========================================
-   OTP VERIFICATION SCREEN — box entry style
-   Matches the Magical Blue theme in register.css
+ /* ==========================================
+   OTP VERIFICATION — HACKER TERMINAL + KEYPAD
    Add this block to the end of register.css
    ========================================== */
 
-.otp-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 20px;
-    border-radius: 50%;
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+.terminal-mode {
+    position: relative;
+    font-family: 'Share Tech Mono', monospace;
+    background: #030906;
+    border: 1px solid rgba(0, 255, 102, .35);
+    border-radius: 16px;
+    padding: 22px 26px 30px;
+    box-shadow:
+        0 0 25px rgba(0, 255, 102, .10) inset,
+        0 0 40px rgba(0, 255, 102, .08);
+    overflow: hidden;
+}
+
+/* CRT scanline overlay */
+.terminal-scanlines {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 255, 102, .035) 0px,
+        rgba(0, 255, 102, .035) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    animation: scanFlicker 6s linear infinite;
+}
+
+@keyframes scanFlicker {
+    0%, 100% { opacity: .8; }
+    50% { opacity: 1; }
+}
+
+.terminal-mode > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Fake terminal window chrome */
+.terminal-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 0;
-    background: radial-gradient(circle, rgba(56, 189, 248, .22), rgba(37, 99, 235, .06));
-    border: 1px solid rgba(96, 165, 250, .35);
-    box-shadow: 0 0 20px rgba(59, 130, 246, .30), 0 0 50px rgba(37, 99, 235, .15);
-    animation: lampGlow 3s ease-in-out infinite;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0, 255, 102, .18);
 }
 
-.otp-icon::before {
-    content: "✉";
-    font-size: 28px;
-    color: #7dd3fc;
-    filter: drop-shadow(0 0 8px #38bdf8);
+.terminal-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
 }
 
+.terminal-dot.red { background: #ff5f56; }
+.terminal-dot.yellow { background: #ffbd2e; }
+.terminal-dot.green { background: #27c93f; }
+
+.terminal-header-title {
+    margin-left: 10px;
+    font-size: 11.5px;
+    color: #4ade80;
+    opacity: .7;
+    letter-spacing: .5px;
+}
+
+.terminal-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 22px;
+    color: #39ff88;
+    text-shadow: 0 0 8px rgba(57, 255, 136, .65), 0 0 20px rgba(57, 255, 136, .35);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.terminal-subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    color: #6ee7a0;
+    font-size: 12.5px;
+    line-height: 1.6;
+    opacity: .85;
+}
+
+/* Code boxes — green terminal glow, readonly (filled via keypad) */
 .otp-boxes {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    margin: 26px 0 10px;
+    gap: 10px;
+    margin: 22px 0 6px;
 }
 
 .otp-box {
-    width: 50px;
-    height: 58px;
+    width: 44px;
+    height: 54px;
     text-align: center;
-    font-family: inherit;
+    font-family: 'Share Tech Mono', monospace;
     font-size: 22px;
-    font-weight: 600;
-    color: white;
-    border: 1px solid rgba(96, 165, 250, .25);
-    border-radius: 13px;
-    background: rgba(2, 15, 40, .65);
+    font-weight: 700;
+    color: #39ff88;
+    background: #000;
+    border: 1px solid rgba(0, 255, 102, .35);
+    border-radius: 8px;
     outline: none;
-    transition: .3s ease;
-    -moz-appearance: textfield;
-}
-
-.otp-box::-webkit-outer-spin-button,
-.otp-box::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.otp-box:focus {
-    border-color: #38bdf8;
-    background: rgba(3, 22, 55, .85);
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, .12), 0 0 25px rgba(37, 99, 235, .25);
+    caret-color: transparent;
+    text-shadow: 0 0 8px rgba(57, 255, 136, .7);
+    transition: .2s ease;
 }
 
 .otp-box.filled {
-    border-color: rgba(56, 189, 248, .55);
-    box-shadow: 0 0 15px rgba(37, 99, 235, .18);
+    border-color: #39ff88;
+    box-shadow: 0 0 12px rgba(57, 255, 136, .45), 0 0 25px rgba(57, 255, 136, .2);
 }
 
 .otp-box.error {
-    border-color: #f87171;
-    box-shadow: 0 0 15px rgba(248, 113, 113, .35);
+    border-color: #ff4747;
+    color: #ff4747;
+    text-shadow: 0 0 10px rgba(255, 71, 71, .7);
+    box-shadow: 0 0 15px rgba(255, 71, 71, .35);
     animation: otpShake .35s ease;
 }
 
@@ -660,47 +717,129 @@ body {
     80% { transform: translateX(4px); }
 }
 
-.otp-timer {
+.terminal-timer {
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: #4b9c6b;
+    margin: 4px 0 20px;
+}
+
+.terminal-timer .otp-timer-count {
+    color: #39ff88;
+    font-weight: 700;
+    text-shadow: 0 0 6px rgba(57, 255, 136, .6);
+}
+
+/* ==========================================
+   NUMBER KEYPAD — phone dialer layout
+   ========================================== */
+
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 260px;
+    margin: 0 auto 24px;
+}
+
+.keypad-btn {
+    height: 56px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 19px;
+    font-weight: 700;
+    color: #39ff88;
+    background: rgba(0, 255, 102, .04);
+    border: 1px solid rgba(0, 255, 102, .30);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: .15s ease;
+    text-shadow: 0 0 6px rgba(57, 255, 136, .5);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.keypad-btn:hover {
+    background: rgba(0, 255, 102, .12);
+    border-color: #39ff88;
+    box-shadow: 0 0 14px rgba(57, 255, 136, .30);
+}
+
+.keypad-btn:active {
+    transform: scale(.93);
+    background: rgba(57, 255, 136, .22);
+    box-shadow: 0 0 20px rgba(57, 255, 136, .5);
+}
+
+.keypad-clear,
+.keypad-back {
+    font-size: 14px;
+    color: #ff8a8a;
+    border-color: rgba(255, 90, 90, .30);
+    text-shadow: 0 0 6px rgba(255, 90, 90, .5);
+}
+
+.keypad-clear:hover,
+.keypad-back:hover {
+    background: rgba(255, 90, 90, .10);
+    border-color: #ff5a5a;
+    box-shadow: 0 0 14px rgba(255, 90, 90, .30);
+}
+
+/* Execute button */
+.terminal-btn {
+    background: #000 !important;
+    border: 1px solid #39ff88 !important;
+    color: #39ff88 !important;
+    font-family: 'Share Tech Mono', monospace !important;
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(57, 255, 136, .25) !important;
+    animation: none !important;
+}
+
+.terminal-btn:hover {
+    background: rgba(57, 255, 136, .10) !important;
+    box-shadow: 0 0 25px rgba(57, 255, 136, .45) !important;
+    transform: translateY(-2px);
+}
+
+.terminal-status {
+    font-family: 'Share Tech Mono', monospace;
     text-align: center;
     font-size: 12.5px;
-    color: #64748b;
-    margin: 2px 0 22px;
+    color: #ff8a8a;
+    min-height: 16px;
 }
 
-.otp-timer .otp-timer-count {
-    font-weight: 600;
-    color: #93c5fd;
+.terminal-link {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: #4b9c6b;
 }
 
-.resend-link {
-    background: none;
-    border: none;
-    color: #38bdf8;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    padding: 0;
-    transition: .3s;
+.terminal-link a,
+.terminal-link .resend-link {
+    color: #39ff88;
+    text-shadow: 0 0 6px rgba(57, 255, 136, .5);
 }
 
-.resend-link:hover:not(:disabled) {
-    color: #7dd3fc;
-    text-shadow: 0 0 10px rgba(56, 189, 248, .5);
-}
-
-.resend-link:disabled {
-    color: #475569;
-    cursor: default;
+.terminal-link .resend-link:disabled {
+    color: #2f5c40;
+    text-shadow: none;
 }
 
 @media (max-width: 480px) {
     .otp-box {
-        width: 42px;
-        height: 50px;
+        width: 38px;
+        height: 48px;
         font-size: 19px;
-        border-radius: 11px;
     }
     .otp-boxes {
-        gap: 8px;
+        gap: 7px;
+    }
+    .keypad {
+        max-width: 100%;
+    }
+    .keypad-btn {
+        height: 50px;
     }
 }

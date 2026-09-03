@@ -271,56 +271,83 @@
 
 
                 <!-- ================== STEP 2: VERIFY EMAIL OTP ================== -->
-                <div id="otpStep" style="display:none;">
+       <!-- ================== STEP 2: VERIFY EMAIL OTP ================== -->
+<!-- ================== STEP 2: VERIFY EMAIL OTP — HACKER TERMINAL STYLE ================== -->
+<!-- Replace your existing <div id="otpStep" ...> block with this one -->
 
-                    <h2>
-                        Verify Your Email
-                    </h2>
+<div id="otpStep" class="terminal-mode" style="display:none;">
 
-                    <p class="subtitle" id="otpSubtitle">
-                        We've emailed a 6-digit code to your inbox. Enter it below to activate your account.
-                    </p>
+    <div class="terminal-scanlines"></div>
 
-                    <form id="otpForm">
+    <div class="terminal-header">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-header-title">secure_verify.sh</span>
+    </div>
 
-                        <div class="input-group">
+    <h2 class="terminal-title">&gt; VERIFY_IDENTITY</h2>
 
-                            <label for="otpInput">
-                                6-Digit Code
-                            </label>
+    <p class="subtitle terminal-subtitle" id="otpSubtitle">
+        [ACCESS CODE TRANSMITTED TO YOUR INBOX] Enter the 6-digit key to authenticate.
+    </p>
 
-                            <input
-                                type="text"
-                                id="otpInput"
-                                placeholder="Enter the code"
-                                inputmode="numeric"
-                                maxlength="6"
-                                autocomplete="one-time-code"
-                                required
-                            >
+    <form id="otpForm">
 
-                        </div>
+        <div class="otp-boxes" id="otpBoxes">
+            <input type="text" class="otp-box" inputmode="numeric" maxlength="1" autocomplete="one-time-code" data-index="0" readonly>
+            <input type="text" class="otp-box" inputmode="numeric" maxlength="1" data-index="1" readonly>
+            <input type="text" class="otp-box" inputmode="numeric" maxlength="1" data-index="2" readonly>
+            <input type="text" class="otp-box" inputmode="numeric" maxlength="1" data-index="3" readonly>
+            <input type="text" class="otp-box" inputmode="numeric" maxlength="1" data-index="4" readonly>
+            <input type="text" class="otp-box" inputmode="numeric" maxlength="1" data-index="5" readonly>
+        </div>
 
-                        <button
-                            type="submit"
-                            class="register-btn"
-                            id="otpSubmitBtn">
+        <p class="otp-timer terminal-timer" id="otpTimer">
+            &gt; key_expires: <span class="otp-timer-count" id="otpTimerCount">10:00</span>
+        </p>
 
-                            Verify Account
+        <!-- NUMBER KEYPAD -->
+        <div class="keypad" id="otpKeypad">
+            <button type="button" class="keypad-btn" data-digit="1">1</button>
+            <button type="button" class="keypad-btn" data-digit="2">2</button>
+            <button type="button" class="keypad-btn" data-digit="3">3</button>
+            <button type="button" class="keypad-btn" data-digit="4">4</button>
+            <button type="button" class="keypad-btn" data-digit="5">5</button>
+            <button type="button" class="keypad-btn" data-digit="6">6</button>
+            <button type="button" class="keypad-btn" data-digit="7">7</button>
+            <button type="button" class="keypad-btn" data-digit="8">8</button>
+            <button type="button" class="keypad-btn" data-digit="9">9</button>
+            <button type="button" class="keypad-btn keypad-clear" id="keypadClear">C</button>
+            <button type="button" class="keypad-btn" data-digit="0">0</button>
+            <button type="button" class="keypad-btn keypad-back" id="keypadBack">⌫</button>
+        </div>
 
-                        </button>
+        <button
+            type="submit"
+            class="register-btn terminal-btn"
+            id="otpSubmitBtn">
 
-                        <p class="status-msg" id="otpStatusMsg"></p>
+            &gt; EXECUTE_VERIFY
 
-                        <p class="login-link">
-                            <a href="#" id="backToRegisterLink">
-                                &larr; Back
-                            </a>
-                        </p>
+        </button>
 
-                    </form>
+        <p class="status-msg terminal-status" id="otpStatusMsg"></p>
 
-                </div>
+        <p class="login-link terminal-link">
+            No signal received?
+            <button type="button" class="resend-link" id="resendOtpBtn">[ RESEND_KEY ]</button>
+        </p>
+
+        <p class="login-link terminal-link">
+            <a href="#" id="backToRegisterLink">
+                &lt; ABORT
+            </a>
+        </p>
+
+    </form>
+
+</div>
 
             </div>
 

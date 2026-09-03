@@ -26,14 +26,23 @@ const registerStatusMsg =
 
 
 // ======================================
-// OTP FORM
+// OTP FORM (keypad-driven box entry)
 // ======================================
 
 const otpForm =
     document.getElementById("otpForm");
 
-const otpInput =
-    document.getElementById("otpInput");
+const otpBoxes =
+    Array.from(document.querySelectorAll(".otp-box"));
+
+const keypadButtons =
+    Array.from(document.querySelectorAll(".keypad-btn[data-digit]"));
+
+const keypadClearBtn =
+    document.getElementById("keypadClear");
+
+const keypadBackBtn =
+    document.getElementById("keypadBack");
 
 const otpSubmitBtn =
     document.getElementById("otpSubmitBtn");
@@ -44,10 +53,17 @@ const otpStatusMsg =
 const otpSubtitle =
     document.getElementById("otpSubtitle");
 
+const otpTimerCount =
+    document.getElementById("otpTimerCount");
+
+const resendOtpBtn =
+    document.getElementById("resendOtpBtn");
+
 const backToRegisterLink =
     document.getElementById("backToRegisterLink");
 
 let pendingEmail = null;
+let otpCountdownInterval = null;
 
 
 // ======================================
@@ -129,6 +145,149 @@ toggleConfirmPassword.addEventListener(
 
 
 // ======================================
+// OTP BOXES — read / clear / error flash
+// ======================================
+
+function getOtpValue() {
+    return otpBoxes.map(box => box.value).join("");
+}
+
+function clearOtpBoxes() {
+    otpBoxes.forEach(box => {
+        box.value = "";
+        box.classList.remove("filled", "error");
+    });
+}
+
+function flashOtpError() {
+    otpBoxes.forEach(box => box.classList.add("error"));
+    setTimeout(() => {
+        otpBoxes.forEach(box => box.classList.remove("error"));
+    }, 400);
+}
+
+function firstEmptyIndex() {
+    return otpBoxes.findIndex(box => !box.value);
+}
+
+function lastFilledIndex() {
+    for (let i = otpBoxes.length - 1; i >= 0; i--) {
+        if (otpBoxes[i].value) return i;
+    }
+    return -1;
+}
+
+
+// ======================================
+// KEYPAD — type a digit into next empty box
+// ======================================
+
+function typeDigit(digit) {
+
+    const index = firstEmptyIndex();
+
+    if (index === -1) return; // all boxes already full
+
+    otpBoxes[index].value = digit;
+    otpBoxes[index].classList.add("filled");
+
+    otpStatusMsg.textContent = "";
+
+    if (getOtpValue().length === 6) {
+        otpForm.requestSubmit();
+    }
+
+}
+
+function backspaceDigit() {
+
+    const index = lastFilledIndex();
+
+    if (index === -1) return;
+
+    otpBoxes[index].value = "";
+    otpBoxes[index].classList.remove("filled");
+
+}
+
+
+keypadButtons.forEach(button => {
+
+    button.addEventListener("click", function () {
+        typeDigit(button.dataset.digit);
+    });
+
+});
+
+keypadClearBtn.addEventListener("click", function () {
+    clearOtpBoxes();
+});
+
+keypadBackBtn.addEventListener("click", function () {
+    backspaceDigit();
+});
+
+
+// ======================================
+// PHYSICAL KEYBOARD SUPPORT (bonus — works
+// alongside the on-screen keypad while the
+// OTP step is visible)
+// ======================================
+
+document.addEventListener("keydown", function (event) {
+
+    if (otpStep.style.display === "none") return;
+
+    if (event.key >= "0" && event.key <= "9") {
+        typeDigit(event.key);
+    }
+
+    if (event.key === "Backspace") {
+        backspaceDigit();
+    }
+
+});
+
+
+// ======================================
+// COUNTDOWN TIMER (10 minutes, matches backend expiry)
+// ======================================
+
+function startOtpCountdown() {
+
+    clearInterval(otpCountdownInterval);
+
+    let secondsLeft = 10 * 60;
+
+    function render() {
+        const m = Math.floor(secondsLeft / 60);
+        const s = secondsLeft % 60;
+        otpTimerCount.textContent = `${m}:${String(s).padStart(2, "0")}`;
+    }
+
+    render();
+
+    resendOtpBtn.disabled = true;
+
+    otpCountdownInterval = setInterval(function () {
+
+        secondsLeft--;
+
+        if (secondsLeft <= 0) {
+            clearInterval(otpCountdownInterval);
+            otpTimerCount.textContent = "00:00";
+            resendOtpBtn.disabled = false;
+            return;
+        }
+
+        render();
+
+    }, 1000);
+
+}
+
+
+// ======================================
 // SWITCH TO OTP STEP
 // ======================================
 
@@ -137,14 +296,14 @@ function showOtpStep(email) {
     pendingEmail = email;
 
     otpSubtitle.textContent =
-        `We've emailed a 6-digit code to ${email}. Enter it below to activate your account.`;
+        `[ACCESS CODE TRANSMITTED TO ${email}] Enter the 6-digit key to authenticate.`;
 
     registerStep.style.display = "none";
     otpStep.style.display = "block";
 
-    otpInput.value = "";
+    clearOtpBoxes();
     otpStatusMsg.textContent = "";
-    otpInput.focus();
+    startOtpCountdown();
 
 }
 
@@ -152,6 +311,8 @@ function showOtpStep(email) {
 backToRegisterLink.addEventListener("click", function (event) {
 
     event.preventDefault();
+
+    clearInterval(otpCountdownInterval);
 
     otpStep.style.display = "none";
     registerStep.style.display = "block";
@@ -329,6 +490,49 @@ registerForm.addEventListener(
 
 
 // ======================================
+// RESEND — requests a fresh signup OTP
+// ======================================
+
+resendOtpBtn.addEventListener("click", async function () {
+
+    resendOtpBtn.disabled = true;
+    otpStatusMsg.style.color = "";
+    otpStatusMsg.textContent = "> requesting new key...";
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/resend-signup-otp`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: pendingEmail })
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+            otpStatusMsg.style.color = "#39ff88";
+            otpStatusMsg.textContent = "> new key transmitted.";
+            clearOtpBoxes();
+            startOtpCountdown();
+        } else {
+            otpStatusMsg.style.color = "";
+            otpStatusMsg.textContent = data.message || "> resend failed.";
+            resendOtpBtn.disabled = false;
+        }
+
+    } catch (error) {
+        console.error(error);
+        otpStatusMsg.textContent = "> connection error.";
+        resendOtpBtn.disabled = false;
+    }
+
+});
+
+
+// ======================================
 // STEP 2 — VERIFY SIGNUP OTP
 // ======================================
 
@@ -336,16 +540,16 @@ otpForm.addEventListener("submit", async function (event) {
 
     event.preventDefault();
 
-    const otp = otpInput.value.trim();
+    const otp = getOtpValue();
 
-    if (!otp) {
-        otpStatusMsg.textContent = "Please enter the code.";
+    if (otp.length !== 6) {
+        otpStatusMsg.textContent = "> enter all 6 digits.";
         return;
     }
 
     otpStatusMsg.textContent = "";
     otpSubmitBtn.disabled = true;
-    otpSubmitBtn.textContent = "Verifying…";
+    otpSubmitBtn.textContent = "> VERIFYING...";
 
     try {
 
@@ -365,8 +569,10 @@ otpForm.addEventListener("submit", async function (event) {
 
         if (data.success) {
 
-            otpStatusMsg.style.color = "#16803c";
-            otpStatusMsg.textContent = "Account verified! Redirecting to login…";
+            clearInterval(otpCountdownInterval);
+
+            otpStatusMsg.style.color = "#39ff88";
+            otpStatusMsg.textContent = "> ACCESS GRANTED. Redirecting…";
 
             setTimeout(function () {
                 window.location.href = "login.html?verified=true";
@@ -375,8 +581,10 @@ otpForm.addEventListener("submit", async function (event) {
         } else {
 
             otpSubmitBtn.disabled = false;
-            otpSubmitBtn.textContent = "Verify Account";
-            otpStatusMsg.textContent = data.message || "Incorrect or expired code.";
+            otpSubmitBtn.textContent = "> EXECUTE_VERIFY";
+            otpStatusMsg.textContent = "> " + (data.message || "ACCESS DENIED. Incorrect or expired key.");
+            flashOtpError();
+            clearOtpBoxes();
 
         }
 
@@ -385,8 +593,8 @@ otpForm.addEventListener("submit", async function (event) {
         console.error("OTP Verify Error:", error);
 
         otpSubmitBtn.disabled = false;
-        otpSubmitBtn.textContent = "Verify Account";
-        otpStatusMsg.textContent = "Unable to connect to the server. Please try again.";
+        otpSubmitBtn.textContent = "> EXECUTE_VERIFY";
+        otpStatusMsg.textContent = "> connection error. try again.";
 
     }
 

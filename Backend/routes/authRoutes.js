@@ -35,6 +35,18 @@ const otpLimiter = rateLimit({
     legacyHeaders: false
 });
 
+// Limiter just for resend requests, so someone can't spam themselves new codes
+const resendLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 4,
+    message: {
+        success: false,
+        message: "Too many resend requests. Please wait a few minutes and try again."
+    },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
 
 // ==========================================
 // HELPER: GENERATE 6-DIGIT OTP
@@ -134,6 +146,74 @@ router.post("/register", async (req, res) => {
             message: "Server error."
         });
     }
+
+});
+
+
+// ==========================================
+// RESEND SIGNUP OTP
+// Issues a fresh 6-digit code for an account that
+// exists but hasn't been verified yet.
+// Body: { email }
+// ==========================================
+
+router.post("/resend-signup-otp", resendLimiter, (req, res) => {
+
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ success: false, message: "Email is required." });
+    }
+
+    const sql = "SELECT * FROM users WHERE email = ?";
+
+    db.query(sql, [email], (error, results) => {
+
+        if (error) {
+            console.error(error);
+            return res.status(500).json({ success: false, message: "Database error." });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: "Account not found." });
+        }
+
+        const user = results[0];
+
+        if (user.is_verified) {
+            return res.status(400).json({ success: false, message: "Account is already verified. Please log in." });
+        }
+
+        const otp = generateOtp();
+        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+        const updateSql = `
+            UPDATE users
+            SET verification_token = ?, token_expiry = ?
+            WHERE id = ?
+        `;
+
+        db.query(updateSql, [otp, otpExpiry, user.id], (updateError) => {
+
+            if (updateError) {
+                console.error(updateError);
+                return res.status(500).json({ success: false, message: "Unable to resend code. Please try again." });
+            }
+
+            sendOtpEmail(email, otp, "signup", (mailError) => {
+                if (mailError) {
+                    console.error("Resend OTP email failed:", mailError);
+                }
+            });
+
+            res.json({
+                success: true,
+                message: "A new code has been sent to your email."
+            });
+
+        });
+
+    });
 
 });
 
