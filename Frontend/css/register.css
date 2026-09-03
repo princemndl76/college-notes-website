@@ -578,3 +578,129 @@ body {
         scroll-behavior: auto !important;
     }
 }
+/* ==========================================
+   OTP VERIFICATION SCREEN — box entry style
+   Matches the Magical Blue theme in register.css
+   Add this block to the end of register.css
+   ========================================== */
+
+.otp-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+    background: radial-gradient(circle, rgba(56, 189, 248, .22), rgba(37, 99, 235, .06));
+    border: 1px solid rgba(96, 165, 250, .35);
+    box-shadow: 0 0 20px rgba(59, 130, 246, .30), 0 0 50px rgba(37, 99, 235, .15);
+    animation: lampGlow 3s ease-in-out infinite;
+}
+
+.otp-icon::before {
+    content: "✉";
+    font-size: 28px;
+    color: #7dd3fc;
+    filter: drop-shadow(0 0 8px #38bdf8);
+}
+
+.otp-boxes {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 26px 0 10px;
+}
+
+.otp-box {
+    width: 50px;
+    height: 58px;
+    text-align: center;
+    font-family: inherit;
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    border: 1px solid rgba(96, 165, 250, .25);
+    border-radius: 13px;
+    background: rgba(2, 15, 40, .65);
+    outline: none;
+    transition: .3s ease;
+    -moz-appearance: textfield;
+}
+
+.otp-box::-webkit-outer-spin-button,
+.otp-box::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.otp-box:focus {
+    border-color: #38bdf8;
+    background: rgba(3, 22, 55, .85);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, .12), 0 0 25px rgba(37, 99, 235, .25);
+}
+
+.otp-box.filled {
+    border-color: rgba(56, 189, 248, .55);
+    box-shadow: 0 0 15px rgba(37, 99, 235, .18);
+}
+
+.otp-box.error {
+    border-color: #f87171;
+    box-shadow: 0 0 15px rgba(248, 113, 113, .35);
+    animation: otpShake .35s ease;
+}
+
+@keyframes otpShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+}
+
+.otp-timer {
+    text-align: center;
+    font-size: 12.5px;
+    color: #64748b;
+    margin: 2px 0 22px;
+}
+
+.otp-timer .otp-timer-count {
+    font-weight: 600;
+    color: #93c5fd;
+}
+
+.resend-link {
+    background: none;
+    border: none;
+    color: #38bdf8;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    transition: .3s;
+}
+
+.resend-link:hover:not(:disabled) {
+    color: #7dd3fc;
+    text-shadow: 0 0 10px rgba(56, 189, 248, .5);
+}
+
+.resend-link:disabled {
+    color: #475569;
+    cursor: default;
+}
+
+@media (max-width: 480px) {
+    .otp-box {
+        width: 42px;
+        height: 50px;
+        font-size: 19px;
+        border-radius: 11px;
+    }
+    .otp-boxes {
+        gap: 8px;
+    }
+}
