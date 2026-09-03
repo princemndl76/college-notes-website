@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-// Try the flagship model first, then fall back to lighter/less-crowded models
-// if it's overloaded (503) or briefly unavailable.
+// Fastest model first (flash-lite), then flash as a quality/availability fallback.
 const MODEL_CANDIDATES = [
-    "gemini-3.6-flash",
     "gemini-3.1-flash-lite",
+    "gemini-3.6-flash",
     "gemini-2.5-flash"
 ];
 
@@ -22,14 +21,17 @@ async function callGemini(model, question) {
                         parts: [
                             {
                                 text:
-                                    "You are a helpful study assistant for college students. " +
-                                    "Answer clearly and concisely, using simple language and short paragraphs or bullet points where helpful. " +
-                                    "If the question is a numerical/technical problem, show the key steps.\n\n" +
-                                    "Student's question: " + question
+                                    "You are a study assistant for college students. Answer briefly and clearly — " +
+                                    "a short paragraph or a few bullet points is enough. Avoid long essays.\n\n" +
+                                    "Question: " + question
                             }
                         ]
                     }
-                ]
+                ],
+                generationConfig: {
+                    maxOutputTokens: 350,
+                    temperature: 0.4
+                }
             })
         }
     );
@@ -76,7 +78,6 @@ router.post("/ask", async (req, res) => {
 
             }
 
-            // Overloaded (503) or model temporarily unavailable -> try next model
             console.warn(`Gemini model ${model} failed (status ${result.status}):`, result.data?.error?.message);
             lastError = result.data;
 
@@ -89,7 +90,6 @@ router.post("/ask", async (req, res) => {
 
     }
 
-    // All candidate models failed
     console.error("All Gemini models failed. Last error:", lastError);
 
     res.status(502).json({
