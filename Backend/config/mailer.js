@@ -1,6 +1,6 @@
 // Uses Brevo's HTTP email API (over HTTPS/443) instead of SMTP,
 // because Render's free tier blocks outbound SMTP ports (25, 465, 587).
-
+console.log("BREVO_API_KEY present:", !!process.env.BREVO_API_KEY, "length:", process.env.BREVO_API_KEY?.length);
 const BREVO_SEND_URL = "https://api.brevo.com/v3/smtp/email";
 
 async function sendBrevoEmail({ to, subject, html }, callback) {
