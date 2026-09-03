@@ -1,6 +1,46 @@
 const express = require("express");
 const router = express.Router();
 
+// Try the flagship model first, then fall back to lighter/less-crowded models
+// if it's overloaded (503) or briefly unavailable.
+const MODEL_CANDIDATES = [
+    "gemini-3.6-flash",
+    "gemini-3.1-flash-lite",
+    "gemini-2.5-flash"
+];
+
+async function callGemini(model, question) {
+
+    const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [
+                    {
+                        parts: [
+                            {
+                                text:
+                                    "You are a helpful study assistant for college students. " +
+                                    "Answer clearly and concisely, using simple language and short paragraphs or bullet points where helpful. " +
+                                    "If the question is a numerical/technical problem, show the key steps.\n\n" +
+                                    "Student's question: " + question
+                            }
+                        ]
+                    }
+                ]
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    return { ok: response.ok, status: response.status, data };
+
+}
+
+
 // ==================================================
 // ASK AI — POST /api/ai/ask
 // Body: { question: "..." }
@@ -18,48 +58,44 @@ router.post("/ask", async (req, res) => {
         return res.status(500).json({ success: false, message: "AI service is not configured" });
     }
 
-    try {
+    let lastError = null;
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [
-                                {
-                                    text:
-                                        "You are a helpful study assistant for college students. " +
-                                        "Answer clearly and concisely, using simple language and short paragraphs or bullet points where helpful. " +
-                                        "If the question is a numerical/technical problem, show the key steps.\n\n" +
-                                        "Student's question: " + question
-                                }
-                            ]
-                        }
-                    ]
-                })
+    for (const model of MODEL_CANDIDATES) {
+
+        try {
+
+            const result = await callGemini(model, question);
+
+            if (result.ok) {
+
+                const answer =
+                    result.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+                    "Sorry, I couldn't generate an answer. Please try rephrasing your question.";
+
+                return res.json({ success: true, answer, modelUsed: model });
+
             }
-        );
 
-        const data = await response.json();
+            // Overloaded (503) or model temporarily unavailable -> try next model
+            console.warn(`Gemini model ${model} failed (status ${result.status}):`, result.data?.error?.message);
+            lastError = result.data;
 
-        if (!response.ok) {
-            console.error("Gemini API Error:", data);
-            return res.status(502).json({ success: false, message: "AI service error. Please try again." });
+        } catch (error) {
+
+            console.error(`Gemini request error for model ${model}:`, error);
+            lastError = error;
+
         }
 
-        const answer =
-            data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-            "Sorry, I couldn't generate an answer. Please try rephrasing your question.";
-
-        res.json({ success: true, answer });
-
-    } catch (error) {
-        console.error("Ask AI Error:", error);
-        res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
     }
+
+    // All candidate models failed
+    console.error("All Gemini models failed. Last error:", lastError);
+
+    res.status(502).json({
+        success: false,
+        message: "AI is experiencing high demand right now. Please try again in a moment."
+    });
 
 });
 
