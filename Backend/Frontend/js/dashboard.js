@@ -66,7 +66,16 @@ async function loadSubjects() {
             const card =
                 document.createElement("div");
 
-            card.className = "subject-card";
+           card.className = "subject-card";
+
+card.setAttribute(
+    "data-search",
+    `
+    ${subject.subject_name || ""}
+    ${subject.subject_code || ""}
+    ${subject.description || ""}
+    `.toLowerCase()
+);
 
 
             card.innerHTML = `
