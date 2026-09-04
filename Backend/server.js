@@ -20,10 +20,7 @@ const pyqRoutes = require("./routes/pyqRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const bookmarkRoutes = require("./routes/bookmarkRoutes");
 const searchRoutes = require("./routes/searchRoutes");
-
-// ⭐ PROGRESS ROUTE
 const progressRoutes = require("./routes/progressRoutes");
-
 
 // ======================================
 // CREATE APP
@@ -33,6 +30,26 @@ const app = express();
 
 app.set("trust proxy", 1);
 
+// ======================================
+// MIDDLEWARE
+// ======================================
+
+app.use(
+    cors({
+        origin: [
+            "http://localhost:5000",
+            "http://127.0.0.1:5000",
+            "https://college-notes-website-f64v.onrender.com"
+        ],
+        credentials: true
+    })
+);
+
+app.use(express.json());
+
+app.use(express.urlencoded({
+    extended: true
+}));
 
 // ======================================
 // REQUEST TIMEOUT
@@ -62,13 +79,11 @@ app.use((req, res, next) => {
 
 });
 
-
 // ======================================
 // HTTP SERVER
 // ======================================
 
 const server = http.createServer(app);
-
 
 // ======================================
 // SOCKET.IO
@@ -77,11 +92,15 @@ const server = http.createServer(app);
 const io = new Server(server, {
 
     cors: {
-        origin: "*"
+        origin: [
+            "http://localhost:5000",
+            "http://127.0.0.1:5000",
+            "https://college-notes-website-f64v.onrender.com"
+        ],
+        credentials: true
     }
 
 });
-
 
 // ======================================
 // TEST API
@@ -95,7 +114,6 @@ app.get("/api/test123", (req, res) => {
     });
 
 });
-
 
 // ======================================
 // LIVE CONNECTED USERS
@@ -116,7 +134,6 @@ io.on("connection", (socket) => {
         connectedUsers
     );
 
-
     socket.on("disconnect", () => {
 
         connectedUsers--;
@@ -134,38 +151,9 @@ io.on("connection", (socket) => {
 
 });
 
-
-// ======================================
-// CORS
-// ======================================
-
-app.use(
-    cors({
-
-        origin: [
-            "http://localhost:5000",
-            "https://college-notes-website-f64v.onrender.com"
-        ],
-
-        credentials: true
-
-    })
-);
-
-
-// ======================================
-// JSON BODY PARSER
-// ======================================
-
-app.use(
-    express.json()
-);
-
-
 // ======================================
 // API ROUTES
 // ======================================
-
 
 // ======================================
 // AUTHENTICATION
@@ -176,7 +164,6 @@ app.use(
     authRoutes
 );
 
-
 // ======================================
 // SUBJECTS / UNITS / CONTENTS / NOTES
 // ======================================
@@ -185,7 +172,6 @@ app.use(
     "/api/subjects",
     subjectRoutes
 );
-
 
 // ======================================
 // COURSES / YEARS / SEMESTERS
@@ -196,7 +182,6 @@ app.use(
     academicRoutes
 );
 
-
 // ======================================
 // ADMIN
 // ======================================
@@ -205,7 +190,6 @@ app.use(
     "/api/admin",
     adminRoutes
 );
-
 
 // ======================================
 // PREVIOUS YEAR QUESTIONS
@@ -216,7 +200,6 @@ app.use(
     pyqRoutes
 );
 
-
 // ======================================
 // AI
 // ======================================
@@ -225,7 +208,6 @@ app.use(
     "/api/ai",
     aiRoutes
 );
-
 
 // ======================================
 // BOOKMARKS
@@ -236,9 +218,8 @@ app.use(
     bookmarkRoutes
 );
 
-
 // ======================================
-// ⭐ STUDY PROGRESS
+// STUDY PROGRESS
 // ======================================
 
 app.use(
@@ -246,16 +227,18 @@ app.use(
     progressRoutes
 );
 
-
 // ======================================
 // GLOBAL SEARCH
 // ======================================
+
+// IMPORTANT:
+// Keep this route unchanged because your
+// dashboard search is currently working.
 
 app.use(
     "/api/search",
     searchRoutes
 );
-
 
 // ======================================
 // SERVE UPLOADED FILES
@@ -271,7 +254,6 @@ app.use(
     )
 );
 
-
 // ======================================
 // SERVE FRONTEND
 // ======================================
@@ -286,7 +268,6 @@ app.use(
         )
     )
 );
-
 
 // ======================================
 // HOME PAGE
@@ -305,7 +286,6 @@ app.get("/", (req, res) => {
     );
 
 });
-
 
 // ======================================
 // TEST MYSQL DATABASE
@@ -335,7 +315,6 @@ app.get("/test-db", (req, res) => {
 
             }
 
-
             res.json({
 
                 success: true,
@@ -352,9 +331,8 @@ app.get("/test-db", (req, res) => {
 
 });
 
-
 // ======================================
-// 404 API HANDLER
+// API 404 HANDLER
 // ======================================
 
 app.use(
@@ -373,6 +351,33 @@ app.use(
     }
 );
 
+// ======================================
+// GLOBAL ERROR HANDLER
+// ======================================
+
+app.use(
+    (err, req, res, next) => {
+
+        console.error(
+            "Unhandled server error:",
+            err
+        );
+
+        if (res.headersSent) {
+            return next(err);
+        }
+
+        res.status(500).json({
+
+            success: false,
+
+            message:
+                "Internal server error"
+
+        });
+
+    }
+);
 
 // ======================================
 // START SERVER
