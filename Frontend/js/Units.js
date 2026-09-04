@@ -5,11 +5,14 @@ const API_BASE_URL =
 
 
 // ==========================================
-// GET SUBJECT ID FROM URL
+// GET SUBJECT ID
 // ==========================================
 
 const params = new URLSearchParams(window.location.search);
-const subjectId = params.get("subjectId") || localStorage.getItem("selectedSubject");
+
+const subjectId =
+    params.get("subjectId") ||
+    localStorage.getItem("selectedSubject");
 
 if (!subjectId) {
     window.location.href = "dashboard.html";
@@ -20,12 +23,15 @@ if (!subjectId) {
 // ELEMENTS
 // ==========================================
 
-const subjectTitle = document.getElementById("subjectTitle");
-const unitsContainer = document.getElementById("unitsContainer");
+const subjectTitle =
+    document.getElementById("subjectTitle");
+
+const unitsContainer =
+    document.getElementById("unitsContainer");
 
 
 // ==========================================
-// LOAD UNITS FROM DATABASE
+// LOAD UNITS
 // ==========================================
 
 async function loadUnits() {
@@ -39,7 +45,10 @@ async function loadUnits() {
         const data = await response.json();
 
         if (!data.success) {
-            unitsContainer.innerHTML = "<p>Unable to load units.</p>";
+
+            unitsContainer.innerHTML =
+                "<p>Unable to load units.</p>";
+
             return;
         }
 
@@ -49,33 +58,51 @@ async function loadUnits() {
         unitsContainer.innerHTML = "";
 
         if (!data.units || data.units.length === 0) {
+
             unitsContainer.innerHTML =
                 "<p>No units available yet for this subject.</p>";
+
             return;
         }
 
+
         data.units.forEach(function (unit) {
 
-            const card = document.createElement("div");
+            const card =
+                document.createElement("div");
+
             card.className = "unit-card";
-            card.id = `unit-card-${unit.id}`;
+
+            card.id =
+                `unit-card-${unit.id}`;
+
 
             card.innerHTML = `
+
                 <h3>
                     Unit ${unit.unit_number}: ${unit.unit_name}
                 </h3>
 
-                <p>${unit.description || ""}</p>
+                <p>
+                    ${unit.description || ""}
+                </p>
 
-                <button id="toggle-btn-${unit.id}" onclick="toggleUnit(${unit.id})">
+                <button
+                    id="toggle-btn-${unit.id}"
+                    onclick="toggleUnit(${unit.id})"
+                >
                     View Topics →
                 </button>
 
                 <div
                     id="contents-${unit.id}"
                     class="unit-contents"
-                    style="display: none; margin-top: 15px;"
+                    style="
+                        display:none;
+                        margin-top:15px;
+                    "
                 ></div>
+
             `;
 
             unitsContainer.appendChild(card);
@@ -86,7 +113,10 @@ async function loadUnits() {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Load units error:",
+            error
+        );
 
         unitsContainer.innerHTML =
             "<p>Unable to connect to server.</p>";
@@ -97,28 +127,51 @@ async function loadUnits() {
 
 
 // ==========================================
-// TOGGLE UNIT CONTENTS (inline, no new page)
+// TOGGLE TOPICS
 // ==========================================
 
 async function toggleUnit(unitId) {
 
-    const contentsDiv = document.getElementById(`contents-${unitId}`);
-    const toggleBtn = document.getElementById(`toggle-btn-${unitId}`);
+    const contentsDiv =
+        document.getElementById(
+            `contents-${unitId}`
+        );
 
-    // If already open, just close it
+    const toggleBtn =
+        document.getElementById(
+            `toggle-btn-${unitId}`
+        );
+
+
+    // CLOSE
+
     if (contentsDiv.style.display === "block") {
+
         contentsDiv.style.display = "none";
-        toggleBtn.textContent = "View Topics →";
+
+        toggleBtn.textContent =
+            "View Topics →";
+
         return;
     }
 
-    // Show loading state
-    contentsDiv.style.display = "block";
-    contentsDiv.innerHTML = "<p>Loading topics...</p>";
-    toggleBtn.textContent = "Hide Topics ↑";
 
-    // Save selected unit for the notes page later
-    localStorage.setItem("selectedUnit", unitId);
+    // OPEN
+
+    contentsDiv.style.display = "block";
+
+    contentsDiv.innerHTML =
+        "<p>Loading topics...</p>";
+
+    toggleBtn.textContent =
+        "Hide Topics ↑";
+
+
+    localStorage.setItem(
+        "selectedUnit",
+        unitId
+    );
+
 
     try {
 
@@ -128,25 +181,42 @@ async function toggleUnit(unitId) {
 
         const data = await response.json();
 
+
         if (!data.success) {
-            contentsDiv.innerHTML = "<p>Unable to load contents.</p>";
+
+            contentsDiv.innerHTML =
+                "<p>Unable to load topics.</p>";
+
             return;
         }
 
-        if (!data.contents || data.contents.length === 0) {
+
+        if (
+            !data.contents ||
+            data.contents.length === 0
+        ) {
+
             contentsDiv.innerHTML =
-                "<p>No contents available yet for this unit.</p>";
+                "<p>No topics available yet.</p>";
+
             return;
         }
+
 
         contentsDiv.innerHTML = "";
 
+
         data.contents.forEach(function (content) {
 
-            const item = document.createElement("div");
-            item.className = "content-card";
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "content-card";
+
 
             item.innerHTML = `
+
                 <div class="content-number">
                     Content ${content.content_number}
                 </div>
@@ -155,9 +225,12 @@ async function toggleUnit(unitId) {
                     ${content.content_name}
                 </h4>
 
-                <button onclick="openContent(${content.id})">
-                    View Notes →
+                <button
+                    onclick="openContent(${content.id})"
+                >
+                    📖 View Notes →
                 </button>
+
             `;
 
             contentsDiv.appendChild(item);
@@ -168,7 +241,10 @@ async function toggleUnit(unitId) {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Load topics error:",
+            error
+        );
 
         contentsDiv.innerHTML =
             "<p>Unable to connect to server.</p>";
@@ -179,14 +255,18 @@ async function toggleUnit(unitId) {
 
 
 // ==========================================
-// OPEN CONTENT (still goes to notes page)
+// OPEN NOTES
 // ==========================================
 
 function openContent(contentId) {
 
-    localStorage.setItem("selectedContent", contentId);
+    localStorage.setItem(
+        "selectedContent",
+        contentId
+    );
 
-    window.location.href = `notes.html?contentId=${contentId}`;
+    window.location.href =
+        `notes.html?contentId=${contentId}`;
 
 }
 
@@ -197,13 +277,14 @@ function openContent(contentId) {
 
 function goBack() {
 
-    window.location.href = "dashboard.html";
+    window.location.href =
+        "dashboard.html";
 
 }
 
 
 // ==========================================
-// START PAGE
+// START
 // ==========================================
 
 loadUnits();
