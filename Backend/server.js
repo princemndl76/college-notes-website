@@ -12,30 +12,14 @@ const db = require("./config/db");
 // ROUTES
 // ======================================
 
-const authRoutes =
-    require("./routes/authRoutes");
-
-const subjectRoutes =
-    require("./routes/subjectRoutes");
-
-const academicRoutes =
-    require("./routes/academicRoutes");
-
-const adminRoutes =
-    require("./routes/adminRoutes");
-
-const pyqRoutes =
-    require("./routes/pyqRoutes");
-
-const aiRoutes =
-    require("./routes/aiRoutes");
-
-const bookmarkRoutes =
-    require("./routes/bookmarkRoutes");
-
-const searchRoutes =
-    require("./routes/searchRoutes");
-
+const authRoutes = require("./routes/authRoutes");
+const subjectRoutes = require("./routes/subjectRoutes");
+const academicRoutes = require("./routes/academicRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const pyqRoutes = require("./routes/pyqRoutes");
+const aiRoutes = require("./routes/aiRoutes");
+const bookmarkRoutes = require("./routes/bookmarkRoutes");
+const searchRoutes = require("./routes/searchRoutes");
 
 // ======================================
 // CREATE APP
@@ -45,13 +29,9 @@ const app = express();
 
 app.set("trust proxy", 1);
 
-
 // ======================================
 // REQUEST TIMEOUT
 // ======================================
-
-// Normal requests: 20 seconds
-// AI requests: 45 seconds
 
 app.use((req, res, next) => {
 
@@ -62,46 +42,46 @@ app.use((req, res, next) => {
 
     res.setTimeout(timeoutMs, () => {
 
-        res.status(504).json({
-            success: false,
-            message: "Request timed out"
-        });
+        if (!res.headersSent) {
+            res.status(504).json({
+                success: false,
+                message: "Request timed out"
+            });
+        }
 
     });
 
     next();
-
 });
 
+// ======================================
+// HTTP SERVER
+// ======================================
+
+const server = http.createServer(app);
 
 // ======================================
-// HTTP SERVER + SOCKET.IO
+// SOCKET.IO
 // ======================================
 
-const server =
-    http.createServer(app);
-
-const io =
-    new Server(server, {
-        cors: {
-            origin: "*"
-        }
-    });
-
+const io = new Server(server, {
+    cors: {
+        origin: "*"
+    }
+});
 
 // ======================================
 // TEST API
 // ======================================
 
-app.get(
-    "/api/test123",
-    (req, res) => {
-        res.json({
-            ok: true
-        });
-    }
-);
+app.get("/api/test123", (req, res) => {
 
+    res.json({
+        success: true,
+        message: "Backend API is working!"
+    });
+
+});
 
 // ======================================
 // LIVE CONNECTED USERS
@@ -113,15 +93,22 @@ io.on("connection", (socket) => {
 
     connectedUsers++;
 
+    console.log(
+        `User connected. Total users: ${connectedUsers}`
+    );
+
     io.emit(
         "userCount",
         connectedUsers
     );
 
-
     socket.on("disconnect", () => {
 
         connectedUsers--;
+
+        console.log(
+            `User disconnected. Total users: ${connectedUsers}`
+        );
 
         io.emit(
             "userCount",
@@ -132,9 +119,8 @@ io.on("connection", (socket) => {
 
 });
 
-
 // ======================================
-// MIDDLEWARE
+// CORS
 // ======================================
 
 app.use(
@@ -147,58 +133,66 @@ app.use(
     })
 );
 
-app.use(
-    express.json()
-);
+// ======================================
+// JSON BODY PARSER
+// ======================================
 
+app.use(express.json());
 
 // ======================================
 // API ROUTES
 // ======================================
 
+// Authentication
 app.use(
     "/api",
     authRoutes
 );
 
+// Subjects / Units / Contents / Notes
 app.use(
     "/api/subjects",
     subjectRoutes
 );
 
+// Courses / Years / Semesters
 app.use(
     "/api/academic",
     academicRoutes
 );
 
+// Admin
 app.use(
     "/api/admin",
     adminRoutes
 );
 
+// Previous Year Questions
 app.use(
     "/api/pyq",
     pyqRoutes
 );
 
+// AI
 app.use(
     "/api/ai",
     aiRoutes
 );
 
+// Bookmarks
 app.use(
     "/api/bookmarks",
     bookmarkRoutes
 );
 
+// Global Search
 app.use(
     "/api/search",
     searchRoutes
 );
 
-
 // ======================================
-// SERVE UPLOADED NOTE FILES
+// SERVE UPLOADED FILES
 // ======================================
 
 app.use(
@@ -210,7 +204,6 @@ app.use(
         )
     )
 );
-
 
 // ======================================
 // SERVE FRONTEND
@@ -227,82 +220,82 @@ app.use(
     )
 );
 
-
 // ======================================
 // HOME PAGE
 // ======================================
 
-app.get(
-    "/",
-    (req, res) => {
+app.get("/", (req, res) => {
 
-        res.sendFile(
-            path.join(
-                __dirname,
-                "..",
-                "Frontend/pages/login.html"
-            )
-        );
+    res.sendFile(
+        path.join(
+            __dirname,
+            "..",
+            "Frontend",
+            "pages",
+            "login.html"
+        )
+    );
 
-    }
-);
-
+});
 
 // ======================================
-// TEST MYSQL
+// TEST MYSQL DATABASE
 // ======================================
 
-app.get(
-    "/test-db",
-    (req, res) => {
+app.get("/test-db", (req, res) => {
 
-        db.query(
-            "SELECT 1 AS result",
-            (error, results) => {
+    db.query(
+        "SELECT 1 AS result",
+        (error, results) => {
 
-                if (error) {
+            if (error) {
 
-                    console.error(error);
+                console.error(
+                    "Database error:",
+                    error
+                );
 
-                    return res.status(500).json({
-                        success: false,
-                        message:
-                            "Database connection failed"
-                    });
-
-                }
-
-                res.json({
-                    success: true,
-                    message:
-                        "MySQL Database Connected!",
-                    result: results
+                return res.status(500).json({
+                    success: false,
+                    message: "Database connection failed"
                 });
 
             }
-        );
 
-    }
-);
+            res.json({
+                success: true,
+                message: "MySQL Database Connected!",
+                result: results
+            });
 
+        }
+    );
+
+});
+
+// ======================================
+// 404 API HANDLER
+// ======================================
+
+app.use("/api", (req, res) => {
+
+    res.status(404).json({
+        success: false,
+        message: "API endpoint not found"
+    });
+
+});
 
 // ======================================
 // START SERVER
 // ======================================
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-// IMPORTANT:
-// Use server.listen instead of app.listen
-// because Socket.IO is attached to server.
+server.listen(PORT, () => {
 
-server.listen(
-    PORT,
-    () => {
+    console.log(
+        `Server running at http://localhost:${PORT}`
+    );
 
-        console.log(
-            `Server running at http://localhost:${PORT}`
-        );
-
-    }
-);
+});

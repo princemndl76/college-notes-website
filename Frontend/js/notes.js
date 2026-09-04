@@ -5,13 +5,22 @@ const API_BASE_URL =
 
 
 // ==========================================
-// GET SUBJECT ID FROM URL
+// GET CONTENT ID FROM URL
 // ==========================================
 
 const params = new URLSearchParams(window.location.search);
-const subjectId = params.get("subjectId") || localStorage.getItem("selectedSubject");
 
-if (!subjectId) {
+const contentId =
+    params.get("contentId") ||
+    localStorage.getItem("selectedContent");
+
+
+// ==========================================
+// CHECK CONTENT ID
+// ==========================================
+
+if (!contentId) {
+    alert("Content not found.");
     window.location.href = "dashboard.html";
 }
 
@@ -20,69 +29,219 @@ if (!subjectId) {
 // ELEMENTS
 // ==========================================
 
-const subjectTitle = document.getElementById("subjectTitle");
-const unitsContainer = document.getElementById("unitsContainer");
+const contentTitle =
+    document.getElementById("contentTitle");
+
+const notesContainer =
+    document.getElementById("notesContainer");
 
 
 // ==========================================
-// LOAD UNITS FROM DATABASE
+// GET LOGIN TOKEN
 // ==========================================
 
-async function loadUnits() {
+function getToken() {
+
+    const userData =
+        localStorage.getItem("user");
+
+    if (!userData) {
+        return null;
+    }
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/subjects/${subjectId}/units`
+        const user =
+            JSON.parse(userData);
+
+        return (
+            user.token ||
+            user.accessToken ||
+            user.jwt ||
+            null
         );
 
-        const data = await response.json();
+    } catch (error) {
+
+        console.error(
+            "User data error:",
+            error
+        );
+
+        return null;
+    }
+}
+
+
+// ==========================================
+// LOAD CONTENT + NOTES
+// ==========================================
+
+async function loadNotes() {
+
+    try {
+
+        notesContainer.innerHTML =
+            "<p>Loading notes...</p>";
+
+
+        // ======================================
+        // LOAD NOTES
+        // ======================================
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/subjects/content/${contentId}/notes`
+        );
+
+        const data =
+            await response.json();
+
 
         if (!data.success) {
-            unitsContainer.innerHTML = "<p>Unable to load units.</p>";
+
+            notesContainer.innerHTML =
+                "<p>Unable to load notes.</p>";
+
             return;
         }
 
-        subjectTitle.textContent =
-            `📘 ${data.subject.subject_name}`;
 
-        unitsContainer.innerHTML = "";
+        // ======================================
+        // CONTENT TITLE
+        // ======================================
 
-        if (!data.units || data.units.length === 0) {
-            unitsContainer.innerHTML =
-                "<p>No units available yet for this subject.</p>";
-            return;
+        if (data.content) {
+
+            contentTitle.textContent =
+                `📖 ${data.content.content_name}`;
+
+        } else {
+
+            contentTitle.textContent =
+                "📖 Study Notes";
+
         }
 
-        data.units.forEach(function (unit) {
 
-            const card = document.createElement("div");
-            card.className = "unit-card";
+        // ======================================
+        // NO NOTES
+        // ======================================
 
-            card.innerHTML = `
-                <h3>
-                    Unit ${unit.unit_number}: ${unit.unit_name}
-                </h3>
+        if (
+            !data.notes ||
+            data.notes.length === 0
+        ) {
 
-                <p>${unit.description || ""}</p>
-
-                <button onclick="openUnit(${unit.id})">
-                    View Contents →
-                </button>
+            notesContainer.innerHTML = `
+                <div class="note-card">
+                    <h3>No notes available</h3>
+                    <p>
+                        Notes for this topic have not been
+                        uploaded yet.
+                    </p>
+                </div>
             `;
 
-            unitsContainer.appendChild(card);
+            return;
+        }
 
-        });
+
+        // ======================================
+        // DISPLAY NOTES
+        // ======================================
+
+        notesContainer.innerHTML = "";
+
+
+        for (const note of data.notes) {
+
+            const noteCard =
+                document.createElement("div");
+
+            noteCard.className =
+                "note-card";
+
+
+            noteCard.innerHTML = `
+
+                <div class="note-header">
+
+                    <h3>
+                        ${escapeHTML(note.title || "Untitled Note")}
+                    </h3>
+
+                </div>
+
+
+                <div class="note-body">
+
+                    ${formatNoteBody(note.body)}
+
+                </div>
+
+
+                <div class="note-actions">
+
+                    ${
+                        note.file_url
+                            ? `
+                                <a
+                                    href="${note.file_url}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="note-file-btn"
+                                >
+                                    📄 View File
+                                </a>
+                              `
+                            : ""
+                    }
+
+
+                    <button
+                        class="bookmark-btn"
+                        id="bookmark-${note.id}"
+                        onclick="toggleBookmark(${note.id})"
+                    >
+                        🔖 Save Note
+                    </button>
+
+                </div>
+
+            `;
+
+
+            notesContainer.appendChild(
+                noteCard
+            );
+
+
+            // Check bookmark status
+
+            checkBookmark(
+                note.id
+            );
+
+        }
 
     }
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Load notes error:",
+            error
+        );
 
-        unitsContainer.innerHTML =
-            "<p>Unable to connect to server.</p>";
+        notesContainer.innerHTML = `
+            <div class="note-card">
+                <h3>Unable to load notes</h3>
+                <p>
+                    Please check your internet connection
+                    and try again.
+                </p>
+            </div>
+        `;
 
     }
 
@@ -90,15 +249,304 @@ async function loadUnits() {
 
 
 // ==========================================
-// OPEN UNIT (go to contents page)
+// CHECK BOOKMARK
 // ==========================================
 
-function openUnit(unitId) {
+async function checkBookmark(noteId) {
 
-    localStorage.setItem("selectedUnit", unitId);
+    const token =
+        getToken();
 
-    window.location.href = `contents.html?unitId=${unitId}`;
+    const button =
+        document.getElementById(
+            `bookmark-${noteId}`
+        );
 
+
+    if (!button) {
+        return;
+    }
+
+
+    // User is not logged in
+
+    if (!token) {
+
+        button.textContent =
+            "🔖 Save Note";
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/api/bookmarks/check/${noteId}`,
+                {
+                    method: "GET",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            data.success &&
+            data.bookmarked
+        ) {
+
+            button.textContent =
+                "✅ Saved";
+
+            button.classList.add(
+                "bookmarked"
+            );
+
+        } else {
+
+            button.textContent =
+                "🔖 Save Note";
+
+            button.classList.remove(
+                "bookmarked"
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Check bookmark error:",
+            error
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// TOGGLE BOOKMARK
+// ==========================================
+
+async function toggleBookmark(noteId) {
+
+    const token =
+        getToken();
+
+
+    // ======================================
+    // LOGIN CHECK
+    // ======================================
+
+    if (!token) {
+
+        alert(
+            "Please login to save notes."
+        );
+
+        return;
+    }
+
+
+    const button =
+        document.getElementById(
+            `bookmark-${noteId}`
+        );
+
+
+    if (!button) {
+        return;
+    }
+
+
+    const isSaved =
+        button.classList.contains(
+            "bookmarked"
+        );
+
+
+    try {
+
+        button.disabled = true;
+
+
+        // ==================================
+        // REMOVE BOOKMARK
+        // ==================================
+
+        if (isSaved) {
+
+            const response =
+                await fetch(
+                    `${API_BASE_URL}/api/bookmarks/${noteId}`,
+                    {
+                        method: "DELETE",
+
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!data.success) {
+
+                alert(
+                    data.message ||
+                    "Unable to remove bookmark."
+                );
+
+                return;
+            }
+
+
+            button.textContent =
+                "🔖 Save Note";
+
+            button.classList.remove(
+                "bookmarked"
+            );
+
+        }
+
+
+        // ==================================
+        // ADD BOOKMARK
+        // ==================================
+
+        else {
+
+            const response =
+                await fetch(
+                    `${API_BASE_URL}/api/bookmarks`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+
+                            Authorization:
+                                `Bearer ${token}`
+                        },
+
+                        body: JSON.stringify({
+                            note_id: noteId
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!data.success) {
+
+                if (
+                    response.status === 409
+                ) {
+
+                    button.textContent =
+                        "✅ Saved";
+
+                    button.classList.add(
+                        "bookmarked"
+                    );
+
+                    return;
+
+                }
+
+
+                alert(
+                    data.message ||
+                    "Unable to save note."
+                );
+
+                return;
+            }
+
+
+            button.textContent =
+                "✅ Saved";
+
+            button.classList.add(
+                "bookmarked"
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Bookmark error:",
+            error
+        );
+
+        alert(
+            "Unable to connect to server."
+        );
+
+    }
+
+    finally {
+
+        button.disabled = false;
+
+    }
+
+}
+
+
+// ==========================================
+// FORMAT NOTE BODY
+// ==========================================
+
+function formatNoteBody(body) {
+
+    if (!body) {
+        return "<p>No note content available.</p>";
+    }
+
+
+    return escapeHTML(body)
+        .replace(/\n/g, "<br>");
+}
+
+
+// ==========================================
+// ESCAPE HTML
+// ==========================================
+
+function escapeHTML(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        value;
+
+    return div.innerHTML;
 }
 
 
@@ -108,7 +556,7 @@ function openUnit(unitId) {
 
 function goBack() {
 
-    window.location.href = "dashboard.html";
+    window.history.back();
 
 }
 
@@ -117,4 +565,4 @@ function goBack() {
 // START PAGE
 // ==========================================
 
-loadUnits();
+loadNotes();
