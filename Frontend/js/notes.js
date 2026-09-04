@@ -35,6 +35,9 @@ const contentTitle =
 const notesContainer =
     document.getElementById("notesContainer");
 
+const progressContainer =
+    document.getElementById("progressContainer");
+
 
 // ==========================================
 // GET TOKEN
@@ -42,7 +45,6 @@ const notesContainer =
 
 function getToken() {
 
-    // First try user object
     const userData = localStorage.getItem("user");
 
     if (userData) {
@@ -65,16 +67,11 @@ function getToken() {
 
         } catch (error) {
 
-            console.error(
-                "User JSON error:",
-                error
-            );
+            console.error("User JSON error:", error);
 
         }
     }
 
-
-    // Also check standalone token
     return (
         localStorage.getItem("token") ||
         localStorage.getItem("accessToken") ||
@@ -95,13 +92,13 @@ async function loadNotes() {
         notesContainer.innerHTML =
             "<p>Loading notes...</p>";
 
-
         const response = await fetch(
             `${API_BASE_URL}/api/subjects/content/${contentId}/notes`
         );
 
-
         const data = await response.json();
+
+        console.log("Notes API:", data);
 
 
         if (!data.success) {
@@ -126,7 +123,6 @@ async function loadNotes() {
 
             contentTitle.textContent =
                 "📖 Study Notes";
-
         }
 
 
@@ -134,22 +130,53 @@ async function loadNotes() {
         // NO NOTES
         // ======================================
 
-        if (
-            !data.notes ||
-            data.notes.length === 0
-        ) {
+        if (!data.notes || data.notes.length === 0) {
 
             notesContainer.innerHTML = `
                 <div class="note-card">
+
                     <h3>No notes available</h3>
+
                     <p>
-                        Notes for this topic have not been
-                        uploaded yet.
+                        Notes for this topic have not
+                        been uploaded yet.
                     </p>
+
                 </div>
             `;
 
             return;
+        }
+
+
+        // ======================================
+        // PROGRESS BUTTON
+        // ONE BUTTON FOR WHOLE CONTENT
+        // ======================================
+
+        if (progressContainer) {
+
+            progressContainer.innerHTML = `
+
+                <div class="progress-panel">
+
+                    <span class="progress-label">
+                        📊 Topic Progress
+                    </span>
+
+                    <button
+                        class="progress-btn"
+                        id="progress-${contentId}"
+                        onclick="toggleProgress(${contentId})"
+                    >
+                        ⏳ Mark as Completed
+                    </button>
+
+                </div>
+
+            `;
+
+            checkProgress(contentId);
         }
 
 
@@ -203,7 +230,7 @@ async function loadNotes() {
                                 >
                                     📄 View File
                                 </a>
-                              `
+                            `
                             : ""
                     }
 
@@ -216,15 +243,6 @@ async function loadNotes() {
                         🔖 Save Note
                     </button>
 
-
-                    <button
-                        class="progress-btn"
-                        id="progress-${note.id}"
-                        onclick="toggleProgress(${contentId})"
-                    >
-                        ⏳ Mark as Completed
-                    </button>
-
                 </div>
 
             `;
@@ -235,10 +253,6 @@ async function loadNotes() {
 
             // Check bookmark
             checkBookmark(note.id);
-
-
-            // Check progress
-            checkProgress(contentId);
 
         }
 
@@ -274,7 +288,7 @@ async function loadNotes() {
 
 
 // ==========================================
-// BOOKMARK STATUS
+// CHECK BOOKMARK
 // ==========================================
 
 async function checkBookmark(noteId) {
@@ -319,6 +333,12 @@ async function checkBookmark(noteId) {
 
         const data =
             await response.json();
+
+
+        console.log(
+            "Bookmark check:",
+            data
+        );
 
 
         if (
@@ -400,7 +420,7 @@ async function toggleBookmark(noteId) {
 
 
         // ==================================
-        // REMOVE
+        // REMOVE BOOKMARK
         // ==================================
 
         if (isSaved) {
@@ -445,7 +465,7 @@ async function toggleBookmark(noteId) {
 
 
         // ==================================
-        // ADD
+        // ADD BOOKMARK
         // ==================================
 
         else {
@@ -544,7 +564,7 @@ async function checkProgress(contentId) {
 
     const button =
         document.getElementById(
-            `progress-${getFirstNoteId()}`
+            `progress-${contentId}`
         );
 
 
@@ -568,6 +588,8 @@ async function checkProgress(contentId) {
             await fetch(
                 `${API_BASE_URL}/api/progress/check/${contentId}`,
                 {
+                    method: "GET",
+
                     headers: {
                         Authorization:
                             `Bearer ${token}`
@@ -578,6 +600,12 @@ async function checkProgress(contentId) {
 
         const data =
             await response.json();
+
+
+        console.log(
+            "Progress check:",
+            data
+        );
 
 
         if (
@@ -618,33 +646,6 @@ async function checkProgress(contentId) {
 
 
 // ==========================================
-// GET FIRST NOTE ID
-// ==========================================
-
-function getFirstNoteId() {
-
-    const button =
-        document.querySelector(
-            ".progress-btn"
-        );
-
-    if (!button) {
-        return null;
-    }
-
-
-    const id =
-        button.id.replace(
-            "progress-",
-            ""
-        );
-
-    return id;
-
-}
-
-
-// ==========================================
 // TOGGLE PROGRESS
 // ==========================================
 
@@ -664,8 +665,8 @@ async function toggleProgress(contentId) {
 
 
     const progressButton =
-        document.querySelector(
-            ".progress-btn"
+        document.getElementById(
+            `progress-${contentId}`
         );
 
 
@@ -709,6 +710,12 @@ async function toggleProgress(contentId) {
 
         const data =
             await response.json();
+
+
+        console.log(
+            "Progress update:",
+            data
+        );
 
 
         if (!data.success) {
