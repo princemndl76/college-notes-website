@@ -25,6 +25,8 @@ const pyqRoutes =
     
 const aiRoutes =
     require("./routes/aiRoutes");
+    const bookmarkRoutes =
+    require("./routes/bookmarkRoutes");
 
 const app = express();
 app.set("trust proxy", 1);
@@ -98,7 +100,7 @@ app.use("/api/pyq", pyqRoutes);
 
 
 app.use("/api/ai", aiRoutes);
-
+app.use("/api/bookmarks", bookmarkRoutes);
 
 // ======================================
 // SERVE UPLOADED NOTE FILES
