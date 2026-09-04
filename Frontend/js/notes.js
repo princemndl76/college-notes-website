@@ -5,7 +5,7 @@ const API_BASE_URL =
 
 
 // ==========================================
-// GET CONTENT ID FROM URL
+// GET CONTENT ID
 // ==========================================
 
 const params = new URLSearchParams(window.location.search);
@@ -37,44 +37,55 @@ const notesContainer =
 
 
 // ==========================================
-// GET LOGIN TOKEN
+// GET TOKEN
 // ==========================================
 
 function getToken() {
 
-    const userData =
-        localStorage.getItem("user");
+    // First try user object
+    const userData = localStorage.getItem("user");
 
-    if (!userData) {
-        return null;
+    if (userData) {
+
+        try {
+
+            const user = JSON.parse(userData);
+
+            if (user.token) {
+                return user.token;
+            }
+
+            if (user.accessToken) {
+                return user.accessToken;
+            }
+
+            if (user.jwt) {
+                return user.jwt;
+            }
+
+        } catch (error) {
+
+            console.error(
+                "User JSON error:",
+                error
+            );
+
+        }
     }
 
-    try {
 
-        const user =
-            JSON.parse(userData);
-
-        return (
-            user.token ||
-            user.accessToken ||
-            user.jwt ||
-            null
-        );
-
-    } catch (error) {
-
-        console.error(
-            "User data error:",
-            error
-        );
-
-        return null;
-    }
+    // Also check standalone token
+    return (
+        localStorage.getItem("token") ||
+        localStorage.getItem("accessToken") ||
+        localStorage.getItem("jwt") ||
+        null
+    );
 }
 
 
 // ==========================================
-// LOAD CONTENT + NOTES
+// LOAD NOTES
 // ==========================================
 
 async function loadNotes() {
@@ -85,16 +96,12 @@ async function loadNotes() {
             "<p>Loading notes...</p>";
 
 
-        // ======================================
-        // LOAD NOTES
-        // ======================================
-
         const response = await fetch(
             `${API_BASE_URL}/api/subjects/content/${contentId}/notes`
         );
 
-        const data =
-            await response.json();
+
+        const data = await response.json();
 
 
         if (!data.success) {
@@ -167,7 +174,10 @@ async function loadNotes() {
                 <div class="note-header">
 
                     <h3>
-                        ${escapeHTML(note.title || "Untitled Note")}
+                        ${escapeHTML(
+                            note.title ||
+                            "Untitled Note"
+                        )}
                     </h3>
 
                 </div>
@@ -206,21 +216,29 @@ async function loadNotes() {
                         🔖 Save Note
                     </button>
 
+
+                    <button
+                        class="progress-btn"
+                        id="progress-${note.id}"
+                        onclick="toggleProgress(${contentId})"
+                    >
+                        ⏳ Mark as Completed
+                    </button>
+
                 </div>
 
             `;
 
 
-            notesContainer.appendChild(
-                noteCard
-            );
+            notesContainer.appendChild(noteCard);
 
 
-            // Check bookmark status
+            // Check bookmark
+            checkBookmark(note.id);
 
-            checkBookmark(
-                note.id
-            );
+
+            // Check progress
+            checkProgress(contentId);
 
         }
 
@@ -234,13 +252,20 @@ async function loadNotes() {
         );
 
         notesContainer.innerHTML = `
+
             <div class="note-card">
-                <h3>Unable to load notes</h3>
+
+                <h3>
+                    Unable to load notes
+                </h3>
+
                 <p>
                     Please check your internet connection
                     and try again.
                 </p>
+
             </div>
+
         `;
 
     }
@@ -249,13 +274,12 @@ async function loadNotes() {
 
 
 // ==========================================
-// CHECK BOOKMARK
+// BOOKMARK STATUS
 // ==========================================
 
 async function checkBookmark(noteId) {
 
-    const token =
-        getToken();
+    const token = getToken();
 
     const button =
         document.getElementById(
@@ -268,12 +292,10 @@ async function checkBookmark(noteId) {
     }
 
 
-    // User is not logged in
-
     if (!token) {
 
         button.textContent =
-            "🔖 Save Note";
+            "🔖 Login to Save";
 
         return;
     }
@@ -342,13 +364,8 @@ async function checkBookmark(noteId) {
 
 async function toggleBookmark(noteId) {
 
-    const token =
-        getToken();
+    const token = getToken();
 
-
-    // ======================================
-    // LOGIN CHECK
-    // ======================================
 
     if (!token) {
 
@@ -383,7 +400,7 @@ async function toggleBookmark(noteId) {
 
 
         // ==================================
-        // REMOVE BOOKMARK
+        // REMOVE
         // ==================================
 
         if (isSaved) {
@@ -428,7 +445,7 @@ async function toggleBookmark(noteId) {
 
 
         // ==================================
-        // ADD BOOKMARK
+        // ADD
         // ==================================
 
         else {
@@ -472,7 +489,6 @@ async function toggleBookmark(noteId) {
                     );
 
                     return;
-
                 }
 
 
@@ -519,18 +535,257 @@ async function toggleBookmark(noteId) {
 
 
 // ==========================================
+// CHECK PROGRESS
+// ==========================================
+
+async function checkProgress(contentId) {
+
+    const token = getToken();
+
+    const button =
+        document.getElementById(
+            `progress-${getFirstNoteId()}`
+        );
+
+
+    if (!button) {
+        return;
+    }
+
+
+    if (!token) {
+
+        button.textContent =
+            "🔒 Login to Track Progress";
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/api/progress/check/${contentId}`,
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            data.success &&
+            data.completed
+        ) {
+
+            button.textContent =
+                "✅ Completed";
+
+            button.classList.add(
+                "completed"
+            );
+
+        } else {
+
+            button.textContent =
+                "⏳ Mark as Completed";
+
+            button.classList.remove(
+                "completed"
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Check progress error:",
+            error
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// GET FIRST NOTE ID
+// ==========================================
+
+function getFirstNoteId() {
+
+    const button =
+        document.querySelector(
+            ".progress-btn"
+        );
+
+    if (!button) {
+        return null;
+    }
+
+
+    const id =
+        button.id.replace(
+            "progress-",
+            ""
+        );
+
+    return id;
+
+}
+
+
+// ==========================================
+// TOGGLE PROGRESS
+// ==========================================
+
+async function toggleProgress(contentId) {
+
+    const token = getToken();
+
+
+    if (!token) {
+
+        alert(
+            "Please login to track your progress."
+        );
+
+        return;
+    }
+
+
+    const progressButton =
+        document.querySelector(
+            ".progress-btn"
+        );
+
+
+    if (!progressButton) {
+        return;
+    }
+
+
+    const completed =
+        progressButton.classList.contains(
+            "completed"
+        );
+
+
+    try {
+
+        progressButton.disabled = true;
+
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/api/progress/${contentId}`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        Authorization:
+                            `Bearer ${token}`
+                    },
+
+                    body: JSON.stringify({
+                        completed:
+                            !completed
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            alert(
+                data.message ||
+                "Unable to update progress."
+            );
+
+            return;
+        }
+
+
+        if (data.completed) {
+
+            progressButton.textContent =
+                "✅ Completed";
+
+            progressButton.classList.add(
+                "completed"
+            );
+
+        } else {
+
+            progressButton.textContent =
+                "⏳ Mark as Completed";
+
+            progressButton.classList.remove(
+                "completed"
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Progress error:",
+            error
+        );
+
+        alert(
+            "Unable to connect to server."
+        );
+
+    }
+
+    finally {
+
+        progressButton.disabled = false;
+
+    }
+
+}
+
+
+// ==========================================
 // FORMAT NOTE BODY
 // ==========================================
 
 function formatNoteBody(body) {
 
     if (!body) {
-        return "<p>No note content available.</p>";
+
+        return `
+            <p>
+                No note content available.
+            </p>
+        `;
+
     }
 
 
     return escapeHTML(body)
         .replace(/\n/g, "<br>");
+
 }
 
 
@@ -547,6 +802,7 @@ function escapeHTML(value) {
         value;
 
     return div.innerHTML;
+
 }
 
 
@@ -562,7 +818,7 @@ function goBack() {
 
 
 // ==========================================
-// START PAGE
+// START
 // ==========================================
 
 loadNotes();
