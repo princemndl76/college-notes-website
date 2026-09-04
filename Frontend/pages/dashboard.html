@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>College Notes | Dashboard</title>
 
     <style>
@@ -11,230 +12,9 @@
             box-sizing: border-box;
         }
 
-        /* ===== GLOBAL SEARCH BAR ===== */
-
-        #topbar {
-            gap: 20px;
-        }
-
-        .brand-section {
-            flex: 0 0 auto;
-        }
-
-        .search-wrapper {
-            position: relative;
-            flex: 1;
-            max-width: 520px;
-            min-width: 280px;
-        }
-
-        .search-box {
-            width: 100%;
-            height: 46px;
-            display: flex;
-            align-items: center;
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 14px;
-            padding: 0 10px 0 14px;
-            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .search-box:focus-within {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
-        }
-
-        .search-icon {
-            font-size: 18px;
-            margin-right: 8px;
-            flex-shrink: 0;
-        }
-
-        #globalSearch {
-            flex: 1;
-            min-width: 0;
-            border: 0;
-            outline: 0;
-            background: transparent;
-            color: #1f2937;
-            font-size: 14px;
-        }
-
-        #globalSearch::placeholder {
-            color: #9ca3af;
-        }
-
-        #clearSearch {
-            display: none;
-            border: 0;
-            background: transparent;
-            color: #9ca3af;
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        #clearSearch:hover {
-            background: #f3f4f6;
-            color: #ef4444;
-            transform: none;
-        }
-
-        .search-hint {
-            position: absolute;
-            right: 12px;
-            top: 52px;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.9);
-            pointer-events: none;
-        }
-
-        .search-status {
-            display: none;
-            margin: 0 0 18px;
-            padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: 10px;
-            color: #4b5563;
-            font-size: 13px;
-            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.10);
-        }
-
-        /* ===== SEARCH RESULTS ===== */
-
-        .global-search-result {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-            border: 1px solid #f0f1f5;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            animation: slideUp 0.3s ease backwards;
-        }
-
-        .global-search-result:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
-            border-color: #e0e7ff;
-        }
-
-        .search-result-type {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #4f46e5;
-            background: #eef2ff;
-            padding: 5px 9px;
-            border-radius: 999px;
-            margin-bottom: 10px;
-        }
-
-        .global-search-result h3 {
-            margin: 0 0 7px;
-            font-size: 17px;
-            color: #1f2937;
-        }
-
-        .global-search-result p {
-            margin: 0;
-            color: #6b7280;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .search-result-code {
-            display: inline-block;
-            margin-top: 10px;
-            color: #4f46e5;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .search-empty {
-            display: none;
-            grid-column: 1 / -1;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.94);
-            color: #6b7280;
-            padding: 28px 20px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
-        }
-
-        /* ===== RESPONSIVE SEARCH ===== */
-
-        @media (max-width: 800px) {
-
-            #topbar {
-                align-items: stretch;
-                padding: 14px 16px;
-                gap: 10px;
-            }
-
-            .brand-section {
-                flex: 1;
-            }
-
-            .search-wrapper {
-                order: 3;
-                width: 100%;
-                max-width: none;
-                min-width: 0;
-            }
-
-            .search-hint {
-                display: none;
-            }
-
-            #logoutButton {
-                align-self: center;
-            }
-        }
-
-        @media (max-width: 640px) {
-
-            #topbar {
-                padding: 14px 16px;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-
-            #topbar h1 {
-                font-size: 17px;
-            }
-
-            #content {
-                padding: 20px 16px 40px;
-            }
-
-            #sectionTitle {
-                font-size: 18px;
-            }
-
-            .browse-card,
-            .subject-card,
-            .global-search-result {
-                padding: 18px;
-            }
-
-            .bottom-actions {
-                flex-direction: column;
-            }
-
-            .bottom-actions button {
-                width: 100%;
-            }
-        }
-
-        /* ===== BODY ===== */
+        /* =====================================================
+           BODY
+        ===================================================== */
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -242,6 +22,7 @@
             padding: 0;
             color: #1a1a2e;
             min-height: 100vh;
+
             background: linear-gradient(
                 -45deg,
                 #667eea,
@@ -249,10 +30,13 @@
                 #f093fb,
                 #4facfe
             );
+
             background-size: 400% 400%;
+
             animation:
                 gradientShift 14s ease infinite,
                 fadeIn 0.5s ease;
+
             position: relative;
             overflow-x: hidden;
         }
@@ -292,6 +76,35 @@
                 transform: translateY(0);
             }
         }
+
+        @keyframes floaty {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-28px);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* =====================================================
+           BACKGROUND SHAPES
+        ===================================================== */
 
         .bg-shape {
             position: fixed;
@@ -334,39 +147,43 @@
             animation-delay: 1s;
         }
 
-        @keyframes floaty {
-
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-28px);
-            }
-        }
-
-        /* ===== TOP BAR ===== */
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
 
         #topbar {
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(6px);
+
             padding: 18px 40px;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
+
+            gap: 20px;
+
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
             position: sticky;
             top: 0;
-            z-index: 10;
+
+            z-index: 100;
+        }
+
+        .brand-section {
+            flex: 0 0 auto;
         }
 
         #topbar h1 {
             font-size: 20px;
             margin: 0;
+
             font-weight: 700;
+
             display: flex;
             align-items: center;
+
             gap: 8px;
         }
 
@@ -376,57 +193,365 @@
             margin: 2px 0 0;
         }
 
+        /* =====================================================
+           SEARCH
+        ===================================================== */
+
+        .search-wrapper {
+            position: relative;
+
+            flex: 1;
+
+            max-width: 520px;
+            min-width: 280px;
+        }
+
+        .search-box {
+            width: 100%;
+            height: 46px;
+
+            display: flex;
+            align-items: center;
+
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+
+            padding: 0 10px 0 14px;
+
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .search-box:focus-within {
+            border-color: #6366f1;
+
+            box-shadow:
+                0 0 0 4px rgba(99, 102, 241, 0.12);
+        }
+
+        .search-icon {
+            font-size: 18px;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        #globalSearch {
+            flex: 1;
+            min-width: 0;
+
+            border: 0;
+            outline: 0;
+
+            background: transparent;
+
+            color: #1f2937;
+
+            font-size: 14px;
+        }
+
+        #globalSearch::placeholder {
+            color: #9ca3af;
+        }
+
+        #clearSearch {
+            display: none;
+
+            border: 0;
+            background: transparent;
+
+            color: #9ca3af;
+
+            width: 30px;
+            height: 30px;
+
+            padding: 0;
+
+            border-radius: 50%;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            flex-shrink: 0;
+        }
+
+        #clearSearch:hover {
+            background: #f3f4f6;
+            color: #ef4444;
+        }
+
+        .search-hint {
+            position: absolute;
+
+            right: 12px;
+            top: 52px;
+
+            font-size: 11px;
+
+            color: rgba(255, 255, 255, 0.9);
+
+            pointer-events: none;
+        }
+
+        /* =====================================================
+           SEARCH RESULTS DROPDOWN
+        ===================================================== */
+
+        #searchResults {
+            position: absolute;
+
+            top: 54px;
+            left: 0;
+            right: 0;
+
+            background: white;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.22);
+
+            max-height: 450px;
+
+            overflow-y: auto;
+
+            display: none;
+
+            z-index: 9999;
+        }
+
+        .search-result {
+            padding: 14px 16px;
+
+            border-bottom: 1px solid #eeeeee;
+
+            cursor: pointer;
+
+            transition: background 0.15s ease;
+        }
+
+        .search-result:last-child {
+            border-bottom: none;
+        }
+
+        .search-result:hover {
+            background: #f5f7ff;
+        }
+
+        .search-result-type {
+            font-size: 11px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            color: #4f46e5;
+
+            margin-bottom: 4px;
+        }
+
+        .search-result-title {
+            font-size: 15px;
+
+            font-weight: 700;
+
+            color: #1f2937;
+
+            margin-bottom: 4px;
+        }
+
+        .search-result-description {
+            font-size: 12px;
+
+            color: #6b7280;
+
+            line-height: 1.4;
+        }
+
+        .search-result-code {
+            display: inline-block;
+
+            margin-top: 6px;
+
+            color: #4f46e5;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+        .search-message {
+            padding: 18px;
+
+            text-align: center;
+
+            color: #6b7280;
+
+            font-size: 13px;
+        }
+
+        /* =====================================================
+           LOGOUT
+        ===================================================== */
+
         #logoutButton {
             background: #fff;
+
             border: 1px solid #e5e7eb;
+
             color: #374151;
+
             padding: 9px 18px;
+
             border-radius: 10px;
+
             cursor: pointer;
+
             font-weight: 600;
+
             font-size: 13px;
+
             transition: all 0.2s ease;
+
             flex-shrink: 0;
         }
 
         #logoutButton:hover {
             background: #fef2f2;
+
             border-color: #fecaca;
+
             color: #dc2626;
         }
 
-        /* ===== CONTENT ===== */
+        /* =====================================================
+           CONTENT
+        ===================================================== */
 
         #content {
             max-width: 1100px;
+
             margin: 0 auto;
+
             padding: 30px 40px 60px;
+
             position: relative;
+
             z-index: 1;
         }
 
-        /* ===== BREADCRUMB ===== */
+        /* =====================================================
+           LIVE USER COUNT
+        ===================================================== */
+
+        #count {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            color: #059669;
+
+            background: rgba(236, 253, 245, 0.95);
+
+            border: 1px solid #d1fae5;
+
+            padding: 6px 12px;
+
+            border-radius: 999px;
+
+            margin-bottom: 18px;
+
+            animation: slideUp 0.4s ease;
+        }
+
+        #count::before {
+            content: "";
+
+            width: 8px;
+            height: 8px;
+
+            background: #10b981;
+
+            border-radius: 50%;
+
+            display: inline-block;
+
+            animation: pulse 1.6s infinite;
+        }
+
+        /* =====================================================
+           SEARCH STATUS
+        ===================================================== */
+
+        #searchStatus {
+            display: none;
+
+            margin: 0 0 18px;
+
+            padding: 10px 14px;
+
+            background: rgba(255, 255, 255, 0.92);
+
+            border-radius: 10px;
+
+            color: #4b5563;
+
+            font-size: 13px;
+
+            box-shadow:
+                0 5px 18px rgba(0, 0, 0, 0.10);
+        }
+
+        /* =====================================================
+           BREADCRUMB
+        ===================================================== */
 
         #breadcrumb {
             display: flex;
+
             align-items: center;
+
             flex-wrap: wrap;
+
             gap: 6px;
+
             margin-bottom: 20px;
+
             font-size: 14px;
+
             animation: slideUp 0.4s ease;
         }
 
         #breadcrumb button {
             background: none;
+
             border: none;
+
             color: #fff;
+
             font-weight: 600;
+
             font-size: 14px;
+
             cursor: pointer;
+
             padding: 4px 2px;
+
             transition: opacity 0.2s ease;
-            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+
+            text-shadow:
+                0 1px 6px rgba(0, 0, 0, 0.2);
         }
 
         #breadcrumb button:hover {
@@ -435,7 +560,9 @@
 
         #breadcrumb button:disabled {
             color: #fff;
+
             opacity: 0.85;
+
             cursor: default;
         }
 
@@ -443,100 +570,115 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
+        /* =====================================================
+           SECTION TITLE
+        ===================================================== */
+
         #sectionTitle {
             margin: 0 0 20px;
+
             font-size: 22px;
+
             font-weight: 700;
+
             color: white;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
-            animation: slideUp 0.4s ease 0.05s backwards;
+
+            text-shadow:
+                0 2px 10px rgba(0, 0, 0, 0.18);
+
+            animation:
+                slideUp 0.4s ease 0.05s backwards;
         }
 
-        /* ===== CARDS ===== */
+        /* =====================================================
+           CARDS
+        ===================================================== */
 
         #browseContainer {
             display: grid;
-            grid-template-columns: repeat(
-                auto-fit,
-                minmax(260px, 1fr)
-            );
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(260px, 1fr));
+
             gap: 18px;
+
             margin-bottom: 30px;
         }
 
         .browse-card,
         .subject-card {
             background: white;
+
             padding: 24px;
+
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.18);
+
             border: 1px solid #f0f1f5;
+
             transition:
                 transform 0.25s ease,
                 box-shadow 0.25s ease;
+
             cursor: pointer;
-            animation: slideUp 0.4s ease backwards;
-        }
 
-        .browse-card:nth-child(1) {
-            animation-delay: 0.05s;
-        }
-
-        .browse-card:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .browse-card:nth-child(3) {
-            animation-delay: 0.15s;
-        }
-
-        .browse-card:nth-child(4) {
-            animation-delay: 0.2s;
-        }
-
-        .browse-card:nth-child(5) {
-            animation-delay: 0.25s;
-        }
-
-        .browse-card:nth-child(6) {
-            animation-delay: 0.3s;
+            animation:
+                slideUp 0.4s ease backwards;
         }
 
         .browse-card:hover,
         .subject-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+
+            box-shadow:
+                0 16px 36px rgba(0, 0, 0, 0.24);
+
             border-color: #e0e7ff;
         }
 
         .browse-card h3,
         .subject-card h3 {
             margin: 0 0 6px;
+
             font-size: 17px;
+
             font-weight: 700;
         }
 
         .browse-card .meta {
             color: #6b7280;
+
             font-size: 13px;
+
             margin-bottom: 16px;
         }
 
         .subject-code {
             font-weight: 700;
+
             color: #4f46e5;
         }
 
         .browse-card button,
         .subject-card button {
             padding: 10px 18px;
+
             border: none;
+
             border-radius: 10px;
+
             cursor: pointer;
+
             background: #4f46e5;
+
             color: white;
+
             font-weight: 600;
+
             font-size: 13px;
+
             transition:
                 background 0.2s ease,
                 transform 0.15s ease;
@@ -545,38 +687,79 @@
         .browse-card button:hover,
         .subject-card button:hover {
             background: #4338ca;
+
             transform: scale(1.03);
         }
 
         .empty-msg {
             color: rgba(255, 255, 255, 0.9);
+
             font-size: 14px;
-            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+
+            text-shadow:
+                0 1px 6px rgba(0, 0, 0, 0.15);
         }
 
-        /* ===== BOTTOM ACTIONS ===== */
+        /* =====================================================
+           SEARCH EMPTY
+        ===================================================== */
+
+        #searchEmpty {
+            display: none;
+
+            grid-column: 1 / -1;
+
+            text-align: center;
+
+            background: rgba(255, 255, 255, 0.94);
+
+            color: #6b7280;
+
+            padding: 28px 20px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.14);
+        }
+
+        /* =====================================================
+           BOTTOM ACTIONS
+        ===================================================== */
 
         .bottom-actions {
             display: flex;
+
             gap: 12px;
+
             flex-wrap: wrap;
+
             margin-top: 10px;
         }
 
         .bottom-actions button {
             padding: 11px 20px;
+
             border: none;
+
             border-radius: 10px;
+
             cursor: pointer;
+
             font-weight: 600;
+
             font-size: 13px;
+
             background: rgba(255, 255, 255, 0.92);
+
             color: #4338ca;
+
             transition: all 0.2s ease;
         }
 
         .bottom-actions button:hover {
             background: #fff;
+
             transform: translateY(-2px);
         }
 
@@ -585,64 +768,107 @@
             display: none;
         }
 
-        /* ===== LIVE USER COUNT ===== */
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
 
-        #count {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #059669;
-            background: rgba(236, 253, 245, 0.95);
-            border: 1px solid #d1fae5;
-            padding: 6px 12px;
-            border-radius: 999px;
-            margin-bottom: 18px;
-            animation: slideUp 0.4s ease;
-        }
+        @media (max-width: 800px) {
 
-        #count::before {
-            content: "";
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse 1.6s infinite;
-        }
+            #topbar {
+                align-items: stretch;
 
-        @keyframes pulse {
+                padding: 14px 16px;
 
-            0% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+                gap: 10px;
+
+                flex-wrap: wrap;
             }
 
-            70% {
-                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            .brand-section {
+                flex: 1;
             }
 
-            100% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            .search-wrapper {
+                order: 3;
+
+                width: 100%;
+
+                max-width: none;
+
+                min-width: 0;
+            }
+
+            .search-hint {
+                display: none;
+            }
+
+            #logoutButton {
+                align-self: center;
+            }
+        }
+
+        @media (max-width: 640px) {
+
+            #topbar {
+                padding: 14px 16px;
+
+                flex-wrap: wrap;
+
+                gap: 8px;
+            }
+
+            #topbar h1 {
+                font-size: 17px;
+            }
+
+            #content {
+                padding: 20px 16px 40px;
+            }
+
+            #sectionTitle {
+                font-size: 18px;
+            }
+
+            .browse-card,
+            .subject-card {
+                padding: 18px;
+            }
+
+            .bottom-actions {
+                flex-direction: column;
+            }
+
+            .bottom-actions button {
+                width: 100%;
             }
         }
     </style>
 </head>
 
+
 <body>
+
+    <!-- =====================================================
+         BACKGROUND
+    ===================================================== -->
 
     <div class="bg-shape s1"></div>
     <div class="bg-shape s2"></div>
     <div class="bg-shape s3"></div>
     <div class="bg-shape s4"></div>
 
-    <!-- ===== TOP BAR ===== -->
+
+    <!-- =====================================================
+         TOP BAR
+    ===================================================== -->
 
     <div id="topbar">
 
         <div class="brand-section">
 
-            <h1>📚 College Notes</h1>
+            <h1>
+                📚 College Notes
+            </h1>
 
             <p id="welcomeMessage">
                 Welcome!
@@ -650,13 +876,17 @@
 
         </div>
 
-        <!-- ===== DATABASE SEARCH ===== -->
+
+        <!-- SEARCH -->
 
         <div class="search-wrapper">
 
             <div class="search-box">
 
-                <span class="search-icon" aria-hidden="true">
+                <span
+                    class="search-icon"
+                    aria-hidden="true"
+                >
                     🔍
                 </span>
 
@@ -680,11 +910,23 @@
 
             </div>
 
+
+            <!-- SEARCH RESULTS -->
+
+            <div
+                id="searchResults"
+                aria-live="polite"
+            ></div>
+
+
             <span class="search-hint">
                 Press Ctrl + K to search
             </span>
 
         </div>
+
+
+        <!-- LOGOUT -->
 
         <button id="logoutButton">
             Logout
@@ -692,25 +934,41 @@
 
     </div>
 
-    <!-- ===== CONTENT ===== -->
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ===================================================== -->
 
     <div id="content">
+
+        <!-- LIVE USER COUNT -->
 
         <div id="count">
             Loading…
         </div>
 
+
+        <!-- SEARCH STATUS -->
+
         <div
             id="searchStatus"
-            class="search-status"
             aria-live="polite"
         ></div>
 
+
+        <!-- BREADCRUMB -->
+
         <div id="breadcrumb"></div>
+
+
+        <!-- TITLE -->
 
         <h2 id="sectionTitle">
             Choose Your Course
         </h2>
+
+
+        <!-- CARDS -->
 
         <div id="browseContainer">
 
@@ -718,12 +976,10 @@
                 Loading...
             </p>
 
-            <div
-                id="searchEmpty"
-                class="search-empty"
-            >
+            <div id="searchEmpty">
                 🔎 No matching results found.
                 <br>
+
                 <small>
                     Try a different course, subject, unit, or note.
                 </small>
@@ -731,11 +987,14 @@
 
         </div>
 
-        <!-- ===== BOTTOM ACTIONS ===== -->
+
+        <!-- =================================================
+             BOTTOM ACTIONS
+        ================================================= -->
 
         <div class="bottom-actions">
 
-            <!-- Admin buttons -->
+            <!-- ADMIN -->
 
             <span id="adminActions">
 
@@ -753,7 +1012,8 @@
 
             </span>
 
-            <!-- Feedback button -->
+
+            <!-- FEEDBACK -->
 
             <span id="feedbackActions">
 
@@ -769,9 +1029,13 @@
 
     </div>
 
-    <!-- ===== LIVE USER COUNT ===== -->
+
+    <!-- =====================================================
+         LIVE USER COUNT
+    ===================================================== -->
 
     <script>
+
         (function () {
 
             const countEl =
@@ -810,43 +1074,45 @@
                         }
                     );
 
-                } catch (e) {
+                } catch (error) {
 
                     console.warn(
                         "Live user count unavailable:",
-                        e
+                        error
                     );
 
                     countEl.style.display =
                         "none";
                 }
-
             };
 
             script.onerror = function () {
 
                 console.warn(
-                    "socket.io.js failed to load — live count hidden."
+                    "socket.io.js failed to load"
                 );
 
                 countEl.style.display =
                     "none";
-
             };
 
             document.head.appendChild(script);
 
         })();
+
     </script>
 
-    <!-- ===== DASHBOARD JS ===== -->
+
+    <!-- =====================================================
+         DASHBOARD JS
+    ===================================================== -->
 
     <script src="/Frontend/js/dashboard.js"></script>
 
 
     <!-- =====================================================
-         DATABASE SEARCH
-         ===================================================== -->
+         GLOBAL DATABASE SEARCH
+    ===================================================== -->
 
     <script>
 
@@ -854,90 +1120,145 @@
 
             "use strict";
 
+
+            /* =================================================
+               ELEMENTS
+            ================================================= */
+
             const searchInput =
                 document.getElementById("globalSearch");
 
             const clearButton =
                 document.getElementById("clearSearch");
 
-            const container =
-                document.getElementById("browseContainer");
+            const searchResults =
+                document.getElementById("searchResults");
 
-            const status =
+            const searchStatus =
                 document.getElementById("searchStatus");
 
-            const empty =
-                document.getElementById("searchEmpty");
+            const browseContainer =
+                document.getElementById("browseContainer");
 
 
             if (
                 !searchInput ||
                 !clearButton ||
-                !container
+                !searchResults
             ) {
+                console.error(
+                    "Search elements not found."
+                );
+
                 return;
             }
 
 
-            /*
-             * Detect whether website is running locally
-             * or on Render.
-             */
+            /* =================================================
+               API
+            ================================================= */
 
-            const API_BASE =
-                window.location.hostname === "localhost" ||
-                window.location.hostname === "127.0.0.1"
-
+            const API_BASE_URL =
+                (
+                    window.location.hostname === "localhost" ||
+                    window.location.hostname === "127.0.0.1"
+                )
                     ? "http://localhost:5000"
-
                     : "https://college-notes-website-f64v.onrender.com";
 
 
             let searchTimer = null;
 
 
-            /* ===== CLEAR OLD SEARCH RESULTS ===== */
+            /* =================================================
+               NORMALIZE SEARCH
+            ================================================= */
 
-            function clearSearchResults() {
+            function normalizeSearch(query) {
 
-                container
-                    .querySelectorAll(
-                        ".global-search-result"
-                    )
-                    .forEach(function (element) {
-
-                        element.remove();
-
-                    });
-
-            }
-
-
-            /* ===== RESTORE DASHBOARD ===== */
-
-            function restoreDashboard() {
-
-                clearSearchResults();
-
-                status.style.display = "none";
-
-                empty.style.display = "none";
+                query = query.trim();
 
                 /*
-                 * Let dashboard.js show the normal
-                 * Course → Year → Semester cards again.
+                 * semester 4
+                 * 4 semester
+                 * 4th semester
                  */
 
-                if (typeof showCourses === "function") {
+                const semesterMatch =
+                    query.match(
+                        /^(?:semester\s*)?(\d+)(?:st|nd|rd|th)?\s*semester$/i
+                    );
 
-                    showCourses();
+                if (semesterMatch) {
 
+                    const number =
+                        Number(semesterMatch[1]);
+
+                    let suffix = "th";
+
+                    if (number === 1) {
+                        suffix = "st";
+                    }
+
+                    if (number === 2) {
+                        suffix = "nd";
+                    }
+
+                    if (number === 3) {
+                        suffix = "rd";
+                    }
+
+                    return (
+                        number +
+                        suffix +
+                        " semester"
+                    );
                 }
 
+
+                /*
+                 * semester 4
+                 */
+
+                const simpleSemester =
+                    query.match(
+                        /^semester\s+(\d+)$/i
+                    );
+
+                if (simpleSemester) {
+
+                    const number =
+                        Number(simpleSemester[1]);
+
+                    let suffix = "th";
+
+                    if (number === 1) {
+                        suffix = "st";
+                    }
+
+                    if (number === 2) {
+                        suffix = "nd";
+                    }
+
+                    if (number === 3) {
+                        suffix = "rd";
+                    }
+
+                    return (
+                        number +
+                        suffix +
+                        " semester"
+                    );
+                }
+
+
+                return query;
             }
 
 
-            /* ===== RESULT ICON ===== */
+            /* =================================================
+               TYPE ICON
+            ================================================= */
 
             function getIcon(type) {
 
@@ -960,11 +1281,12 @@
                 };
 
                 return icons[type] || "🔎";
-
             }
 
 
-            /* ===== RESULT TYPE ===== */
+            /* =================================================
+               TYPE NAME
+            ================================================= */
 
             function getTypeName(type) {
 
@@ -987,19 +1309,63 @@
                 };
 
                 return names[type] || "Result";
+            }
+
+
+            /* =================================================
+               CLEAR RESULTS
+            ================================================= */
+
+            function clearResults() {
+
+                searchResults.innerHTML = "";
+
+                searchResults.style.display =
+                    "none";
+
+                searchStatus.style.display =
+                    "none";
 
             }
 
 
-            /* ===== CREATE RESULT CARD ===== */
+            /* =================================================
+               RESTORE DASHBOARD
+            ================================================= */
 
-            function createResultCard(result) {
+            function restoreDashboard() {
 
-                const card =
+                clearResults();
+
+                searchInput.value = "";
+
+                clearButton.style.display =
+                    "none";
+
+
+                if (
+                    typeof window.showCourses ===
+                    "function"
+                ) {
+
+                    window.showCourses();
+
+                }
+
+            }
+
+
+            /* =================================================
+               CREATE RESULT
+            ================================================= */
+
+            function createResult(result) {
+
+                const item =
                     document.createElement("div");
 
-                card.className =
-                    "global-search-result";
+                item.className =
+                    "search-result";
 
 
                 const type =
@@ -1015,34 +1381,36 @@
 
 
                 const title =
-                    document.createElement("h3");
+                    document.createElement("div");
+
+                title.className =
+                    "search-result-title";
 
                 title.textContent =
-                    result.title || "Untitled";
+                    result.title ||
+                    "Untitled";
 
 
-                card.appendChild(type);
+                item.appendChild(type);
 
-                card.appendChild(title);
+                item.appendChild(title);
 
 
                 if (result.description) {
 
                     const description =
-                        document.createElement("p");
+                        document.createElement("div");
+
+                    description.className =
+                        "search-result-description";
 
                     let text =
                         String(result.description);
 
-                    /*
-                     * Keep very long note bodies
-                     * from making huge cards.
-                     */
-
-                    if (text.length > 180) {
+                    if (text.length > 150) {
 
                         text =
-                            text.substring(0, 180) +
+                            text.substring(0, 150) +
                             "...";
 
                     }
@@ -1050,7 +1418,9 @@
                     description.textContent =
                         text;
 
-                    card.appendChild(description);
+                    item.appendChild(
+                        description
+                    );
 
                 }
 
@@ -1066,130 +1436,125 @@
                     code.textContent =
                         result.code;
 
-                    card.appendChild(code);
+                    item.appendChild(code);
 
                 }
 
 
-                card.addEventListener(
+                item.addEventListener(
                     "click",
                     function () {
 
-                        openSearchResult(result);
+                        openResult(result);
 
                     }
                 );
 
 
-                return card;
-
+                return item;
             }
 
 
-            /* ===== OPEN SEARCH RESULT ===== */
+            /* =================================================
+               OPEN RESULT
+            ================================================= */
 
-            function openSearchResult(result) {
+            function openResult(result) {
 
                 /*
-                 * Course
+                 * COURSE
                  */
 
                 if (
                     result.type === "course" &&
-                    typeof showYears === "function"
+                    typeof window.showYears ===
+                    "function"
                 ) {
 
-                    showYears(result.id);
+                    window.showYears({
+                        id: result.id,
+                        course_name: result.title,
+                        name: result.title,
+                        title: result.title
+                    });
 
-                    searchInput.value = "";
-
-                    clearButton.style.display =
-                        "none";
-
-                    status.style.display =
-                        "none";
+                    closeSearch();
 
                     return;
                 }
 
 
                 /*
-                 * Academic Year
+                 * YEAR
                  */
 
                 if (
                     result.type === "year" &&
-                    typeof showSemesters === "function"
+                    typeof window.showSemesters ===
+                    "function"
                 ) {
 
-                    showSemesters(result.id);
+                    window.showSemesters({
+                        id: result.id,
+                        year_name: result.title,
+                        name: result.title,
+                        title: result.title
+                    });
 
-                    searchInput.value = "";
-
-                    clearButton.style.display =
-                        "none";
-
-                    status.style.display =
-                        "none";
+                    closeSearch();
 
                     return;
                 }
 
 
                 /*
-                 * Semester
+                 * SEMESTER
                  */
 
                 if (
                     result.type === "semester" &&
-                    typeof showSubjects === "function"
+                    typeof window.showSubjects ===
+                    "function"
                 ) {
 
-                    showSubjects(result.id);
+                    window.showSubjects({
+                        id: result.id,
+                        semester_name: result.title,
+                        name: result.title,
+                        title: result.title
+                    });
 
-                    searchInput.value = "";
-
-                    clearButton.style.display =
-                        "none";
-
-                    status.style.display =
-                        "none";
+                    closeSearch();
 
                     return;
                 }
 
 
                 /*
-                 * Subject
-                 *
-                 * Your dashboard.js already has
-                 * openSubject().
+                 * SUBJECT
                  */
 
                 if (
                     result.type === "subject" &&
-                    typeof openSubject === "function"
+                    typeof window.openSubject ===
+                    "function"
                 ) {
 
-                    openSubject(result.id);
+                    window.openSubject(
+                        result.id
+                    );
 
-                    searchInput.value = "";
-
-                    clearButton.style.display =
-                        "none";
-
-                    status.style.display =
-                        "none";
+                    closeSearch();
 
                     return;
                 }
 
 
                 /*
-                 * For Unit / Content / Note:
+                 * UNIT / CONTENT / NOTE
                  *
-                 * We don't guess your page URL.
-                 * Show the information for now.
+                 * These can be connected to their
+                 * exact pages later.
                  */
 
                 if (
@@ -1199,10 +1564,12 @@
                 ) {
 
                     alert(
-                        "Selected " +
                         getTypeName(result.type) +
-                        ": " +
-                        result.title
+                        ":\n\n" +
+                        (
+                            result.title ||
+                            "Untitled"
+                        )
                     );
 
                 }
@@ -1210,14 +1577,36 @@
             }
 
 
-            /* ===== PERFORM DATABASE SEARCH ===== */
+            /* =================================================
+               CLOSE SEARCH
+            ================================================= */
+
+            function closeSearch() {
+
+                searchInput.value = "";
+
+                clearButton.style.display =
+                    "none";
+
+                searchResults.innerHTML = "";
+
+                searchResults.style.display =
+                    "none";
+
+                searchStatus.style.display =
+                    "none";
+
+            }
+
+
+            /* =================================================
+               PERFORM SEARCH
+            ================================================= */
 
             async function performSearch(query) {
 
-                clearSearchResults();
-
-                empty.style.display =
-                    "none";
+                query =
+                    query.trim();
 
 
                 if (!query) {
@@ -1225,33 +1614,46 @@
                     restoreDashboard();
 
                     return;
-
                 }
 
 
-                status.textContent =
+                searchResults.innerHTML =
+                    '<div class="search-message">🔎 Searching...</div>';
+
+                searchResults.style.display =
+                    "block";
+
+
+                searchStatus.textContent =
                     "Searching for \"" +
                     query +
                     "\"...";
 
-                status.style.display =
+                searchStatus.style.display =
                     "block";
+
+
+                const normalizedQuery =
+                    normalizeSearch(query);
 
 
                 try {
 
                     const response =
                         await fetch(
-                            API_BASE +
+                            API_BASE_URL +
                             "/api/search?q=" +
-                            encodeURIComponent(query)
+                            encodeURIComponent(
+                                normalizedQuery
+                            )
                         );
 
 
                     if (!response.ok) {
 
                         throw new Error(
-                            "Search request failed"
+                            "HTTP " +
+                            response.status
                         );
 
                     }
@@ -1261,9 +1663,17 @@
                         await response.json();
 
 
+                    console.log(
+                        "Search response:",
+                        data
+                    );
+
+
                     if (
                         !data.success ||
-                        !Array.isArray(data.results)
+                        !Array.isArray(
+                            data.results
+                        )
                     ) {
 
                         throw new Error(
@@ -1273,77 +1683,70 @@
                     }
 
 
-                    /*
-                     * Hide normal dashboard cards.
-                     */
-
-                    Array.from(
-                        container.children
-                    ).forEach(function (element) {
-
-                        if (
-                            element.id !==
-                            "searchEmpty" &&
-                            !element.classList.contains(
-                                "global-search-result"
-                            )
-                        ) {
-
-                            element.style.display =
-                                "none";
-
-                        }
-
-                    });
+                    searchResults.innerHTML =
+                        "";
 
 
                     if (
                         data.results.length === 0
                     ) {
 
-                        status.textContent =
+                        searchResults.innerHTML =
+                            '<div class="search-message">🔎 No results found for "' +
+                            query +
+                            '"</div>';
+
+                        searchStatus.textContent =
                             "No results found for \"" +
                             query +
                             "\"";
 
-                        empty.style.display =
+                        searchStatus.style.display =
                             "block";
 
                         return;
-
                     }
 
 
-                    status.textContent =
+                    /*
+                     * Limit dropdown to first 15
+                     * results.
+                     */
+
+                    const results =
+                        data.results.slice(
+                            0,
+                            15
+                        );
+
+
+                    results.forEach(
+                        function (result) {
+
+                            searchResults.appendChild(
+                                createResult(result)
+                            );
+
+                        }
+                    );
+
+
+                    searchResults.style.display =
+                        "block";
+
+
+                    searchStatus.textContent =
                         data.results.length +
                         (
                             data.results.length === 1
                                 ? " result"
                                 : " results"
                         ) +
-                        " found for \"" +
-                        query +
-                        "\"";
+                        " found";
 
 
-                    /*
-                     * Show database results.
-                     */
-
-                    data.results.forEach(
-                        function (result) {
-
-                            const card =
-                                createResultCard(
-                                    result
-                                );
-
-                            container.appendChild(
-                                card
-                            );
-
-                        }
-                    );
+                    searchStatus.style.display =
+                        "block";
 
                 } catch (error) {
 
@@ -1352,21 +1755,29 @@
                         error
                     );
 
-                    status.textContent =
-                        "Unable to search right now. Please try again.";
 
-                    status.style.display =
+                    searchResults.innerHTML =
+                        '<div class="search-message">⚠️ Unable to search right now.<br>Please try again.</div>';
+
+
+                    searchResults.style.display =
                         "block";
 
-                    empty.style.display =
-                        "none";
+
+                    searchStatus.textContent =
+                        "Search service unavailable.";
+
+                    searchStatus.style.display =
+                        "block";
 
                 }
 
             }
 
 
-            /* ===== INPUT ===== */
+            /* =================================================
+               INPUT
+            ================================================= */
 
             searchInput.addEventListener(
                 "input",
@@ -1375,13 +1786,24 @@
                     const query =
                         searchInput.value.trim();
 
+
                     clearButton.style.display =
-                        query ? "block" : "none";
+                        query
+                            ? "block"
+                            : "none";
 
 
                     clearTimeout(
                         searchTimer
                     );
+
+
+                    if (!query) {
+
+                        restoreDashboard();
+
+                        return;
+                    }
 
 
                     searchTimer =
@@ -1400,17 +1822,13 @@
             );
 
 
-            /* ===== CLEAR BUTTON ===== */
+            /* =================================================
+               CLEAR
+            ================================================= */
 
             clearButton.addEventListener(
                 "click",
                 function () {
-
-                    searchInput.value =
-                        "";
-
-                    clearButton.style.display =
-                        "none";
 
                     restoreDashboard();
 
@@ -1420,21 +1838,18 @@
             );
 
 
-            /* ===== ESCAPE KEY ===== */
+            /* =================================================
+               ESC
+            ================================================= */
 
             searchInput.addEventListener(
                 "keydown",
                 function (event) {
 
                     if (
-                        event.key === "Escape"
+                        event.key ===
+                        "Escape"
                     ) {
-
-                        searchInput.value =
-                            "";
-
-                        clearButton.style.display =
-                            "none";
 
                         restoreDashboard();
 
@@ -1444,16 +1859,21 @@
             );
 
 
-            /* ===== CTRL + K ===== */
+            /* =================================================
+               CTRL + K
+            ================================================= */
 
             document.addEventListener(
                 "keydown",
                 function (event) {
 
                     if (
-                        (event.ctrlKey ||
-                            event.metaKey) &&
-                        event.key.toLowerCase() === "k"
+                        (
+                            event.ctrlKey ||
+                            event.metaKey
+                        ) &&
+                        event.key.toLowerCase() ===
+                        "k"
                     ) {
 
                         event.preventDefault();
@@ -1467,19 +1887,47 @@
                 }
             );
 
+
+            /* =================================================
+               CLICK OUTSIDE
+            ================================================= */
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        !event.target.closest(
+                            ".search-wrapper"
+                        )
+                    ) {
+
+                        searchResults.style.display =
+                            "none";
+
+                    }
+
+                }
+            );
+
         })();
 
     </script>
 
 
-    <!-- ===== DARK MODE ===== -->
+    <!-- =====================================================
+         DARK MODE
+    ===================================================== -->
 
     <script src="../js/dark-mode.js"></script>
 
-    <!-- ===== ASK AI ===== -->
+
+    <!-- =====================================================
+         ASK AI
+    ===================================================== -->
 
     <script src="../js/ask-ai.js"></script>
 
-</body>
 
+</body>
 </html>
