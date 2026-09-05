@@ -195,12 +195,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // INLINE FILE VIEWER
+    // INLINE FILE VIEWER (now with view/download tracking)
     // ==========================================
 
     let fileViewerCounter = 0;
 
-    function renderFileButton(fileUrl) {
+    function renderFileButton(fileUrl, noteId, noteType, views, downloads) {
 
         if (!fileUrl) return "";
 
@@ -209,8 +209,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return `
             <div style="margin-top:8px;">
-                <button onclick="toggleFileView('${uid}', '${fileUrl}')" style="padding:4px 10px; font-size:13px;">
+                <span style="font-size:12px; font-weight:600; color:#4b5563; background:#f3f4f6; padding:3px 8px; border-radius:999px; margin-right:6px;">
+                    👁️ ${views || 0} views
+                </span>
+                <span style="font-size:12px; font-weight:600; color:#4b5563; background:#f3f4f6; padding:3px 8px; border-radius:999px; margin-right:8px;">
+                    ⬇️ ${downloads || 0} downloads
+                </span>
+                <button onclick="toggleFileView('${uid}', ${noteId}, '${noteType}')" style="padding:4px 10px; font-size:13px;">
                     📄 Open File
+                </button>
+                <button onclick="downloadNote(${noteId}, '${noteType}')" style="padding:4px 10px; font-size:13px; margin-left:6px; background:#16a34a;">
+                    ⬇️ Download
                 </button>
                 <div id="${uid}" style="display:none; margin-top:10px;"></div>
             </div>
@@ -218,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-    window.toggleFileView = function (uid, fileUrl) {
+    window.toggleFileView = async function (uid, noteId, noteType) {
 
         const container = document.getElementById(uid);
 
@@ -228,14 +237,38 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        container.style.display = "block";
-        container.innerHTML = `
-            <iframe
-                src="${fileUrl}"
-                style="width:100%; height:600px; border:1px solid #ccc; border-radius:6px;"
-            ></iframe>
-        `;
+        try {
 
+            const res = await fetch(
+                `${API_BASE_URL}/api/subjects/notes/${noteId}/view?type=${noteType}`
+            );
+            const data = await res.json();
+
+            if (!data.success || !data.note || !data.note.file_url) {
+                container.style.display = "block";
+                container.innerHTML = "<p>Unable to load file.</p>";
+                return;
+            }
+
+            container.style.display = "block";
+            container.innerHTML = `
+                <iframe
+                    src="${data.note.file_url}"
+                    style="width:100%; height:600px; border:1px solid #ccc; border-radius:6px;"
+                ></iframe>
+            `;
+
+        } catch (error) {
+            console.error("View file error:", error);
+            container.style.display = "block";
+            container.innerHTML = "<p>Unable to connect to server.</p>";
+        }
+
+    };
+
+    window.downloadNote = function (noteId, noteType) {
+        window.location.href =
+            `${API_BASE_URL}/api/subjects/notes/${noteId}/download?type=${noteType}`;
     };
 
     // ==========================================
@@ -425,7 +458,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             ${renderBookmarkButton(note.id, "subject", note.title, note.file_url, bookmarkStates[i])}
                             ${renderProgressCheckbox(note.id, "subject", progressStates[i])}
                             ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
-                            ${renderFileButton(note.file_url)}
+                            ${renderFileButton(note.file_url, note.id, "subject", note.views, note.downloads)}
                         </div>
                     `).join("")}
                 </div>
@@ -509,7 +542,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 ${renderBookmarkButton(note.id, "unit", note.title, note.file_url, shortBookmarkStates[i])}
                                 ${renderProgressCheckbox(note.id, "unit", shortProgressStates[i])}
                                 ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
-                                ${renderFileButton(note.file_url)}
+                                ${renderFileButton(note.file_url, note.id, "unit", note.views, note.downloads)}
                             </div>
                         `).join("")}
                     </div>
@@ -581,7 +614,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <strong>${note.title}</strong>
                     ${renderBookmarkButton(note.id, "content", note.title, note.file_url, bookmarkStates[i])}
                     ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
-                    ${renderFileButton(note.file_url)}
+                    ${renderFileButton(note.file_url, note.id, "content", note.views, note.downloads)}
                 </div>
             `).join("");
         } catch (error) {

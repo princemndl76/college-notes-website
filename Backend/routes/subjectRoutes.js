@@ -381,6 +381,8 @@ router.get("/content/:contentId/notes", (req, res) => {
                 title,
                 body,
                 file_url,
+                views,
+                downloads,
                 created_at
             FROM notes
             WHERE content_id = ?
@@ -440,7 +442,7 @@ router.get("/unit/:unitId/short-notes", (req, res) => {
         const { subject_id, unit_number } = unitResults[0];
 
         const notesSql = `
-            SELECT id, title, body, file_url
+            SELECT id, title, body, file_url, views, downloads
             FROM short_notes
             WHERE subject_id = ? AND unit_number = ?
             ORDER BY id
@@ -549,7 +551,7 @@ router.get("/:subjectId/subject-notes", (req, res) => {
     const subjectId = req.params.subjectId;
 
     const sql = `
-        SELECT id, title, body, file_url, created_at
+        SELECT id, title, body, file_url, views, downloads, created_at
         FROM subject_notes
         WHERE subject_id = ?
         ORDER BY created_at DESC
@@ -646,23 +648,38 @@ router.delete("/subject-notes/:id", (req, res) => {
     });
 
 });
+
+
 // ==================================================
-// TRACK NOTE VIEW
-// GET /api/subjects/notes/:id/view
+// TRACK NOTE VIEW (works for content, unit, subject)
+// GET /api/subjects/notes/:id/view?type=content|unit|subject
 // ==================================================
 
 router.get("/notes/:id/view", (req, res) => {
 
     const noteId = req.params.id;
+    const type = req.query.type || "content";
 
-    db.query("UPDATE notes SET views = views + 1 WHERE id = ?", [noteId], (error) => {
+    const tableMap = {
+        content: "notes",
+        unit: "short_notes",
+        subject: "subject_notes"
+    };
+
+    const table = tableMap[type];
+
+    if (!table) {
+        return res.status(400).json({ success: false, message: "Invalid note type" });
+    }
+
+    db.query(`UPDATE ${table} SET views = views + 1 WHERE id = ?`, [noteId], (error) => {
 
         if (error) {
             console.error("Increment View Error:", error);
             return res.status(500).json({ success: false, message: "Unable to update view count" });
         }
 
-        db.query("SELECT * FROM notes WHERE id = ?", [noteId], (error2, results) => {
+        db.query(`SELECT * FROM ${table} WHERE id = ?`, [noteId], (error2, results) => {
 
             if (error2) {
                 console.error("Fetch Note Error:", error2);
@@ -683,23 +700,35 @@ router.get("/notes/:id/view", (req, res) => {
 
 
 // ==================================================
-// TRACK NOTE DOWNLOAD
-// GET /api/subjects/notes/:id/download
-// Redirects to the Cloudinary file URL after counting
+// TRACK NOTE DOWNLOAD (works for content, unit, subject)
+// GET /api/subjects/notes/:id/download?type=content|unit|subject
 // ==================================================
 
 router.get("/notes/:id/download", (req, res) => {
 
     const noteId = req.params.id;
+    const type = req.query.type || "content";
 
-    db.query("UPDATE notes SET downloads = downloads + 1 WHERE id = ?", [noteId], (error) => {
+    const tableMap = {
+        content: "notes",
+        unit: "short_notes",
+        subject: "subject_notes"
+    };
+
+    const table = tableMap[type];
+
+    if (!table) {
+        return res.status(400).json({ success: false, message: "Invalid note type" });
+    }
+
+    db.query(`UPDATE ${table} SET downloads = downloads + 1 WHERE id = ?`, [noteId], (error) => {
 
         if (error) {
             console.error("Increment Download Error:", error);
             return res.status(500).json({ success: false, message: "Unable to update download count" });
         }
 
-        db.query("SELECT file_url FROM notes WHERE id = ?", [noteId], (error2, results) => {
+        db.query(`SELECT file_url FROM ${table} WHERE id = ?`, [noteId], (error2, results) => {
 
             if (error2) {
                 console.error("Fetch File URL Error:", error2);
@@ -847,5 +876,6 @@ router.get("/exam-alert/:semester", (req, res) => {
     });
 
 });
+
 
 module.exports = router;
