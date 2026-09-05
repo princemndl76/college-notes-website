@@ -79,10 +79,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 if (opt.key === q.correct_option) {
+
                     btn.style.borderColor = "#10b981";
                     btn.style.background = "#d1fae5";
                     btn.style.color = "#047857";
+
+                    // Correct answer - auto close after a short delay
+                    setTimeout(function () {
+                        closeSubjectQuizWidget();
+                    }, 1000);
+
                 } else {
+
                     btn.style.borderColor = "#ef4444";
                     btn.style.background = "#fee2e2";
                     btn.style.color = "#b91c1c";
@@ -94,6 +102,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             b.style.color = "#047857";
                         }
                     });
+
+                    // Wrong answer - stays open, user closes manually
+
                 }
 
             });
