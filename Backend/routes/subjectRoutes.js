@@ -646,6 +646,206 @@ router.delete("/subject-notes/:id", (req, res) => {
     });
 
 });
+// ==================================================
+// TRACK NOTE VIEW
+// GET /api/subjects/notes/:id/view
+// ==================================================
 
+router.get("/notes/:id/view", (req, res) => {
+
+    const noteId = req.params.id;
+
+    db.query("UPDATE notes SET views = views + 1 WHERE id = ?", [noteId], (error) => {
+
+        if (error) {
+            console.error("Increment View Error:", error);
+            return res.status(500).json({ success: false, message: "Unable to update view count" });
+        }
+
+        db.query("SELECT * FROM notes WHERE id = ?", [noteId], (error2, results) => {
+
+            if (error2) {
+                console.error("Fetch Note Error:", error2);
+                return res.status(500).json({ success: false, message: "Unable to load note" });
+            }
+
+            if (results.length === 0) {
+                return res.status(404).json({ success: false, message: "Note not found" });
+            }
+
+            res.json({ success: true, note: results[0] });
+
+        });
+
+    });
+
+});
+
+
+// ==================================================
+// TRACK NOTE DOWNLOAD
+// GET /api/subjects/notes/:id/download
+// Redirects to the Cloudinary file URL after counting
+// ==================================================
+
+router.get("/notes/:id/download", (req, res) => {
+
+    const noteId = req.params.id;
+
+    db.query("UPDATE notes SET downloads = downloads + 1 WHERE id = ?", [noteId], (error) => {
+
+        if (error) {
+            console.error("Increment Download Error:", error);
+            return res.status(500).json({ success: false, message: "Unable to update download count" });
+        }
+
+        db.query("SELECT file_url FROM notes WHERE id = ?", [noteId], (error2, results) => {
+
+            if (error2) {
+                console.error("Fetch File URL Error:", error2);
+                return res.status(500).json({ success: false, message: "Unable to load file" });
+            }
+
+            if (results.length === 0 || !results[0].file_url) {
+                return res.status(404).json({ success: false, message: "File not found" });
+            }
+
+            res.redirect(results[0].file_url);
+
+        });
+
+    });
+
+});
+
+
+// ==================================================
+// LEADERBOARD - TOP CONTRIBUTORS
+// GET /api/subjects/leaderboard
+// ==================================================
+
+router.get("/leaderboard", (req, res) => {
+
+    const sql = `
+        SELECT
+            u.id,
+            u.full_name,
+            COUNT(n.id) AS upload_count,
+            COALESCE(SUM(n.views), 0) AS total_views,
+            COALESCE(SUM(n.downloads), 0) AS total_downloads
+        FROM users u
+        JOIN notes n ON n.uploaded_by = u.id
+        GROUP BY u.id
+        ORDER BY upload_count DESC, total_views DESC
+        LIMIT 20
+    `;
+
+    db.query(sql, (error, results) => {
+
+        if (error) {
+            console.error("Leaderboard Error:", error);
+            return res.status(500).json({ success: false, message: "Unable to load leaderboard" });
+        }
+
+        res.json({ success: true, leaderboard: results });
+
+    });
+
+});
+
+
+// ==================================================
+// MY UPLOADS - LOGGED-IN USER'S CONTRIBUTION STATS
+// GET /api/subjects/my-uploads
+// ==================================================
+
+router.get("/my-uploads", verifyToken, (req, res) => {
+
+    const userId = req.user.id;
+
+    const sql = `
+        SELECT id, title, views, downloads, created_at
+        FROM notes
+        WHERE uploaded_by = ?
+        ORDER BY created_at DESC
+    `;
+
+    db.query(sql, [userId], (error, results) => {
+
+        if (error) {
+            console.error("My Uploads Error:", error);
+            return res.status(500).json({ success: false, message: "Unable to load your uploads" });
+        }
+
+        res.json({ success: true, uploads: results });
+
+    });
+
+});
+
+
+// ==================================================
+// EXAM ALERT - TOP NOTES FOR UPCOMING SEMESTER EXAM
+// GET /api/subjects/exam-alert/:semester
+// ==================================================
+
+router.get("/exam-alert/:semester", (req, res) => {
+
+    const semesterNumber = req.params.semester;
+
+    const examSql = `
+        SELECT exam_date
+        FROM exam_schedule
+        WHERE semester = ? AND exam_date >= CURDATE()
+        ORDER BY exam_date ASC
+        LIMIT 1
+    `;
+
+    db.query(examSql, [semesterNumber], (error, examResults) => {
+
+        if (error) {
+            console.error("Exam Alert Error:", error);
+            return res.status(500).json({ success: false, message: "Unable to load exam alert" });
+        }
+
+        if (examResults.length === 0) {
+            return res.json({ success: true, hasExam: false });
+        }
+
+        const examDate = examResults[0].exam_date;
+        const daysLeft = Math.ceil((new Date(examDate) - new Date()) / (1000 * 60 * 60 * 24));
+
+        const notesSql = `
+            SELECT n.id, n.title, n.views
+            FROM notes n
+            JOIN contents c ON n.content_id = c.id
+            JOIN units u ON c.unit_id = u.id
+            JOIN subjects s ON u.subject_id = s.id
+            JOIN semesters sem ON s.semester_id = sem.id
+            WHERE sem.semester_number = ?
+            ORDER BY n.views DESC
+            LIMIT 5
+        `;
+
+        db.query(notesSql, [semesterNumber], (error2, notesResults) => {
+
+            if (error2) {
+                console.error("Top Notes Error:", error2);
+                return res.status(500).json({ success: false, message: "Unable to load top notes" });
+            }
+
+            res.json({
+                success: true,
+                hasExam: true,
+                daysLeft,
+                examDate,
+                topNotes: notesResults
+            });
+
+        });
+
+    });
+
+});
 
 module.exports = router;
