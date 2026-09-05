@@ -4,30 +4,49 @@ const router = express.Router();
 const db = require("../config/db");
 const { verifyToken } = require("../middleware/auth");
 
+// Valid note_type values: 'content', 'unit', 'subject'
+
+
 // ==========================================
 // ADD BOOKMARK
 // POST /api/bookmarks
+// Body: { note_id, note_type, title, file_url }
 // ==========================================
 router.post("/", verifyToken, (req, res) => {
 
-    const { note_id } = req.body;
+    const { note_id, note_type, title, file_url } = req.body;
     const user_id = req.user.id;
 
-    if (!note_id) {
+    if (!note_id || !note_type || !title) {
         return res.status(400).json({
             success: false,
-            message: "note_id is required."
+            message: "note_id, note_type and title are required."
         });
     }
 
-    // Check if note exists
+    if (!["content", "unit", "subject"].includes(note_type)) {
+        return res.status(400).json({
+            success: false,
+            message: "note_type must be 'content', 'unit', or 'subject'."
+        });
+    }
+
     db.query(
-        "SELECT id FROM notes WHERE id = ?",
-        [note_id],
-        (err, notes) => {
+        `INSERT INTO bookmarks (user_id, note_id, note_type, title, file_url)
+         VALUES (?, ?, ?, ?, ?)`,
+        [user_id, note_id, note_type, title, file_url || null],
+        (err, result) => {
 
             if (err) {
-                console.error("Check note error:", err);
+
+                if (err.code === "ER_DUP_ENTRY") {
+                    return res.status(409).json({
+                        success: false,
+                        message: "Note is already bookmarked."
+                    });
+                }
+
+                console.error("Add bookmark error:", err);
 
                 return res.status(500).json({
                     success: false,
@@ -35,44 +54,10 @@ router.post("/", verifyToken, (req, res) => {
                 });
             }
 
-            if (notes.length === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Note not found."
-                });
-            }
-
-            // Insert bookmark
-            db.query(
-                `INSERT INTO bookmarks (user_id, note_id)
-                 VALUES (?, ?)`,
-                [user_id, note_id],
-                (err, result) => {
-
-                    if (err) {
-
-                        // Already bookmarked
-                        if (err.code === "ER_DUP_ENTRY") {
-                            return res.status(409).json({
-                                success: false,
-                                message: "Note is already bookmarked."
-                            });
-                        }
-
-                        console.error("Add bookmark error:", err);
-
-                        return res.status(500).json({
-                            success: false,
-                            message: "Server error."
-                        });
-                    }
-
-                    res.status(201).json({
-                        success: true,
-                        message: "Note bookmarked successfully."
-                    });
-                }
-            );
+            res.status(201).json({
+                success: true,
+                message: "Note bookmarked successfully."
+            });
         }
     );
 });
@@ -80,17 +65,18 @@ router.post("/", verifyToken, (req, res) => {
 
 // ==========================================
 // REMOVE BOOKMARK
-// DELETE /api/bookmarks/:noteId
+// DELETE /api/bookmarks/:noteId?type=unit
 // ==========================================
 router.delete("/:noteId", verifyToken, (req, res) => {
 
     const user_id = req.user.id;
     const note_id = req.params.noteId;
+    const note_type = req.query.type || "content";
 
     db.query(
         `DELETE FROM bookmarks
-         WHERE user_id = ? AND note_id = ?`,
-        [user_id, note_id],
+         WHERE user_id = ? AND note_id = ? AND note_type = ?`,
+        [user_id, note_id, note_type],
         (err, result) => {
 
             if (err) {
@@ -127,19 +113,10 @@ router.get("/", verifyToken, (req, res) => {
     const user_id = req.user.id;
 
     db.query(
-        `SELECT
-            b.id AS bookmark_id,
-            b.note_id,
-            b.created_at,
-            n.title,
-            n.body,
-            n.file_url,
-            n.created_at AS note_created_at
-         FROM bookmarks b
-         INNER JOIN notes n
-            ON b.note_id = n.id
-         WHERE b.user_id = ?
-         ORDER BY b.created_at DESC`,
+        `SELECT id, note_id, note_type, title, file_url, created_at
+         FROM bookmarks
+         WHERE user_id = ?
+         ORDER BY created_at DESC`,
         [user_id],
         (err, bookmarks) => {
 
@@ -163,18 +140,19 @@ router.get("/", verifyToken, (req, res) => {
 
 // ==========================================
 // CHECK BOOKMARK
-// GET /api/bookmarks/check/:noteId
+// GET /api/bookmarks/check/:noteId?type=unit
 // ==========================================
 router.get("/check/:noteId", verifyToken, (req, res) => {
 
     const user_id = req.user.id;
     const note_id = req.params.noteId;
+    const note_type = req.query.type || "content";
 
     db.query(
         `SELECT id
          FROM bookmarks
-         WHERE user_id = ? AND note_id = ?`,
-        [user_id, note_id],
+         WHERE user_id = ? AND note_id = ? AND note_type = ?`,
+        [user_id, note_id, note_type],
         (err, rows) => {
 
             if (err) {

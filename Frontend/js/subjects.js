@@ -99,15 +99,18 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // ==========================================
-    // BOOKMARKS (only for content-level notes,
-    // since bookmarkRoutes.js checks the "notes" table)
+    // BOOKMARKS
+    // Works for all three note types now:
+    // 'content' (topic notes), 'unit' (short_notes),
+    // 'subject' (subject_notes)
     // ==========================================
 
-    async function isBookmarked(noteId) {
+    async function isBookmarked(noteId, noteType) {
         try {
-            const res = await fetch(`${API_BASE_URL}/api/bookmarks/check/${noteId}`, {
-                headers: authHeaders()
-            });
+            const res = await fetch(
+                `${API_BASE_URL}/api/bookmarks/check/${noteId}?type=${noteType}`,
+                { headers: authHeaders() }
+            );
             const data = await res.json();
             return data.success ? data.bookmarked : false;
         } catch (error) {
@@ -116,12 +119,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function renderBookmarkButton(noteId, bookmarked) {
+    // Escapes text so it can safely sit inside an HTML attribute
+    function escAttr(str) {
+        return String(str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function renderBookmarkButton(noteId, noteType, title, fileUrl, bookmarked) {
         return `
             <button
                 class="bookmark-btn"
-                data-note-id="${noteId}"
-                onclick="toggleBookmark(${noteId}, this)"
+                onclick="toggleBookmark(${noteId}, '${noteType}', '${escAttr(title)}', '${escAttr(fileUrl)}', this)"
                 style="margin-left:8px; padding:4px 10px; font-size:13px; background:${bookmarked ? '#fef3c7' : '#f3f4f6'}; border:1px solid #e5e7eb; border-radius:6px; cursor:pointer;"
             >
                 ${bookmarked ? "🔖 Bookmarked" : "🔖 Bookmark"}
@@ -129,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     }
 
-    window.toggleBookmark = async function (noteId, btnEl) {
+    window.toggleBookmark = async function (noteId, noteType, title, fileUrl, btnEl) {
 
         const isCurrentlyBookmarked = btnEl.textContent.includes("Bookmarked");
 
@@ -139,10 +149,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (isCurrentlyBookmarked) {
 
-                const res = await fetch(`${API_BASE_URL}/api/bookmarks/${noteId}`, {
-                    method: "DELETE",
-                    headers: authHeaders()
-                });
+                const res = await fetch(
+                    `${API_BASE_URL}/api/bookmarks/${noteId}?type=${noteType}`,
+                    { method: "DELETE", headers: authHeaders() }
+                );
                 const data = await res.json();
 
                 if (data.success) {
@@ -155,7 +165,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 const res = await fetch(`${API_BASE_URL}/api/bookmarks`, {
                     method: "POST",
                     headers: authHeaders(),
-                    body: JSON.stringify({ note_id: noteId })
+                    body: JSON.stringify({
+                        note_id: noteId,
+                        note_type: noteType,
+                        title: title,
+                        file_url: fileUrl || null
+                    })
                 });
                 const data = await res.json();
 
@@ -222,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
 
             if (!data.success) {
-                checkboxEl.checked = !completed; // revert on failure
+                checkboxEl.checked = !completed;
                 alert(data.message || "Unable to update progress.");
             }
 
@@ -249,12 +264,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            const bookmarkStates = await Promise.all(
+                data.subject_notes.map(note => isBookmarked(note.id, "subject"))
+            );
+
             area.innerHTML = `
                 <div style="margin-top:14px;">
                     <strong>Subject Notes:</strong>
-                    ${data.subject_notes.map(note => `
+                    ${data.subject_notes.map((note, i) => `
                         <div style="background:#fff7e6; padding:10px; border-radius:6px; margin-top:6px;">
                             <strong>${note.title}</strong>
+                            ${renderBookmarkButton(note.id, "subject", note.title, note.file_url, bookmarkStates[i])}
                             ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
                             ${renderFileButton(note.file_url)}
                         </div>
@@ -322,12 +342,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
             let shortNotesHtml = "";
             if (shortNotes.length > 0) {
+
+                const shortBookmarkStates = await Promise.all(
+                    shortNotes.map(note => isBookmarked(note.id, "unit"))
+                );
+
                 shortNotesHtml = `
                     <div style="margin-bottom:14px;">
                         <strong>Unit Notes:</strong>
-                        ${shortNotes.map(note => `
+                        ${shortNotes.map((note, i) => `
                             <div style="background:#f0f4ff; padding:10px; border-radius:6px; margin-top:6px;">
                                 <strong>${note.title}</strong>
+                                ${renderBookmarkButton(note.id, "unit", note.title, note.file_url, shortBookmarkStates[i])}
                                 ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
                                 ${renderFileButton(note.file_url)}
                             </div>
@@ -352,7 +378,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Fetch progress state for each topic in parallel
             const progressStates = await Promise.all(
                 contentsWithNotes.map(c => getProgress(c.id))
             );
@@ -393,15 +418,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Check bookmark state for each note in parallel
             const bookmarkStates = await Promise.all(
-                data.notes.map(note => isBookmarked(note.id))
+                data.notes.map(note => isBookmarked(note.id, "content"))
             );
 
             target.innerHTML = data.notes.map((note, i) => `
                 <div style="background:#f0f4ff; padding:10px; border-radius:6px; margin-bottom:6px;">
                     <strong>${note.title}</strong>
-                    ${renderBookmarkButton(note.id, bookmarkStates[i])}
+                    ${renderBookmarkButton(note.id, "content", note.title, note.file_url, bookmarkStates[i])}
                     ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
                     ${renderFileButton(note.file_url)}
                 </div>
