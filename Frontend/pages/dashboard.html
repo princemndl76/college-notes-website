@@ -491,6 +491,73 @@
         }
 
         /* =====================================================
+           PROGRESS BAR
+        ===================================================== */
+
+        #progressCard {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(6px);
+
+            border-radius: 14px;
+
+            padding: 16px 20px;
+
+            margin-bottom: 18px;
+
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.10);
+
+            animation: slideUp 0.4s ease;
+        }
+
+        #progressCard .progress-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        #progressCard .progress-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        #progressCard .progress-percent {
+            font-size: 13px;
+            font-weight: 700;
+            color: #4f46e5;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 10px;
+
+            background: #e5e7eb;
+
+            border-radius: 999px;
+
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+
+            background: linear-gradient(90deg, #667eea, #764ba2);
+
+            border-radius: 999px;
+
+            width: 0%;
+
+            transition: width 0.6s ease;
+        }
+
+        .progress-sub {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 6px;
+        }
+
+        /* =====================================================
            SEARCH STATUS
         ===================================================== */
 
@@ -948,6 +1015,24 @@
         </div>
 
 
+        <!-- OVERALL PROGRESS -->
+
+        <div id="progressCard">
+
+            <div class="progress-top">
+                <span class="progress-label">📈 Overall Study Progress</span>
+                <span class="progress-percent" id="progressPercent">0%</span>
+            </div>
+
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="progress-sub" id="progressSub">Loading progress...</div>
+
+        </div>
+
+
         <!-- SEARCH STATUS -->
 
         <div
@@ -1109,6 +1194,86 @@
             };
 
             document.head.appendChild(script);
+
+        })();
+
+    </script>
+
+
+    <!-- =====================================================
+         OVERALL PROGRESS
+    ===================================================== -->
+
+    <script>
+
+        (function () {
+
+            "use strict";
+
+            const API_BASE_URL =
+                (
+                    window.location.hostname === "localhost" ||
+                    window.location.hostname === "127.0.0.1"
+                )
+                    ? "http://localhost:5000"
+                    : "https://college-notes-website-f64v.onrender.com";
+
+            const token = localStorage.getItem("token");
+
+            const progressFill =
+                document.getElementById("progressFill");
+
+            const progressPercent =
+                document.getElementById("progressPercent");
+
+            const progressSub =
+                document.getElementById("progressSub");
+
+            async function loadProgressSummary() {
+
+                try {
+
+                    const response = await fetch(
+                        API_BASE_URL + "/api/progress/summary",
+                        {
+                            headers: {
+                                "Authorization": "Bearer " + token
+                            }
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (!data.success) {
+                        throw new Error(
+                            data.message || "Unable to load progress."
+                        );
+                    }
+
+                    progressFill.style.width = data.percentage + "%";
+                    progressPercent.textContent = data.percentage + "%";
+
+                    progressSub.textContent =
+                        data.completed +
+                        " of " +
+                        data.total +
+                        " topics completed";
+
+                } catch (error) {
+
+                    console.warn(
+                        "Progress summary unavailable:",
+                        error
+                    );
+
+                    progressSub.textContent =
+                        "Progress unavailable right now.";
+
+                }
+
+            }
+
+            loadProgressSummary();
 
         })();
 

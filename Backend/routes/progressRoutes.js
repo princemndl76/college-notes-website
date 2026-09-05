@@ -181,4 +181,70 @@ router.get("/", verifyToken, (req, res) => {
 });
 
 
+// ==========================================
+// GET OVERALL PROGRESS SUMMARY
+// GET /api/progress/summary
+// ==========================================
+
+router.get("/summary", verifyToken, (req, res) => {
+
+    const user_id = req.user.id;
+
+    db.query(
+        "SELECT COUNT(*) AS total FROM contents",
+        (err, totalRows) => {
+
+            if (err) {
+                console.error(
+                    "Progress summary total error:",
+                    err
+                );
+
+                return res.status(500).json({
+                    success: false,
+                    message: "Server error."
+                });
+            }
+
+            db.query(
+                `SELECT COUNT(*) AS completedCount
+                 FROM study_progress
+                 WHERE user_id = ?
+                 AND completed = 1`,
+                [user_id],
+                (err, completedRows) => {
+
+                    if (err) {
+                        console.error(
+                            "Progress summary completed error:",
+                            err
+                        );
+
+                        return res.status(500).json({
+                            success: false,
+                            message: "Server error."
+                        });
+                    }
+
+                    const total = totalRows[0].total || 0;
+                    const completed = completedRows[0].completedCount || 0;
+
+                    const percentage =
+                        total > 0
+                            ? Math.round((completed / total) * 100)
+                            : 0;
+
+                    res.json({
+                        success: true,
+                        total: total,
+                        completed: completed,
+                        percentage: percentage
+                    });
+                }
+            );
+        }
+    );
+});
+
+
 module.exports = router;
