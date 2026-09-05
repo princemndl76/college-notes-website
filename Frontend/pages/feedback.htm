@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Feedback | College Notes</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #1a1a2e;
+            min-height: 100vh;
+
+            background: linear-gradient(
+                -45deg,
+                #667eea,
+                #764ba2,
+                #f093fb,
+                #4facfe
+            );
+
+            background-size: 400% 400%;
+
+            animation: gradientShift 14s ease infinite;
+
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
+
+        #topbar {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(6px);
+
+            padding: 18px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        #topbar h1 {
+            font-size: 20px;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        #backButton {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            padding: 9px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        #backButton:hover {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+            color: #4338ca;
+        }
+
+        /* =====================================================
+           CONTENT
+        ===================================================== */
+
+        #content {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 30px 24px 60px;
+        }
+
+        h2.page-title {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 6px 0 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+            animation: slideUp 0.4s ease;
+        }
+
+        /* =====================================================
+           FORM CARD
+        ===================================================== */
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+            margin-bottom: 26px;
+            animation: slideUp 0.4s ease backwards;
+        }
+
+        .field-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 10px;
+        }
+
+        /* CATEGORY CHECKBOXES */
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .category-option {
+            position: relative;
+        }
+
+        .category-option input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .category-option label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 12px 14px;
+
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .category-option .check-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 6px;
+            border: 2px solid #d1d5db;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: transparent;
+            transition: all 0.15s ease;
+        }
+
+        .category-option input:checked + label {
+            border-color: #6366f1;
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .category-option input:checked + label .check-icon {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: #fff;
+        }
+
+        .category-option input:focus-visible + label {
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
+        }
+
+        /* STAR RATING */
+
+        .star-rating {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+        }
+
+        .star {
+            font-size: 30px;
+            cursor: pointer;
+            color: #e5e7eb;
+            transition: color 0.15s ease, transform 0.1s ease;
+            line-height: 1;
+        }
+
+        .star:hover {
+            transform: scale(1.12);
+        }
+
+        .star.filled {
+            color: #f59e0b;
+        }
+
+        /* MESSAGE */
+
+        textarea#feedbackMessage {
+            width: 100%;
+            min-height: 120px;
+
+            padding: 14px;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+
+            font-family: inherit;
+            font-size: 14px;
+            color: #1f2937;
+
+            resize: vertical;
+
+            margin-bottom: 6px;
+
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        textarea#feedbackMessage:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: #9ca3af;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        /* SUBMIT */
+
+        #submitButton {
+            width: 100%;
+            padding: 14px;
+
+            border: none;
+            border-radius: 12px;
+
+            background: #4f46e5;
+            color: #fff;
+
+            font-weight: 700;
+            font-size: 15px;
+
+            cursor: pointer;
+
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+
+        #submitButton:hover:not(:disabled) {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        #submitButton:disabled {
+            background: #a5b4fc;
+            cursor: not-allowed;
+        }
+
+        #formStatus {
+            margin-top: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        #formStatus.success {
+            color: #059669;
+            display: block;
+        }
+
+        #formStatus.error {
+            color: #dc2626;
+            display: block;
+        }
+
+        /* =====================================================
+           HISTORY
+        ===================================================== */
+
+        .history-title {
+            color: #fff;
+            font-size: 17px;
+            font-weight: 700;
+            margin: 0 0 14px;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .history-item {
+            background: #fff;
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+            animation: slideUp 0.4s ease backwards;
+        }
+
+        .history-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .history-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chip {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            text-transform: capitalize;
+            white-space: nowrap;
+        }
+
+        .status-badge.new {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-badge.reviewed {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-badge.resolved {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .history-message {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.5;
+            margin: 8px 0;
+        }
+
+        .history-meta {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .history-stars {
+            color: #f59e0b;
+            font-size: 13px;
+        }
+
+        .empty-history {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 640px) {
+
+            #topbar {
+                padding: 14px 16px;
+            }
+
+            #content {
+                padding: 20px 16px 40px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="topbar">
+        <h1>💬 Feedback</h1>
+        <button id="backButton" onclick="window.location.href='/Frontend/pages/dashboard.html'">
+            ← Back to Dashboard
+        </button>
+    </div>
+
+    <div id="content">
+
+        <h2 class="page-title">Share Your Feedback</h2>
+
+        <div class="card">
+
+            <p class="field-label">What's this about? (select all that apply)</p>
+
+            <div class="category-grid" id="categoryGrid">
+
+                <div class="category-option">
+                    <input type="checkbox" id="cat-bug" value="Bug">
+                    <label for="cat-bug">
+                        <span class="check-icon">✓</span> 🐞 Bug
+                    </label>
+                </div>
+
+                <div class="category-option">
+                    <input type="checkbox" id="cat-uiux" value="UI/UX">
+                    <label for="cat-uiux">
+                        <span class="check-icon">✓</span> 🎨 UI/UX
+                    </label>
+                </div>
+
+                <div class="category-option">
+                    <input type="checkbox" id="cat-feature" value="Feature Request">
+                    <label for="cat-feature">
+                        <span class="check-icon">✓</span> ✨ Feature Request
+                    </label>
+                </div>
+
+                <div class="category-option">
+                    <input type="checkbox" id="cat-content" value="Content Quality">
+                    <label for="cat-content">
+                        <span class="check-icon">✓</span> 📚 Content Quality
+                    </label>
+                </div>
+
+                <div class="category-option">
+                    <input type="checkbox" id="cat-other" value="Other">
+                    <label for="cat-other">
+                        <span class="check-icon">✓</span> 💭 Other
+                    </label>
+                </div>
+
+            </div>
+
+            <p class="field-label">How would you rate your experience? (optional)</p>
+
+            <div class="star-rating" id="starRating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+
+            <p class="field-label">Tell us more</p>
+
+            <textarea
+                id="feedbackMessage"
+                placeholder="What's on your mind? Be as detailed as you'd like..."
+                maxlength="1000"
+            ></textarea>
+
+            <div class="char-count">
+                <span id="charCount">0</span>/1000
+            </div>
+
+            <button id="submitButton">Submit Feedback</button>
+
+            <div id="formStatus"></div>
+
+        </div>
+
+        <h3 class="history-title">Your Past Feedback</h3>
+
+        <div id="historyList">
+            <p class="empty-history">Loading...</p>
+        </div>
+
+    </div>
+
+    <script>
+        (function () {
+            "use strict";
+
+            const API_BASE_URL =
+                (
+                    window.location.hostname === "localhost" ||
+                    window.location.hostname === "127.0.0.1"
+                )
+                    ? "http://localhost:5000"
+                    : "https://college-notes-website-f64v.onrender.com";
+
+            const token = localStorage.getItem("token");
+
+            const submitButton = document.getElementById("submitButton");
+            const formStatus = document.getElementById("formStatus");
+            const messageBox = document.getElementById("feedbackMessage");
+            const charCount = document.getElementById("charCount");
+            const historyList = document.getElementById("historyList");
+            const stars = document.querySelectorAll(".star");
+
+            let selectedRating = 0;
+
+            /* ================= CHAR COUNT ================= */
+
+            messageBox.addEventListener("input", function () {
+                charCount.textContent = messageBox.value.length;
+            });
+
+            /* ================= STAR RATING ================= */
+
+            function paintStars(hoverValue) {
+                stars.forEach(function (star) {
+                    const value = Number(star.dataset.value);
+                    star.classList.toggle("filled", value <= hoverValue);
+                });
+            }
+
+            stars.forEach(function (star) {
+                star.addEventListener("mouseenter", function () {
+                    paintStars(Number(star.dataset.value));
+                });
+
+                star.addEventListener("click", function () {
+                    selectedRating = Number(star.dataset.value);
+                    paintStars(selectedRating);
+                });
+            });
+
+            document.getElementById("starRating").addEventListener("mouseleave", function () {
+                paintStars(selectedRating);
+            });
+
+            /* ================= SUBMIT ================= */
+
+            submitButton.addEventListener("click", async function () {
+
+                const categories = Array.from(
+                    document.querySelectorAll("#categoryGrid input:checked")
+                ).map(function (input) {
+                    return input.value;
+                });
+
+                const message = messageBox.value.trim();
+
+                formStatus.className = "";
+                formStatus.style.display = "none";
+
+                if (categories.length === 0) {
+                    formStatus.textContent = "Please select at least one category.";
+                    formStatus.className = "error";
+                    return;
+                }
+
+                if (!message) {
+                    formStatus.textContent = "Please enter a message.";
+                    formStatus.className = "error";
+                    return;
+                }
+
+                submitButton.disabled = true;
+                submitButton.textContent = "Submitting...";
+
+                try {
+
+                    const response = await fetch(API_BASE_URL + "/api/feedback", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + token
+                        },
+                        body: JSON.stringify({
+                            categories: categories,
+                            rating: selectedRating || null,
+                            message: message
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!data.success) {
+                        throw new Error(data.message || "Failed to submit feedback.");
+                    }
+
+                    formStatus.textContent = "✅ Feedback submitted — thank you!";
+                    formStatus.className = "success";
+
+                    // Reset form
+                    document.querySelectorAll("#categoryGrid input").forEach(function (input) {
+                        input.checked = false;
+                    });
+
+                    selectedRating = 0;
+                    paintStars(0);
+
+                    messageBox.value = "";
+                    charCount.textContent = "0";
+
+                    loadHistory();
+
+                } catch (error) {
+
+                    console.error("Submit feedback error:", error);
+
+                    formStatus.textContent = "⚠️ " + (error.message || "Something went wrong.");
+                    formStatus.className = "error";
+
+                } finally {
+
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Submit Feedback";
+
+                }
+
+            });
+
+            /* ================= HISTORY ================= */
+
+            function renderStars(rating) {
+                if (!rating) return "";
+                let out = "";
+                for (let i = 1; i <= 5; i++) {
+                    out += i <= rating ? "★" : "☆";
+                }
+                return '<span class="history-stars">' + out + "</span>";
+            }
+
+            function formatDate(isoString) {
+                const date = new Date(isoString);
+                return date.toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric"
+                });
+            }
+
+            async function loadHistory() {
+
+                try {
+
+                    const response = await fetch(API_BASE_URL + "/api/feedback/mine", {
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (!data.success || !Array.isArray(data.feedback)) {
+                        throw new Error("Invalid response");
+                    }
+
+                    if (data.feedback.length === 0) {
+                        historyList.innerHTML =
+                            '<p class="empty-history">You haven\'t submitted any feedback yet.</p>';
+                        return;
+                    }
+
+                    historyList.innerHTML = "";
+
+                    data.feedback.forEach(function (item) {
+
+                        const categories = (item.categories || "")
+                            .split(",")
+                            .filter(Boolean);
+
+                        const chipsHtml = categories
+                            .map(function (cat) {
+                                return '<span class="chip">' + cat + "</span>";
+                            })
+                            .join("");
+
+                        const el = document.createElement("div");
+                        el.className = "history-item";
+
+                        el.innerHTML =
+                            '<div class="history-top">' +
+                                '<div class="history-chips">' + chipsHtml + "</div>" +
+                                '<span class="status-badge ' + item.status + '">' + item.status + "</span>" +
+                            "</div>" +
+                            (item.rating ? renderStars(item.rating) : "") +
+                            '<p class="history-message">' +
+                                String(item.message).replace(/</g, "&lt;") +
+                            "</p>" +
+                            '<div class="history-meta">' + formatDate(item.created_at) + "</div>";
+
+                        historyList.appendChild(el);
+
+                    });
+
+                } catch (error) {
+
+                    console.error("Load history error:", error);
+
+                    historyList.innerHTML =
+                        '<p class="empty-history">⚠️ Unable to load your feedback history.</p>';
+
+                }
+
+            }
+
+            loadHistory();
+
+        })();
+    </script>
+
+</body>
+</html>

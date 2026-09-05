@@ -20,7 +20,7 @@ const aiRoutes = require("./routes/aiRoutes");
 const bookmarkRoutes = require("./routes/bookmarkRoutes");
 const searchRoutes = require("./routes/searchRoutes");
 const progressRoutes = require("./routes/progressRoutes");
-
+const feedbackRoutes = require("./routes/feedbackRoutes");
 // ======================================
 // CREATE APP
 // ======================================
@@ -161,6 +161,14 @@ io.on("connection", (socket) => {
 app.use(
     "/api",
     authRoutes
+);
+// ======================================
+// FEEDBACK
+// ======================================
+
+app.use(
+    "/api/feedback",
+    feedbackRoutes
 );
 
 // ======================================
