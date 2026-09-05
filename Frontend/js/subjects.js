@@ -23,6 +23,146 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    // ==========================================
+    // SUBJECT QUIZ WIDGET
+    // Shows one random question tied to this subject,
+    // once, when the subject page loads.
+    // ==========================================
+
+    const quizCategoryLabels = {
+        subject: "📘 Quick Quiz for this Subject"
+    };
+
+    function closeSubjectQuizWidget() {
+        const overlay = document.getElementById("subjectQuizOverlay");
+        if (overlay) {
+            overlay.style.display = "none";
+        }
+    }
+
+    function renderSubjectQuizQuestion(q) {
+
+        const overlay = document.getElementById("subjectQuizOverlay");
+        const labelEl = document.getElementById("subjectQuizLabel");
+        const questionEl = document.getElementById("subjectQuizQuestion");
+        const optionsEl = document.getElementById("subjectQuizOptions");
+
+        labelEl.textContent = quizCategoryLabels.subject;
+        questionEl.textContent = q.question;
+
+        const options = [
+            { key: "A", text: q.option_a },
+            { key: "B", text: q.option_b },
+            { key: "C", text: q.option_c },
+            { key: "D", text: q.option_d }
+        ];
+
+        optionsEl.innerHTML = "";
+
+        options.forEach(function (opt) {
+
+            const btn = document.createElement("button");
+            btn.className = "quiz-widget-option";
+            btn.textContent = opt.text;
+            btn.style.cssText =
+                "display:block; width:100%; text-align:left; padding:12px 14px; " +
+                "margin-bottom:8px; border:2px solid #e5e7eb; border-radius:10px; " +
+                "background:#fff; font-size:14px; color:#374151; cursor:pointer;";
+
+            btn.addEventListener("click", function () {
+
+                const allButtons =
+                    optionsEl.querySelectorAll("button");
+
+                allButtons.forEach(function (b) {
+                    b.disabled = true;
+                });
+
+                if (opt.key === q.correct_option) {
+                    btn.style.borderColor = "#10b981";
+                    btn.style.background = "#d1fae5";
+                    btn.style.color = "#047857";
+                } else {
+                    btn.style.borderColor = "#ef4444";
+                    btn.style.background = "#fee2e2";
+                    btn.style.color = "#b91c1c";
+
+                    allButtons.forEach(function (b, i) {
+                        if (options[i].key === q.correct_option) {
+                            b.style.borderColor = "#10b981";
+                            b.style.background = "#d1fae5";
+                            b.style.color = "#047857";
+                        }
+                    });
+                }
+
+            });
+
+            optionsEl.appendChild(btn);
+
+        });
+
+        overlay.style.display = "flex";
+
+    }
+
+    async function loadSubjectQuizWidget(subjectId) {
+
+        try {
+
+            const res = await fetch(
+                `${API_BASE_URL}/api/quiz/subject-widget/${subjectId}`,
+                { headers: authHeaders() }
+            );
+
+            const data = await res.json();
+
+            if (!data.success || !data.question) {
+                return; // No questions yet for this subject - skip silently
+            }
+
+            // Build the overlay markup once, if not already present
+            if (!document.getElementById("subjectQuizOverlay")) {
+
+                const overlay = document.createElement("div");
+                overlay.id = "subjectQuizOverlay";
+                overlay.style.cssText =
+                    "display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); " +
+                    "z-index:500; align-items:center; justify-content:center; padding:16px;";
+
+                overlay.innerHTML = `
+                    <div style="background:#fff; border-radius:18px; max-width:420px; width:100%; padding:24px; box-shadow:0 20px 50px rgba(0,0,0,0.3);">
+                        <div id="subjectQuizLabel" style="font-size:12px; font-weight:700; text-transform:uppercase; color:#4f46e5; margin-bottom:8px;"></div>
+                        <div id="subjectQuizQuestion" style="font-size:16px; font-weight:700; color:#1f2937; margin-bottom:16px; line-height:1.4;"></div>
+                        <div id="subjectQuizOptions"></div>
+                        <button id="subjectQuizCloseBtn" style="margin-top:12px; width:100%; padding:10px; border:none; border-radius:10px; background:#f3f4f6; color:#4b5563; font-weight:600; font-size:13px; cursor:pointer;">Close</button>
+                    </div>
+                `;
+
+                document.body.appendChild(overlay);
+
+                document.getElementById("subjectQuizCloseBtn")
+                    .addEventListener("click", closeSubjectQuizWidget);
+
+                overlay.addEventListener("click", function (event) {
+                    if (event.target === overlay) {
+                        closeSubjectQuizWidget();
+                    }
+                });
+
+            }
+
+            renderSubjectQuizQuestion(data.question);
+
+        } catch (error) {
+            console.warn("Subject quiz widget unavailable:", error);
+        }
+
+    }
+
+    // Trigger the subject quiz widget once, on page load
+    loadSubjectQuizWidget(subjectId);
+
     loadUnits(subjectId);
     loadSubjectNotes(subjectId);
 

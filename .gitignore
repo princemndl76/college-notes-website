@@ -3,3 +3,6 @@ node_modules/
 uploads/
 Git-2.55.0.5-64-bit.exe
 NOTES/
+backup.js
+college_notes_backup.sql
+.env

@@ -1,920 +1,991 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>College Notes | Dashboard</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
+      * {
+        box-sizing: border-box;
+      }
 
-        /* =====================================================
+      /* =====================================================
            BODY
         ===================================================== */
 
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: #1a1a2e;
-            min-height: 100vh;
+      body {
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #1a1a2e;
+        min-height: 100vh;
 
-            background: linear-gradient(
-                -45deg,
-                #667eea,
-                #764ba2,
-                #f093fb,
-                #4facfe
-            );
+        background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
 
-            background-size: 400% 400%;
+        background-size: 400% 400%;
 
-            animation:
-                gradientShift 14s ease infinite,
-                fadeIn 0.5s ease;
+        animation:
+          gradientShift 14s ease infinite,
+          fadeIn 0.5s ease;
 
-            position: relative;
-            overflow-x: hidden;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
         }
 
-        @keyframes gradientShift {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
+        50% {
+          background-position: 100% 50%;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
 
-            to {
-                opacity: 1;
-            }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
+        to {
+          opacity: 1;
+        }
+      }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
         }
 
-        @keyframes floaty {
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-            50% {
-                transform: translateY(-28px);
-            }
+      @keyframes floaty {
+        0%,
+        100% {
+          transform: translateY(0px);
         }
 
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
-            }
+        50% {
+          transform: translateY(-28px);
+        }
+      }
 
-            70% {
-                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-            }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
         }
 
-        /* =====================================================
+        70% {
+          box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+        }
+
+        100% {
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+      }
+
+      /* =====================================================
            BACKGROUND SHAPES
         ===================================================== */
 
-        .bg-shape {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(2px);
-            background: rgba(255, 255, 255, 0.12);
-            animation: floaty 8s ease-in-out infinite;
-            z-index: 0;
-            pointer-events: none;
-        }
+      .bg-shape {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(2px);
+        background: rgba(255, 255, 255, 0.12);
+        animation: floaty 8s ease-in-out infinite;
+        z-index: 0;
+        pointer-events: none;
+      }
 
-        .bg-shape.s1 {
-            width: 260px;
-            height: 260px;
-            top: -80px;
-            left: -80px;
-        }
+      .bg-shape.s1 {
+        width: 260px;
+        height: 260px;
+        top: -80px;
+        left: -80px;
+      }
 
-        .bg-shape.s2 {
-            width: 340px;
-            height: 340px;
-            bottom: -110px;
-            right: -100px;
-            animation-delay: 2s;
-        }
+      .bg-shape.s2 {
+        width: 340px;
+        height: 340px;
+        bottom: -110px;
+        right: -100px;
+        animation-delay: 2s;
+      }
 
-        .bg-shape.s3 {
-            width: 140px;
-            height: 140px;
-            top: 60%;
-            left: 5%;
-            animation-delay: 4s;
-        }
+      .bg-shape.s3 {
+        width: 140px;
+        height: 140px;
+        top: 60%;
+        left: 5%;
+        animation-delay: 4s;
+      }
 
-        .bg-shape.s4 {
-            width: 100px;
-            height: 100px;
-            top: 12%;
-            right: 12%;
-            animation-delay: 1s;
-        }
+      .bg-shape.s4 {
+        width: 100px;
+        height: 100px;
+        top: 12%;
+        right: 12%;
+        animation-delay: 1s;
+      }
 
-        /* =====================================================
+      /* =====================================================
            TOP BAR
         ===================================================== */
 
-        #topbar {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(6px);
+      #topbar {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(6px);
 
-            padding: 18px 40px;
+        padding: 18px 40px;
 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
-            gap: 20px;
+        gap: 20px;
 
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
-            position: sticky;
-            top: 0;
+        position: sticky;
+        top: 0;
 
-            z-index: 100;
-        }
+        z-index: 100;
+      }
 
-        .brand-section {
-            flex: 0 0 auto;
-        }
+      .brand-section {
+        flex: 0 0 auto;
+      }
 
-        #topbar h1 {
-            font-size: 20px;
-            margin: 0;
+      #topbar h1 {
+        font-size: 20px;
+        margin: 0;
 
-            font-weight: 700;
+        font-weight: 700;
 
-            display: flex;
-            align-items: center;
+        display: flex;
+        align-items: center;
 
-            gap: 8px;
-        }
+        gap: 8px;
+      }
 
-        #welcomeMessage {
-            font-size: 14px;
-            color: #6b7280;
-            margin: 2px 0 0;
-        }
+      #welcomeMessage {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 2px 0 0;
+      }
 
-        /* =====================================================
+      /* =====================================================
            SEARCH
         ===================================================== */
 
-        .search-wrapper {
-            position: relative;
+      .search-wrapper {
+        position: relative;
 
-            flex: 1;
+        flex: 1;
 
-            max-width: 520px;
-            min-width: 280px;
-        }
+        max-width: 520px;
+        min-width: 280px;
+      }
 
-        .search-box {
-            width: 100%;
-            height: 46px;
+      .search-box {
+        width: 100%;
+        height: 46px;
 
-            display: flex;
-            align-items: center;
+        display: flex;
+        align-items: center;
 
-            background: #ffffff;
+        background: #ffffff;
 
-            border: 1px solid #e5e7eb;
-            border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
 
-            padding: 0 10px 0 14px;
+        padding: 0 10px 0 14px;
 
-            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
 
-            transition:
-                border-color 0.2s ease,
-                box-shadow 0.2s ease;
-        }
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
 
-        .search-box:focus-within {
-            border-color: #6366f1;
+      .search-box:focus-within {
+        border-color: #6366f1;
 
-            box-shadow:
-                0 0 0 4px rgba(99, 102, 241, 0.12);
-        }
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+      }
 
-        .search-icon {
-            font-size: 18px;
-            margin-right: 8px;
-            flex-shrink: 0;
-        }
+      .search-icon {
+        font-size: 18px;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
 
-        #globalSearch {
-            flex: 1;
-            min-width: 0;
+      #globalSearch {
+        flex: 1;
+        min-width: 0;
 
-            border: 0;
-            outline: 0;
+        border: 0;
+        outline: 0;
 
-            background: transparent;
+        background: transparent;
 
-            color: #1f2937;
+        color: #1f2937;
 
-            font-size: 14px;
-        }
+        font-size: 14px;
+      }
 
-        #globalSearch::placeholder {
-            color: #9ca3af;
-        }
+      #globalSearch::placeholder {
+        color: #9ca3af;
+      }
 
-        #clearSearch {
-            display: none;
+      #clearSearch {
+        display: none;
 
-            border: 0;
-            background: transparent;
+        border: 0;
+        background: transparent;
 
-            color: #9ca3af;
+        color: #9ca3af;
 
-            width: 30px;
-            height: 30px;
+        width: 30px;
+        height: 30px;
 
-            padding: 0;
+        padding: 0;
 
-            border-radius: 50%;
+        border-radius: 50%;
 
-            cursor: pointer;
+        cursor: pointer;
 
-            font-size: 14px;
+        font-size: 14px;
 
-            flex-shrink: 0;
-        }
+        flex-shrink: 0;
+      }
 
-        #clearSearch:hover {
-            background: #f3f4f6;
-            color: #ef4444;
-        }
+      #clearSearch:hover {
+        background: #f3f4f6;
+        color: #ef4444;
+      }
 
-        .search-hint {
-            position: absolute;
+      .search-hint {
+        position: absolute;
 
-            right: 12px;
-            top: 52px;
+        right: 12px;
+        top: 52px;
 
-            font-size: 11px;
+        font-size: 11px;
 
-            color: rgba(255, 255, 255, 0.9);
+        color: rgba(255, 255, 255, 0.9);
 
-            pointer-events: none;
-        }
+        pointer-events: none;
+      }
 
-        /* =====================================================
+      /* =====================================================
            SEARCH RESULTS DROPDOWN
         ===================================================== */
 
-        #searchResults {
-            position: absolute;
+      #searchResults {
+        position: absolute;
 
-            top: 54px;
-            left: 0;
-            right: 0;
+        top: 54px;
+        left: 0;
+        right: 0;
 
-            background: white;
+        background: white;
 
-            border-radius: 14px;
+        border-radius: 14px;
 
-            box-shadow:
-                0 15px 40px rgba(0, 0, 0, 0.22);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.22);
 
-            max-height: 450px;
+        max-height: 450px;
 
-            overflow-y: auto;
+        overflow-y: auto;
 
-            display: none;
+        display: none;
 
-            z-index: 9999;
-        }
+        z-index: 9999;
+      }
 
-        .search-result {
-            padding: 14px 16px;
+      .search-result {
+        padding: 14px 16px;
 
-            border-bottom: 1px solid #eeeeee;
+        border-bottom: 1px solid #eeeeee;
 
-            cursor: pointer;
+        cursor: pointer;
 
-            transition: background 0.15s ease;
-        }
+        transition: background 0.15s ease;
+      }
 
-        .search-result:last-child {
-            border-bottom: none;
-        }
+      .search-result:last-child {
+        border-bottom: none;
+      }
 
-        .search-result:hover {
-            background: #f5f7ff;
-        }
+      .search-result:hover {
+        background: #f5f7ff;
+      }
 
-        .search-result-type {
-            font-size: 11px;
+      .search-result-type {
+        font-size: 11px;
 
-            font-weight: 700;
+        font-weight: 700;
 
-            text-transform: uppercase;
+        text-transform: uppercase;
 
-            color: #4f46e5;
+        color: #4f46e5;
 
-            margin-bottom: 4px;
-        }
+        margin-bottom: 4px;
+      }
 
-        .search-result-title {
-            font-size: 15px;
+      .search-result-title {
+        font-size: 15px;
 
-            font-weight: 700;
+        font-weight: 700;
 
-            color: #1f2937;
+        color: #1f2937;
 
-            margin-bottom: 4px;
-        }
+        margin-bottom: 4px;
+      }
 
-        .search-result-description {
-            font-size: 12px;
+      .search-result-description {
+        font-size: 12px;
 
-            color: #6b7280;
+        color: #6b7280;
 
-            line-height: 1.4;
-        }
+        line-height: 1.4;
+      }
 
-        .search-result-code {
-            display: inline-block;
+      .search-result-code {
+        display: inline-block;
 
-            margin-top: 6px;
+        margin-top: 6px;
 
-            color: #4f46e5;
+        color: #4f46e5;
 
-            font-size: 12px;
+        font-size: 12px;
 
-            font-weight: 700;
-        }
+        font-weight: 700;
+      }
 
-        .search-message {
-            padding: 18px;
+      .search-message {
+        padding: 18px;
 
-            text-align: center;
+        text-align: center;
 
-            color: #6b7280;
+        color: #6b7280;
 
-            font-size: 13px;
-        }
+        font-size: 13px;
+      }
 
-        /* =====================================================
+      /* =====================================================
            LOGOUT
         ===================================================== */
 
-        #logoutButton {
-            background: #fff;
+      #logoutButton {
+        background: #fff;
 
-            border: 1px solid #e5e7eb;
+        border: 1px solid #e5e7eb;
 
-            color: #374151;
+        color: #374151;
 
-            padding: 9px 18px;
+        padding: 9px 18px;
 
-            border-radius: 10px;
+        border-radius: 10px;
 
-            cursor: pointer;
+        cursor: pointer;
 
-            font-weight: 600;
+        font-weight: 600;
 
-            font-size: 13px;
+        font-size: 13px;
 
-            transition: all 0.2s ease;
+        transition: all 0.2s ease;
 
-            flex-shrink: 0;
-        }
+        flex-shrink: 0;
+      }
 
-        #logoutButton:hover {
-            background: #fef2f2;
+      #logoutButton:hover {
+        background: #fef2f2;
 
-            border-color: #fecaca;
+        border-color: #fecaca;
 
-            color: #dc2626;
-        }
+        color: #dc2626;
+      }
 
-        /* =====================================================
+      /* =====================================================
            CONTENT
         ===================================================== */
 
-        #content {
-            max-width: 1100px;
+      #content {
+        max-width: 1100px;
 
-            margin: 0 auto;
+        margin: 0 auto;
 
-            padding: 30px 40px 60px;
+        padding: 30px 40px 60px;
 
-            position: relative;
+        position: relative;
 
-            z-index: 1;
-        }
+        z-index: 1;
+      }
 
-        /* =====================================================
+      /* =====================================================
            LIVE USER COUNT
         ===================================================== */
 
-        #count {
-            display: inline-flex;
+      #count {
+        display: inline-flex;
 
-            align-items: center;
+        align-items: center;
 
-            gap: 6px;
+        gap: 6px;
 
-            font-size: 13px;
+        font-size: 13px;
 
-            font-weight: 600;
+        font-weight: 600;
 
-            color: #059669;
+        color: #059669;
 
-            background: rgba(236, 253, 245, 0.95);
+        background: rgba(236, 253, 245, 0.95);
 
-            border: 1px solid #d1fae5;
+        border: 1px solid #d1fae5;
 
-            padding: 6px 12px;
+        padding: 6px 12px;
 
-            border-radius: 999px;
+        border-radius: 999px;
 
-            margin-bottom: 18px;
+        margin-bottom: 18px;
 
-            animation: slideUp 0.4s ease;
-        }
+        animation: slideUp 0.4s ease;
+      }
 
-        #count::before {
-            content: "";
+      #count::before {
+        content: "";
 
-            width: 8px;
-            height: 8px;
+        width: 8px;
+        height: 8px;
 
-            background: #10b981;
+        background: #10b981;
 
-            border-radius: 50%;
+        border-radius: 50%;
 
-            display: inline-block;
+        display: inline-block;
 
-            animation: pulse 1.6s infinite;
-        }
+        animation: pulse 1.6s infinite;
+      }
 
-        /* =====================================================
+      /* =====================================================
+           QUIZ WIDGET MODAL
+        ===================================================== */
+
+      #quizWidgetOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 500;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      #quizWidgetCard {
+        background: #fff;
+        border-radius: 18px;
+        max-width: 420px;
+        width: 100%;
+        padding: 24px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease;
+      }
+
+      .quiz-widget-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #4f46e5;
+        margin-bottom: 8px;
+      }
+
+      .quiz-widget-question {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 16px;
+        line-height: 1.4;
+      }
+
+      .quiz-widget-option {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        font-size: 14px;
+        color: #374151;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .quiz-widget-option:hover:not(:disabled) {
+        border-color: #a5b4fc;
+        background: #eef2ff;
+      }
+
+      .quiz-widget-option.correct {
+        border-color: #10b981;
+        background: #d1fae5;
+        color: #047857;
+      }
+
+      .quiz-widget-option.incorrect {
+        border-color: #ef4444;
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+
+      .quiz-widget-close {
+        margin-top: 12px;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        background: #f3f4f6;
+        color: #4b5563;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      .quiz-widget-close:hover {
+        background: #e5e7eb;
+      }
+
+      /* =====================================================
            PROGRESS BAR
         ===================================================== */
 
-        #progressCard {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(6px);
+      #progressCard {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(6px);
 
-            border-radius: 14px;
+        border-radius: 14px;
 
-            padding: 16px 20px;
+        padding: 16px 20px;
 
-            margin-bottom: 18px;
+        margin-bottom: 18px;
 
-            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.10);
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.1);
 
-            animation: slideUp 0.4s ease;
-        }
+        animation: slideUp 0.4s ease;
+      }
 
-        #progressCard .progress-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
+      #progressCard .progress-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
 
-        #progressCard .progress-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: #374151;
-        }
+      #progressCard .progress-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+      }
 
-        #progressCard .progress-percent {
-            font-size: 13px;
-            font-weight: 700;
-            color: #4f46e5;
-        }
+      #progressCard .progress-percent {
+        font-size: 13px;
+        font-weight: 700;
+        color: #4f46e5;
+      }
 
-        .progress-track {
-            width: 100%;
-            height: 10px;
+      .progress-track {
+        width: 100%;
+        height: 10px;
 
-            background: #e5e7eb;
+        background: #e5e7eb;
 
-            border-radius: 999px;
+        border-radius: 999px;
 
-            overflow: hidden;
-        }
+        overflow: hidden;
+      }
 
-        .progress-fill {
-            height: 100%;
+      .progress-fill {
+        height: 100%;
 
-            background: linear-gradient(90deg, #667eea, #764ba2);
+        background: linear-gradient(90deg, #667eea, #764ba2);
 
-            border-radius: 999px;
+        border-radius: 999px;
 
-            width: 0%;
+        width: 0%;
 
-            transition: width 0.6s ease;
-        }
+        transition: width 0.6s ease;
+      }
 
-        .progress-sub {
-            font-size: 11px;
-            color: #9ca3af;
-            margin-top: 6px;
-        }
+      .progress-sub {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-top: 6px;
+      }
 
-        /* =====================================================
+      /* =====================================================
            SEARCH STATUS
         ===================================================== */
 
-        #searchStatus {
-            display: none;
+      #searchStatus {
+        display: none;
 
-            margin: 0 0 18px;
+        margin: 0 0 18px;
 
-            padding: 10px 14px;
+        padding: 10px 14px;
 
-            background: rgba(255, 255, 255, 0.92);
+        background: rgba(255, 255, 255, 0.92);
 
-            border-radius: 10px;
+        border-radius: 10px;
 
-            color: #4b5563;
+        color: #4b5563;
 
-            font-size: 13px;
+        font-size: 13px;
 
-            box-shadow:
-                0 5px 18px rgba(0, 0, 0, 0.10);
-        }
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.1);
+      }
 
-        /* =====================================================
+      /* =====================================================
            BREADCRUMB
         ===================================================== */
 
-        #breadcrumb {
-            display: flex;
+      #breadcrumb {
+        display: flex;
 
-            align-items: center;
+        align-items: center;
 
-            flex-wrap: wrap;
+        flex-wrap: wrap;
 
-            gap: 6px;
+        gap: 6px;
 
-            margin-bottom: 20px;
+        margin-bottom: 20px;
 
-            font-size: 14px;
+        font-size: 14px;
 
-            animation: slideUp 0.4s ease;
-        }
+        animation: slideUp 0.4s ease;
+      }
 
-        #breadcrumb button {
-            background: none;
+      #breadcrumb button {
+        background: none;
 
-            border: none;
+        border: none;
 
-            color: #fff;
+        color: #fff;
 
-            font-weight: 600;
+        font-weight: 600;
 
-            font-size: 14px;
+        font-size: 14px;
 
-            cursor: pointer;
+        cursor: pointer;
 
-            padding: 4px 2px;
+        padding: 4px 2px;
 
-            transition: opacity 0.2s ease;
+        transition: opacity 0.2s ease;
 
-            text-shadow:
-                0 1px 6px rgba(0, 0, 0, 0.2);
-        }
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+      }
 
-        #breadcrumb button:hover {
-            opacity: 0.75;
-        }
+      #breadcrumb button:hover {
+        opacity: 0.75;
+      }
 
-        #breadcrumb button:disabled {
-            color: #fff;
+      #breadcrumb button:disabled {
+        color: #fff;
 
-            opacity: 0.85;
+        opacity: 0.85;
 
-            cursor: default;
-        }
+        cursor: default;
+      }
 
-        #breadcrumb .sep {
-            color: rgba(255, 255, 255, 0.6);
-        }
+      #breadcrumb .sep {
+        color: rgba(255, 255, 255, 0.6);
+      }
 
-        /* =====================================================
+      /* =====================================================
            SECTION TITLE
         ===================================================== */
 
-        #sectionTitle {
-            margin: 0 0 20px;
+      #sectionTitle {
+        margin: 0 0 20px;
 
-            font-size: 22px;
+        font-size: 22px;
 
-            font-weight: 700;
+        font-weight: 700;
 
-            color: white;
+        color: white;
 
-            text-shadow:
-                0 2px 10px rgba(0, 0, 0, 0.18);
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 
-            animation:
-                slideUp 0.4s ease 0.05s backwards;
-        }
+        animation: slideUp 0.4s ease 0.05s backwards;
+      }
 
-        /* =====================================================
+      /* =====================================================
            CARDS
         ===================================================== */
 
-        #browseContainer {
-            display: grid;
+      #browseContainer {
+        display: grid;
 
-            grid-template-columns:
-                repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 
-            gap: 18px;
+        gap: 18px;
 
-            margin-bottom: 30px;
+        margin-bottom: 30px;
+      }
+
+      .browse-card,
+      .subject-card {
+        background: white;
+
+        padding: 24px;
+
+        border-radius: 16px;
+
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+
+        border: 1px solid #f0f1f5;
+
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+
+        cursor: pointer;
+
+        animation: slideUp 0.4s ease backwards;
+      }
+
+      .browse-card:hover,
+      .subject-card:hover {
+        transform: translateY(-6px);
+
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+
+        border-color: #e0e7ff;
+      }
+
+      .browse-card h3,
+      .subject-card h3 {
+        margin: 0 0 6px;
+
+        font-size: 17px;
+
+        font-weight: 700;
+      }
+
+      .browse-card .meta {
+        color: #6b7280;
+
+        font-size: 13px;
+
+        margin-bottom: 16px;
+      }
+
+      .subject-code {
+        font-weight: 700;
+
+        color: #4f46e5;
+      }
+
+      .browse-card button,
+      .subject-card button {
+        padding: 10px 18px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        cursor: pointer;
+
+        background: #4f46e5;
+
+        color: white;
+
+        font-weight: 600;
+
+        font-size: 13px;
+
+        transition:
+          background 0.2s ease,
+          transform 0.15s ease;
+      }
+
+      .browse-card button:hover,
+      .subject-card button:hover {
+        background: #4338ca;
+
+        transform: scale(1.03);
+      }
+
+      .empty-msg {
+        color: rgba(255, 255, 255, 0.9);
+
+        font-size: 14px;
+
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+      }
+
+      /* =====================================================
+           SEARCH EMPTY
+        ===================================================== */
+
+      #searchEmpty {
+        display: none;
+
+        grid-column: 1 / -1;
+
+        text-align: center;
+
+        background: rgba(255, 255, 255, 0.94);
+
+        color: #6b7280;
+
+        padding: 28px 20px;
+
+        border-radius: 16px;
+
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+      }
+
+      /* =====================================================
+           BOTTOM ACTIONS
+        ===================================================== */
+
+      .bottom-actions {
+        display: flex;
+
+        gap: 12px;
+
+        flex-wrap: wrap;
+
+        margin-top: 10px;
+      }
+
+      .bottom-actions button {
+        padding: 11px 20px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        cursor: pointer;
+
+        font-weight: 600;
+
+        font-size: 13px;
+
+        background: rgba(255, 255, 255, 0.92);
+
+        color: #4338ca;
+
+        transition: all 0.2s ease;
+      }
+
+      .bottom-actions button:hover {
+        background: #fff;
+
+        transform: translateY(-2px);
+      }
+
+      #adminActions,
+      #feedbackActions {
+        display: none;
+      }
+
+      /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+      @media (max-width: 800px) {
+        #topbar {
+          align-items: stretch;
+
+          padding: 14px 16px;
+
+          gap: 10px;
+
+          flex-wrap: wrap;
+        }
+
+        .brand-section {
+          flex: 1;
+        }
+
+        .search-wrapper {
+          order: 3;
+
+          width: 100%;
+
+          max-width: none;
+
+          min-width: 0;
+        }
+
+        .search-hint {
+          display: none;
+        }
+
+        #logoutButton {
+          align-self: center;
+        }
+      }
+
+      @media (max-width: 640px) {
+        #topbar {
+          padding: 14px 16px;
+
+          flex-wrap: wrap;
+
+          gap: 8px;
+        }
+
+        #topbar h1 {
+          font-size: 17px;
+        }
+
+        #content {
+          padding: 20px 16px 40px;
+        }
+
+        #sectionTitle {
+          font-size: 18px;
         }
 
         .browse-card,
         .subject-card {
-            background: white;
-
-            padding: 24px;
-
-            border-radius: 16px;
-
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.18);
-
-            border: 1px solid #f0f1f5;
-
-            transition:
-                transform 0.25s ease,
-                box-shadow 0.25s ease;
-
-            cursor: pointer;
-
-            animation:
-                slideUp 0.4s ease backwards;
+          padding: 18px;
         }
-
-        .browse-card:hover,
-        .subject-card:hover {
-            transform: translateY(-6px);
-
-            box-shadow:
-                0 16px 36px rgba(0, 0, 0, 0.24);
-
-            border-color: #e0e7ff;
-        }
-
-        .browse-card h3,
-        .subject-card h3 {
-            margin: 0 0 6px;
-
-            font-size: 17px;
-
-            font-weight: 700;
-        }
-
-        .browse-card .meta {
-            color: #6b7280;
-
-            font-size: 13px;
-
-            margin-bottom: 16px;
-        }
-
-        .subject-code {
-            font-weight: 700;
-
-            color: #4f46e5;
-        }
-
-        .browse-card button,
-        .subject-card button {
-            padding: 10px 18px;
-
-            border: none;
-
-            border-radius: 10px;
-
-            cursor: pointer;
-
-            background: #4f46e5;
-
-            color: white;
-
-            font-weight: 600;
-
-            font-size: 13px;
-
-            transition:
-                background 0.2s ease,
-                transform 0.15s ease;
-        }
-
-        .browse-card button:hover,
-        .subject-card button:hover {
-            background: #4338ca;
-
-            transform: scale(1.03);
-        }
-
-        .empty-msg {
-            color: rgba(255, 255, 255, 0.9);
-
-            font-size: 14px;
-
-            text-shadow:
-                0 1px 6px rgba(0, 0, 0, 0.15);
-        }
-
-        /* =====================================================
-           SEARCH EMPTY
-        ===================================================== */
-
-        #searchEmpty {
-            display: none;
-
-            grid-column: 1 / -1;
-
-            text-align: center;
-
-            background: rgba(255, 255, 255, 0.94);
-
-            color: #6b7280;
-
-            padding: 28px 20px;
-
-            border-radius: 16px;
-
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.14);
-        }
-
-        /* =====================================================
-           BOTTOM ACTIONS
-        ===================================================== */
 
         .bottom-actions {
-            display: flex;
-
-            gap: 12px;
-
-            flex-wrap: wrap;
-
-            margin-top: 10px;
+          flex-direction: column;
         }
 
         .bottom-actions button {
-            padding: 11px 20px;
-
-            border: none;
-
-            border-radius: 10px;
-
-            cursor: pointer;
-
-            font-weight: 600;
-
-            font-size: 13px;
-
-            background: rgba(255, 255, 255, 0.92);
-
-            color: #4338ca;
-
-            transition: all 0.2s ease;
+          width: 100%;
         }
-
-        .bottom-actions button:hover {
-            background: #fff;
-
-            transform: translateY(-2px);
-        }
-
-        #adminActions,
-        #feedbackActions {
-            display: none;
-        }
-
-        /* =====================================================
-           RESPONSIVE
-        ===================================================== */
-
-        @media (max-width: 800px) {
-
-            #topbar {
-                align-items: stretch;
-
-                padding: 14px 16px;
-
-                gap: 10px;
-
-                flex-wrap: wrap;
-            }
-
-            .brand-section {
-                flex: 1;
-            }
-
-            .search-wrapper {
-                order: 3;
-
-                width: 100%;
-
-                max-width: none;
-
-                min-width: 0;
-            }
-
-            .search-hint {
-                display: none;
-            }
-
-            #logoutButton {
-                align-self: center;
-            }
-        }
-
-        @media (max-width: 640px) {
-
-            #topbar {
-                padding: 14px 16px;
-
-                flex-wrap: wrap;
-
-                gap: 8px;
-            }
-
-            #topbar h1 {
-                font-size: 17px;
-            }
-
-            #content {
-                padding: 20px 16px 40px;
-            }
-
-            #sectionTitle {
-                font-size: 18px;
-            }
-
-            .browse-card,
-            .subject-card {
-                padding: 18px;
-            }
-
-            .bottom-actions {
-                flex-direction: column;
-            }
-
-            .bottom-actions button {
-                width: 100%;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-
-<body>
-
+  <body>
     <!-- =====================================================
          BACKGROUND
     ===================================================== -->
@@ -924,361 +995,360 @@
     <div class="bg-shape s3"></div>
     <div class="bg-shape s4"></div>
 
-
     <!-- =====================================================
          TOP BAR
     ===================================================== -->
 
     <div id="topbar">
+      <div class="brand-section">
+        <h1>📚 College Notes</h1>
 
-        <div class="brand-section">
+        <p id="welcomeMessage">Welcome!</p>
+      </div>
 
-            <h1>
-                📚 College Notes
-            </h1>
+      <!-- SEARCH -->
 
-            <p id="welcomeMessage">
-                Welcome!
-            </p>
+      <div class="search-wrapper">
+        <div class="search-box">
+          <span class="search-icon" aria-hidden="true"> 🔍 </span>
 
+          <input
+            type="search"
+            id="globalSearch"
+            placeholder="Search courses, subjects, notes..."
+            aria-label="Search college notes"
+            autocomplete="off"
+            spellcheck="false"
+          />
+
+          <button
+            type="button"
+            id="clearSearch"
+            aria-label="Clear search"
+            title="Clear search"
+          >
+            ✕
+          </button>
         </div>
 
+        <!-- SEARCH RESULTS -->
 
-        <!-- SEARCH -->
+        <div id="searchResults" aria-live="polite"></div>
 
-        <div class="search-wrapper">
+        <span class="search-hint"> Press Ctrl + K to search </span>
+      </div>
 
-            <div class="search-box">
+      <!-- LOGOUT -->
 
-                <span
-                    class="search-icon"
-                    aria-hidden="true"
-                >
-                    🔍
-                </span>
-
-                <input
-                    type="search"
-                    id="globalSearch"
-                    placeholder="Search courses, subjects, notes..."
-                    aria-label="Search college notes"
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-
-                <button
-                    type="button"
-                    id="clearSearch"
-                    aria-label="Clear search"
-                    title="Clear search"
-                >
-                    ✕
-                </button>
-
-            </div>
-
-
-            <!-- SEARCH RESULTS -->
-
-            <div
-                id="searchResults"
-                aria-live="polite"
-            ></div>
-
-
-            <span class="search-hint">
-                Press Ctrl + K to search
-            </span>
-
-        </div>
-
-
-        <!-- LOGOUT -->
-
-        <button id="logoutButton">
-            Logout
-        </button>
-
+      <button id="logoutButton">Logout</button>
     </div>
 
+    <!-- =====================================================
+         QUIZ WIDGET MODAL
+    ===================================================== -->
+
+    <div id="quizWidgetOverlay">
+      <div id="quizWidgetCard">
+        <div class="quiz-widget-label" id="quizWidgetLabel">
+          Loading quiz...
+        </div>
+        <div class="quiz-widget-question" id="quizWidgetQuestion"></div>
+        <div id="quizWidgetOptions"></div>
+        <button class="quiz-widget-close" id="quizWidgetCloseBtn">Close</button>
+      </div>
+    </div>
 
     <!-- =====================================================
          MAIN CONTENT
     ===================================================== -->
 
     <div id="content">
+      <!-- LIVE USER COUNT -->
 
-        <!-- LIVE USER COUNT -->
+      <div id="count">Loading…</div>
 
-        <div id="count">
-            Loading…
+      <!-- OVERALL PROGRESS -->
+
+      <div id="progressCard">
+        <div class="progress-top">
+          <span class="progress-label">📈 Overall Study Progress</span>
+          <span class="progress-percent" id="progressPercent">0%</span>
         </div>
 
-
-        <!-- OVERALL PROGRESS -->
-
-        <div id="progressCard">
-
-            <div class="progress-top">
-                <span class="progress-label">📈 Overall Study Progress</span>
-                <span class="progress-percent" id="progressPercent">0%</span>
-            </div>
-
-            <div class="progress-track">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-
-            <div class="progress-sub" id="progressSub">Loading progress...</div>
-
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
         </div>
 
+        <div class="progress-sub" id="progressSub">Loading progress...</div>
+      </div>
 
-        <!-- SEARCH STATUS -->
+      <!-- SEARCH STATUS -->
 
-        <div
-            id="searchStatus"
-            aria-live="polite"
-        ></div>
+      <div id="searchStatus" aria-live="polite"></div>
 
+      <!-- BREADCRUMB -->
 
-        <!-- BREADCRUMB -->
+      <div id="breadcrumb"></div>
 
-        <div id="breadcrumb"></div>
+      <!-- TITLE -->
 
+      <h2 id="sectionTitle">Choose Your Course</h2>
 
-        <!-- TITLE -->
+      <!-- CARDS -->
 
-        <h2 id="sectionTitle">
-            Choose Your Course
-        </h2>
+      <div id="browseContainer">
+        <p class="empty-msg">Loading...</p>
 
+        <div id="searchEmpty">
+          🔎 No matching results found.
+          <br />
 
-        <!-- CARDS -->
-
-        <div id="browseContainer">
-
-            <p class="empty-msg">
-                Loading...
-            </p>
-
-            <div id="searchEmpty">
-                🔎 No matching results found.
-                <br>
-
-                <small>
-                    Try a different course, subject, unit, or note.
-                </small>
-            </div>
-
+          <small> Try a different course, subject, unit, or note. </small>
         </div>
+      </div>
 
-
-        <!-- =================================================
+      <!-- =================================================
              BOTTOM ACTIONS
         ================================================= -->
 
-        <div class="bottom-actions">
+      <div class="bottom-actions">
+        <!-- ADMIN -->
 
-            <!-- ADMIN -->
+        <span id="adminActions">
+          <a href="/Frontend/pages/upload.html">
+            <button>Upload Note</button>
+          </a>
 
-            <span id="adminActions">
+          <a href="/Frontend/pages/admin.html">
+            <button>Admin Panel</button>
+          </a>
 
-                <a href="/Frontend/pages/upload.html">
-                    <button>
-                        Upload Note
-                    </button>
-                </a>
+          <a href="/Frontend/pages/bookmarks.html">
+            <button>🔖 My Bookmarks</button>
+          </a>
+        </span>
 
-                <a href="/Frontend/pages/admin.html">
-                    <button>
-                        Admin Panel
-                    </button>
-                </a>
+        <!-- FEEDBACK -->
 
-                <a href="/Frontend/pages/bookmarks.html">
-                    <button>
-                        🔖 My Bookmarks
-                    </button>
-                </a>
+        <span id="feedbackActions">
+          <a href="/Frontend/pages/bookmarks.html">
+            <button>🔖 My Bookmarks</button>
+          </a>
 
-            </span>
-
-
-            <!-- FEEDBACK -->
-
-            <span id="feedbackActions">
-
-                <a href="/Frontend/pages/bookmarks.html">
-                    <button>
-                        🔖 My Bookmarks
-                    </button>
-                </a>
-
-                <a href="/Frontend/pages/feedback.html">
-                    <button>
-                        Suggest Feedback
-                    </button>
-                </a>
-
-            </span>
-
-        </div>
-
+          <a href="/Frontend/pages/feedback.html">
+            <button>Suggest Feedback</button>
+          </a>
+        </span>
+      </div>
     </div>
-
 
     <!-- =====================================================
          LIVE USER COUNT
     ===================================================== -->
 
     <script>
+      (function () {
+        const countEl = document.getElementById("count");
 
-        (function () {
+        const script = document.createElement("script");
 
-            const countEl =
-                document.getElementById("count");
+        script.src = "/socket.io/socket.io.js";
 
-            const script =
-                document.createElement("script");
+        script.onload = function () {
+          try {
+            const socket = io();
 
-            script.src =
-                "/socket.io/socket.io.js";
+            socket.on("userCount", function (count) {
+              countEl.innerText = count + " users online";
+            });
 
-            script.onload = function () {
+            socket.on("connect_error", function () {
+              countEl.style.display = "none";
+            });
+          } catch (error) {
+            console.warn("Live user count unavailable:", error);
 
-                try {
+            countEl.style.display = "none";
+          }
+        };
 
-                    const socket = io();
+        script.onerror = function () {
+          console.warn("socket.io.js failed to load");
 
-                    socket.on(
-                        "userCount",
-                        function (count) {
+          countEl.style.display = "none";
+        };
 
-                            countEl.innerText =
-                                count +
-                                " users online";
-
-                        }
-                    );
-
-                    socket.on(
-                        "connect_error",
-                        function () {
-
-                            countEl.style.display =
-                                "none";
-
-                        }
-                    );
-
-                } catch (error) {
-
-                    console.warn(
-                        "Live user count unavailable:",
-                        error
-                    );
-
-                    countEl.style.display =
-                        "none";
-                }
-            };
-
-            script.onerror = function () {
-
-                console.warn(
-                    "socket.io.js failed to load"
-                );
-
-                countEl.style.display =
-                    "none";
-            };
-
-            document.head.appendChild(script);
-
-        })();
-
+        document.head.appendChild(script);
+      })();
     </script>
-
 
     <!-- =====================================================
          OVERALL PROGRESS
     ===================================================== -->
 
     <script>
+      (function () {
+        "use strict";
 
-        (function () {
+        const API_BASE_URL =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+            ? "http://localhost:5000"
+            : "https://college-notes-website-f64v.onrender.com";
 
-            "use strict";
+        const token = localStorage.getItem("token");
 
-            const API_BASE_URL =
-                (
-                    window.location.hostname === "localhost" ||
-                    window.location.hostname === "127.0.0.1"
-                )
-                    ? "http://localhost:5000"
-                    : "https://college-notes-website-f64v.onrender.com";
+        const progressFill = document.getElementById("progressFill");
 
-            const token = localStorage.getItem("token");
+        const progressPercent = document.getElementById("progressPercent");
 
-            const progressFill =
-                document.getElementById("progressFill");
+        const progressSub = document.getElementById("progressSub");
 
-            const progressPercent =
-                document.getElementById("progressPercent");
+        async function loadProgressSummary() {
+          try {
+            const response = await fetch(
+              API_BASE_URL + "/api/progress/summary",
+              {
+                headers: {
+                  Authorization: "Bearer " + token,
+                },
+              },
+            );
 
-            const progressSub =
-                document.getElementById("progressSub");
+            const data = await response.json();
 
-            async function loadProgressSummary() {
-
-                try {
-
-                    const response = await fetch(
-                        API_BASE_URL + "/api/progress/summary",
-                        {
-                            headers: {
-                                "Authorization": "Bearer " + token
-                            }
-                        }
-                    );
-
-                    const data = await response.json();
-
-                    if (!data.success) {
-                        throw new Error(
-                            data.message || "Unable to load progress."
-                        );
-                    }
-
-                    progressFill.style.width = data.percentage + "%";
-                    progressPercent.textContent = data.percentage + "%";
-
-                    progressSub.textContent =
-                        data.completed +
-                        " of " +
-                        data.total +
-                        " topics completed";
-
-                } catch (error) {
-
-                    console.warn(
-                        "Progress summary unavailable:",
-                        error
-                    );
-
-                    progressSub.textContent =
-                        "Progress unavailable right now.";
-
-                }
-
+            if (!data.success) {
+              throw new Error(data.message || "Unable to load progress.");
             }
 
-            loadProgressSummary();
+            progressFill.style.width = data.percentage + "%";
+            progressPercent.textContent = data.percentage + "%";
 
-        })();
+            progressSub.textContent =
+              data.completed + " of " + data.total + " topics completed";
+          } catch (error) {
+            console.warn("Progress summary unavailable:", error);
 
+            progressSub.textContent = "Progress unavailable right now.";
+          }
+        }
+
+        loadProgressSummary();
+      })();
     </script>
 
+    <!-- =====================================================
+         DAILY QUIZ WIDGET
+    ===================================================== -->
+
+    <script>
+      (function () {
+        "use strict";
+
+        const API_BASE_URL =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+            ? "http://localhost:5000"
+            : "https://college-notes-website-f64v.onrender.com";
+
+        const token = localStorage.getItem("token");
+
+        const overlay = document.getElementById("quizWidgetOverlay");
+        const labelEl = document.getElementById("quizWidgetLabel");
+        const questionEl = document.getElementById("quizWidgetQuestion");
+        const optionsEl = document.getElementById("quizWidgetOptions");
+        const closeBtn = document.getElementById("quizWidgetCloseBtn");
+
+        const categoryLabels = {
+          ramayana: "🏹 Ramayana Quiz",
+          mahabharata: "⚔️ Mahabharata Quiz",
+          gk: "🌍 General Knowledge",
+        };
+
+        function closeWidget() {
+          overlay.style.display = "none";
+        }
+
+        closeBtn.addEventListener("click", closeWidget);
+
+        overlay.addEventListener("click", function (event) {
+          if (event.target === overlay) {
+            closeWidget();
+          }
+        });
+
+        function renderQuestion(data) {
+          const q = data.question;
+
+          labelEl.textContent = categoryLabels[q.category] || "Quiz";
+
+          questionEl.textContent = q.question;
+
+          const options = [
+            { key: "A", text: q.option_a },
+            { key: "B", text: q.option_b },
+            { key: "C", text: q.option_c },
+            { key: "D", text: q.option_d },
+          ];
+
+          optionsEl.innerHTML = "";
+
+          options.forEach(function (opt) {
+            const btn = document.createElement("button");
+            btn.className = "quiz-widget-option";
+            btn.textContent = opt.text;
+
+            btn.addEventListener("click", function () {
+              const allButtons = optionsEl.querySelectorAll(
+                ".quiz-widget-option",
+              );
+
+              allButtons.forEach(function (b) {
+                b.disabled = true;
+              });
+
+              if (opt.key === q.correct_option) {
+                btn.classList.add("correct");
+              } else {
+                btn.classList.add("incorrect");
+
+                allButtons.forEach(function (b, i) {
+                  if (options[i].key === q.correct_option) {
+                    b.classList.add("correct");
+                  }
+                });
+              }
+            });
+
+            optionsEl.appendChild(btn);
+          });
+        }
+
+        async function loadDashboardQuiz() {
+          try {
+            const response = await fetch(API_BASE_URL + "/api/quiz/widget", {
+              headers: {
+                Authorization: "Bearer " + token,
+              },
+            });
+
+            const data = await response.json();
+
+            if (!data.success || !data.question) {
+              // No questions available - don't bother showing the popup
+              return;
+            }
+
+            renderQuestion(data);
+            overlay.style.display = "flex";
+          } catch (error) {
+            console.warn("Dashboard quiz widget unavailable:", error);
+          }
+        }
+
+        loadDashboardQuiz();
+      })();
+    </script>
 
     <!-- =====================================================
          DASHBOARD JS
@@ -1286,811 +1356,522 @@
 
     <script src="/Frontend/js/dashboard.js"></script>
 
-
     <!-- =====================================================
          GLOBAL DATABASE SEARCH
     ===================================================== -->
 
     <script>
+      (function () {
+        "use strict";
 
-        (function () {
-
-            "use strict";
-
-
-            /* =================================================
+        /* =================================================
                ELEMENTS
             ================================================= */
 
-            const searchInput =
-                document.getElementById("globalSearch");
+        const searchInput = document.getElementById("globalSearch");
 
-            const clearButton =
-                document.getElementById("clearSearch");
+        const clearButton = document.getElementById("clearSearch");
 
-            const searchResults =
-                document.getElementById("searchResults");
+        const searchResults = document.getElementById("searchResults");
 
-            const searchStatus =
-                document.getElementById("searchStatus");
+        const searchStatus = document.getElementById("searchStatus");
 
-            const browseContainer =
-                document.getElementById("browseContainer");
+        const browseContainer = document.getElementById("browseContainer");
 
+        if (!searchInput || !clearButton || !searchResults) {
+          console.error("Search elements not found.");
 
-            if (
-                !searchInput ||
-                !clearButton ||
-                !searchResults
-            ) {
-                console.error(
-                    "Search elements not found."
-                );
+          return;
+        }
 
-                return;
-            }
-
-
-            /* =================================================
+        /* =================================================
                API
             ================================================= */
 
-            const API_BASE_URL =
-                (
-                    window.location.hostname === "localhost" ||
-                    window.location.hostname === "127.0.0.1"
-                )
-                    ? "http://localhost:5000"
-                    : "https://college-notes-website-f64v.onrender.com";
+        const API_BASE_URL =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+            ? "http://localhost:5000"
+            : "https://college-notes-website-f64v.onrender.com";
 
+        let searchTimer = null;
 
-            let searchTimer = null;
-
-
-            /* =================================================
+        /* =================================================
                NORMALIZE SEARCH
             ================================================= */
 
-            function normalizeSearch(query) {
+        function normalizeSearch(query) {
+          query = query.trim();
 
-                query = query.trim();
+          /*
+           * semester 4
+           * 4 semester
+           * 4th semester
+           */
 
-                /*
-                 * semester 4
-                 * 4 semester
-                 * 4th semester
-                 */
+          const semesterMatch = query.match(
+            /^(?:semester\s*)?(\d+)(?:st|nd|rd|th)?\s*semester$/i,
+          );
 
-                const semesterMatch =
-                    query.match(
-                        /^(?:semester\s*)?(\d+)(?:st|nd|rd|th)?\s*semester$/i
-                    );
+          if (semesterMatch) {
+            const number = Number(semesterMatch[1]);
 
-                if (semesterMatch) {
+            let suffix = "th";
 
-                    const number =
-                        Number(semesterMatch[1]);
-
-                    let suffix = "th";
-
-                    if (number === 1) {
-                        suffix = "st";
-                    }
-
-                    if (number === 2) {
-                        suffix = "nd";
-                    }
-
-                    if (number === 3) {
-                        suffix = "rd";
-                    }
-
-                    return (
-                        number +
-                        suffix +
-                        " semester"
-                    );
-                }
-
-
-                /*
-                 * semester 4
-                 */
-
-                const simpleSemester =
-                    query.match(
-                        /^semester\s+(\d+)$/i
-                    );
-
-                if (simpleSemester) {
-
-                    const number =
-                        Number(simpleSemester[1]);
-
-                    let suffix = "th";
-
-                    if (number === 1) {
-                        suffix = "st";
-                    }
-
-                    if (number === 2) {
-                        suffix = "nd";
-                    }
-
-                    if (number === 3) {
-                        suffix = "rd";
-                    }
-
-                    return (
-                        number +
-                        suffix +
-                        " semester"
-                    );
-                }
-
-
-                return query;
+            if (number === 1) {
+              suffix = "st";
             }
 
+            if (number === 2) {
+              suffix = "nd";
+            }
 
-            /* =================================================
+            if (number === 3) {
+              suffix = "rd";
+            }
+
+            return number + suffix + " semester";
+          }
+
+          /*
+           * semester 4
+           */
+
+          const simpleSemester = query.match(/^semester\s+(\d+)$/i);
+
+          if (simpleSemester) {
+            const number = Number(simpleSemester[1]);
+
+            let suffix = "th";
+
+            if (number === 1) {
+              suffix = "st";
+            }
+
+            if (number === 2) {
+              suffix = "nd";
+            }
+
+            if (number === 3) {
+              suffix = "rd";
+            }
+
+            return number + suffix + " semester";
+          }
+
+          return query;
+        }
+
+        /* =================================================
                TYPE ICON
             ================================================= */
 
-            function getIcon(type) {
+        function getIcon(type) {
+          const icons = {
+            course: "📚",
 
-                const icons = {
+            year: "📅",
 
-                    course: "📚",
+            semester: "📖",
 
-                    year: "📅",
+            subject: "📘",
 
-                    semester: "📖",
+            unit: "📑",
 
-                    subject: "📘",
+            content: "📄",
 
-                    unit: "📑",
+            note: "📝",
+          };
 
-                    content: "📄",
+          return icons[type] || "🔎";
+        }
 
-                    note: "📝"
-
-                };
-
-                return icons[type] || "🔎";
-            }
-
-
-            /* =================================================
+        /* =================================================
                TYPE NAME
             ================================================= */
 
-            function getTypeName(type) {
+        function getTypeName(type) {
+          const names = {
+            course: "Course",
 
-                const names = {
+            year: "Academic Year",
 
-                    course: "Course",
+            semester: "Semester",
 
-                    year: "Academic Year",
+            subject: "Subject",
 
-                    semester: "Semester",
+            unit: "Unit",
 
-                    subject: "Subject",
+            content: "Topic",
 
-                    unit: "Unit",
+            note: "Note",
+          };
 
-                    content: "Topic",
+          return names[type] || "Result";
+        }
 
-                    note: "Note"
-
-                };
-
-                return names[type] || "Result";
-            }
-
-
-            /* =================================================
+        /* =================================================
                CLEAR RESULTS
             ================================================= */
 
-            function clearResults() {
+        function clearResults() {
+          searchResults.innerHTML = "";
 
-                searchResults.innerHTML = "";
+          searchResults.style.display = "none";
 
-                searchResults.style.display =
-                    "none";
+          searchStatus.style.display = "none";
+        }
 
-                searchStatus.style.display =
-                    "none";
-
-            }
-
-
-            /* =================================================
+        /* =================================================
                RESTORE DASHBOARD
             ================================================= */
 
-            function restoreDashboard() {
+        function restoreDashboard() {
+          clearResults();
 
-                clearResults();
+          searchInput.value = "";
 
-                searchInput.value = "";
+          clearButton.style.display = "none";
 
-                clearButton.style.display =
-                    "none";
+          if (typeof window.showCourses === "function") {
+            window.showCourses();
+          }
+        }
 
-
-                if (
-                    typeof window.showCourses ===
-                    "function"
-                ) {
-
-                    window.showCourses();
-
-                }
-
-            }
-
-
-            /* =================================================
+        /* =================================================
                CREATE RESULT
             ================================================= */
 
-            function createResult(result) {
+        function createResult(result) {
+          const item = document.createElement("div");
 
-                const item =
-                    document.createElement("div");
+          item.className = "search-result";
 
-                item.className =
-                    "search-result";
+          const type = document.createElement("div");
 
+          type.className = "search-result-type";
 
-                const type =
-                    document.createElement("div");
+          type.textContent =
+            getIcon(result.type) + " " + getTypeName(result.type);
 
-                type.className =
-                    "search-result-type";
+          const title = document.createElement("div");
 
-                type.textContent =
-                    getIcon(result.type) +
-                    " " +
-                    getTypeName(result.type);
+          title.className = "search-result-title";
 
+          title.textContent = result.title || "Untitled";
 
-                const title =
-                    document.createElement("div");
+          item.appendChild(type);
 
-                title.className =
-                    "search-result-title";
+          item.appendChild(title);
 
-                title.textContent =
-                    result.title ||
-                    "Untitled";
+          if (result.description) {
+            const description = document.createElement("div");
 
+            description.className = "search-result-description";
 
-                item.appendChild(type);
+            let text = String(result.description);
 
-                item.appendChild(title);
-
-
-                if (result.description) {
-
-                    const description =
-                        document.createElement("div");
-
-                    description.className =
-                        "search-result-description";
-
-                    let text =
-                        String(result.description);
-
-                    if (text.length > 150) {
-
-                        text =
-                            text.substring(0, 150) +
-                            "...";
-
-                    }
-
-                    description.textContent =
-                        text;
-
-                    item.appendChild(
-                        description
-                    );
-
-                }
-
-
-                if (result.code) {
-
-                    const code =
-                        document.createElement("span");
-
-                    code.className =
-                        "search-result-code";
-
-                    code.textContent =
-                        result.code;
-
-                    item.appendChild(code);
-
-                }
-
-
-                item.addEventListener(
-                    "click",
-                    function () {
-
-                        openResult(result);
-
-                    }
-                );
-
-
-                return item;
+            if (text.length > 150) {
+              text = text.substring(0, 150) + "...";
             }
 
+            description.textContent = text;
 
-            /* =================================================
+            item.appendChild(description);
+          }
+
+          if (result.code) {
+            const code = document.createElement("span");
+
+            code.className = "search-result-code";
+
+            code.textContent = result.code;
+
+            item.appendChild(code);
+          }
+
+          item.addEventListener("click", function () {
+            openResult(result);
+          });
+
+          return item;
+        }
+
+        /* =================================================
                OPEN RESULT
             ================================================= */
 
-            function openResult(result) {
+        function openResult(result) {
+          /*
+           * COURSE
+           */
 
-                /*
-                 * COURSE
-                 */
+          if (
+            result.type === "course" &&
+            typeof window.showYears === "function"
+          ) {
+            window.showYears({
+              id: result.id,
+              course_name: result.title,
+              name: result.title,
+              title: result.title,
+            });
 
-                if (
-                    result.type === "course" &&
-                    typeof window.showYears ===
-                    "function"
-                ) {
+            closeSearch();
 
-                    window.showYears({
-                        id: result.id,
-                        course_name: result.title,
-                        name: result.title,
-                        title: result.title
-                    });
+            return;
+          }
 
-                    closeSearch();
+          /*
+           * YEAR
+           */
 
-                    return;
-                }
+          if (
+            result.type === "year" &&
+            typeof window.showSemesters === "function"
+          ) {
+            window.showSemesters({
+              id: result.id,
+              year_name: result.title,
+              name: result.title,
+              title: result.title,
+            });
 
+            closeSearch();
 
-                /*
-                 * YEAR
-                 */
+            return;
+          }
 
-                if (
-                    result.type === "year" &&
-                    typeof window.showSemesters ===
-                    "function"
-                ) {
+          /*
+           * SEMESTER
+           */
 
-                    window.showSemesters({
-                        id: result.id,
-                        year_name: result.title,
-                        name: result.title,
-                        title: result.title
-                    });
+          if (
+            result.type === "semester" &&
+            typeof window.showSubjects === "function"
+          ) {
+            window.showSubjects({
+              id: result.id,
+              semester_name: result.title,
+              name: result.title,
+              title: result.title,
+            });
 
-                    closeSearch();
+            closeSearch();
 
-                    return;
-                }
+            return;
+          }
 
+          /*
+           * SUBJECT
+           */
 
-                /*
-                 * SEMESTER
-                 */
+          if (
+            result.type === "subject" &&
+            typeof window.openSubject === "function"
+          ) {
+            window.openSubject(result.id);
 
-                if (
-                    result.type === "semester" &&
-                    typeof window.showSubjects ===
-                    "function"
-                ) {
+            closeSearch();
 
-                    window.showSubjects({
-                        id: result.id,
-                        semester_name: result.title,
-                        name: result.title,
-                        title: result.title
-                    });
+            return;
+          }
 
-                    closeSearch();
+          /*
+           * UNIT / CONTENT / NOTE
+           *
+           * These can be connected to their
+           * exact pages later.
+           */
 
-                    return;
-                }
+          if (
+            result.type === "unit" ||
+            result.type === "content" ||
+            result.type === "note"
+          ) {
+            alert(
+              getTypeName(result.type) + ":\n\n" + (result.title || "Untitled"),
+            );
+          }
+        }
 
-
-                /*
-                 * SUBJECT
-                 */
-
-                if (
-                    result.type === "subject" &&
-                    typeof window.openSubject ===
-                    "function"
-                ) {
-
-                    window.openSubject(
-                        result.id
-                    );
-
-                    closeSearch();
-
-                    return;
-                }
-
-
-                /*
-                 * UNIT / CONTENT / NOTE
-                 *
-                 * These can be connected to their
-                 * exact pages later.
-                 */
-
-                if (
-                    result.type === "unit" ||
-                    result.type === "content" ||
-                    result.type === "note"
-                ) {
-
-                    alert(
-                        getTypeName(result.type) +
-                        ":\n\n" +
-                        (
-                            result.title ||
-                            "Untitled"
-                        )
-                    );
-
-                }
-
-            }
-
-
-            /* =================================================
+        /* =================================================
                CLOSE SEARCH
             ================================================= */
 
-            function closeSearch() {
+        function closeSearch() {
+          searchInput.value = "";
 
-                searchInput.value = "";
+          clearButton.style.display = "none";
 
-                clearButton.style.display =
-                    "none";
+          searchResults.innerHTML = "";
 
-                searchResults.innerHTML = "";
+          searchResults.style.display = "none";
 
-                searchResults.style.display =
-                    "none";
+          searchStatus.style.display = "none";
+        }
 
-                searchStatus.style.display =
-                    "none";
-
-            }
-
-
-            /* =================================================
+        /* =================================================
                PERFORM SEARCH
             ================================================= */
 
-            async function performSearch(query) {
+        async function performSearch(query) {
+          query = query.trim();
 
-                query =
-                    query.trim();
+          if (!query) {
+            restoreDashboard();
 
+            return;
+          }
 
-                if (!query) {
+          searchResults.innerHTML =
+            '<div class="search-message">🔎 Searching...</div>';
 
-                    restoreDashboard();
+          searchResults.style.display = "block";
 
-                    return;
-                }
+          searchStatus.textContent = 'Searching for "' + query + '"...';
 
+          searchStatus.style.display = "block";
 
-                searchResults.innerHTML =
-                    '<div class="search-message">🔎 Searching...</div>';
+          const normalizedQuery = normalizeSearch(query);
 
-                searchResults.style.display =
-                    "block";
+          try {
+            const response = await fetch(
+              API_BASE_URL +
+                "/api/search?q=" +
+                encodeURIComponent(normalizedQuery),
+            );
 
-
-                searchStatus.textContent =
-                    "Searching for \"" +
-                    query +
-                    "\"...";
-
-                searchStatus.style.display =
-                    "block";
-
-
-                const normalizedQuery =
-                    normalizeSearch(query);
-
-
-                try {
-
-                    const response =
-                        await fetch(
-                            API_BASE_URL +
-                            "/api/search?q=" +
-                            encodeURIComponent(
-                                normalizedQuery
-                            )
-                        );
-
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            "HTTP " +
-                            response.status
-                        );
-
-                    }
-
-
-                    const data =
-                        await response.json();
-
-
-                    console.log(
-                        "Search response:",
-                        data
-                    );
-
-
-                    if (
-                        !data.success ||
-                        !Array.isArray(
-                            data.results
-                        )
-                    ) {
-
-                        throw new Error(
-                            "Invalid search response"
-                        );
-
-                    }
-
-
-                    searchResults.innerHTML =
-                        "";
-
-
-                    if (
-                        data.results.length === 0
-                    ) {
-
-                        searchResults.innerHTML =
-                            '<div class="search-message">🔎 No results found for "' +
-                            query +
-                            '"</div>';
-
-                        searchStatus.textContent =
-                            "No results found for \"" +
-                            query +
-                            "\"";
-
-                        searchStatus.style.display =
-                            "block";
-
-                        return;
-                    }
-
-
-                    /*
-                     * Limit dropdown to first 15
-                     * results.
-                     */
-
-                    const results =
-                        data.results.slice(
-                            0,
-                            15
-                        );
-
-
-                    results.forEach(
-                        function (result) {
-
-                            searchResults.appendChild(
-                                createResult(result)
-                            );
-
-                        }
-                    );
-
-
-                    searchResults.style.display =
-                        "block";
-
-
-                    searchStatus.textContent =
-                        data.results.length +
-                        (
-                            data.results.length === 1
-                                ? " result"
-                                : " results"
-                        ) +
-                        " found";
-
-
-                    searchStatus.style.display =
-                        "block";
-
-                } catch (error) {
-
-                    console.error(
-                        "Search error:",
-                        error
-                    );
-
-
-                    searchResults.innerHTML =
-                        '<div class="search-message">⚠️ Unable to search right now.<br>Please try again.</div>';
-
-
-                    searchResults.style.display =
-                        "block";
-
-
-                    searchStatus.textContent =
-                        "Search service unavailable.";
-
-                    searchStatus.style.display =
-                        "block";
-
-                }
-
+            if (!response.ok) {
+              throw new Error("HTTP " + response.status);
             }
 
+            const data = await response.json();
 
-            /* =================================================
+            console.log("Search response:", data);
+
+            if (!data.success || !Array.isArray(data.results)) {
+              throw new Error("Invalid search response");
+            }
+
+            searchResults.innerHTML = "";
+
+            if (data.results.length === 0) {
+              searchResults.innerHTML =
+                '<div class="search-message">🔎 No results found for "' +
+                query +
+                '"</div>';
+
+              searchStatus.textContent = 'No results found for "' + query + '"';
+
+              searchStatus.style.display = "block";
+
+              return;
+            }
+
+            /*
+             * Limit dropdown to first 15
+             * results.
+             */
+
+            const results = data.results.slice(0, 15);
+
+            results.forEach(function (result) {
+              searchResults.appendChild(createResult(result));
+            });
+
+            searchResults.style.display = "block";
+
+            searchStatus.textContent =
+              data.results.length +
+              (data.results.length === 1 ? " result" : " results") +
+              " found";
+
+            searchStatus.style.display = "block";
+          } catch (error) {
+            console.error("Search error:", error);
+
+            searchResults.innerHTML =
+              '<div class="search-message">⚠️ Unable to search right now.<br>Please try again.</div>';
+
+            searchResults.style.display = "block";
+
+            searchStatus.textContent = "Search service unavailable.";
+
+            searchStatus.style.display = "block";
+          }
+        }
+
+        /* =================================================
                INPUT
             ================================================= */
 
-            searchInput.addEventListener(
-                "input",
-                function () {
+        searchInput.addEventListener("input", function () {
+          const query = searchInput.value.trim();
 
-                    const query =
-                        searchInput.value.trim();
+          clearButton.style.display = query ? "block" : "none";
 
+          clearTimeout(searchTimer);
 
-                    clearButton.style.display =
-                        query
-                            ? "block"
-                            : "none";
+          if (!query) {
+            restoreDashboard();
 
+            return;
+          }
 
-                    clearTimeout(
-                        searchTimer
-                    );
+          searchTimer = setTimeout(function () {
+            performSearch(query);
+          }, 350);
+        });
 
-
-                    if (!query) {
-
-                        restoreDashboard();
-
-                        return;
-                    }
-
-
-                    searchTimer =
-                        setTimeout(
-                            function () {
-
-                                performSearch(
-                                    query
-                                );
-
-                            },
-                            350
-                        );
-
-                }
-            );
-
-
-            /* =================================================
+        /* =================================================
                CLEAR
             ================================================= */
 
-            clearButton.addEventListener(
-                "click",
-                function () {
+        clearButton.addEventListener("click", function () {
+          restoreDashboard();
 
-                    restoreDashboard();
+          searchInput.focus();
+        });
 
-                    searchInput.focus();
-
-                }
-            );
-
-
-            /* =================================================
+        /* =================================================
                ESC
             ================================================= */
 
-            searchInput.addEventListener(
-                "keydown",
-                function (event) {
+        searchInput.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            restoreDashboard();
+          }
+        });
 
-                    if (
-                        event.key ===
-                        "Escape"
-                    ) {
-
-                        restoreDashboard();
-
-                    }
-
-                }
-            );
-
-
-            /* =================================================
+        /* =================================================
                CTRL + K
             ================================================= */
 
-            document.addEventListener(
-                "keydown",
-                function (event) {
+        document.addEventListener("keydown", function (event) {
+          if (
+            (event.ctrlKey || event.metaKey) &&
+            event.key.toLowerCase() === "k"
+          ) {
+            event.preventDefault();
 
-                    if (
-                        (
-                            event.ctrlKey ||
-                            event.metaKey
-                        ) &&
-                        event.key.toLowerCase() ===
-                        "k"
-                    ) {
+            searchInput.focus();
 
-                        event.preventDefault();
+            searchInput.select();
+          }
+        });
 
-                        searchInput.focus();
-
-                        searchInput.select();
-
-                    }
-
-                }
-            );
-
-
-            /* =================================================
+        /* =================================================
                CLICK OUTSIDE
             ================================================= */
 
-            document.addEventListener(
-                "click",
-                function (event) {
-
-                    if (
-                        !event.target.closest(
-                            ".search-wrapper"
-                        )
-                    ) {
-
-                        searchResults.style.display =
-                            "none";
-
-                    }
-
-                }
-            );
-
-        })();
-
+        document.addEventListener("click", function (event) {
+          if (!event.target.closest(".search-wrapper")) {
+            searchResults.style.display = "none";
+          }
+        });
+      })();
     </script>
-
 
     <!-- =====================================================
          DARK MODE
@@ -2098,13 +1879,10 @@
 
     <script src="../js/dark-mode.js"></script>
 
-
     <!-- =====================================================
          ASK AI
     ===================================================== -->
 
     <script src="../js/ask-ai.js"></script>
-
-
-</body>
+  </body>
 </html>

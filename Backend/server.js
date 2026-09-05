@@ -21,6 +21,7 @@ const bookmarkRoutes = require("./routes/bookmarkRoutes");
 const searchRoutes = require("./routes/searchRoutes");
 const progressRoutes = require("./routes/progressRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
+const quizRoutes = require("./routes/quizRoutes");
 // ======================================
 // CREATE APP
 // ======================================
@@ -42,6 +43,14 @@ app.use(
         ],
         credentials: true
     })
+);
+// ======================================
+// QUIZ
+// ======================================
+
+app.use(
+    "/api/quiz",
+    quizRoutes
 );
 
 app.use(express.json());
