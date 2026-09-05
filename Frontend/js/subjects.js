@@ -191,14 +191,18 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // ==========================================
-    // PROGRESS TRACKING (per topic / content)
+    // PROGRESS TRACKING
+    // Works for all three note types now:
+    // 'content' (topics), 'unit' (short_notes),
+    // 'subject' (subject_notes)
     // ==========================================
 
-    async function getProgress(contentId) {
+    async function getProgress(noteId, noteType) {
         try {
-            const res = await fetch(`${API_BASE_URL}/api/progress/check/${contentId}`, {
-                headers: authHeaders()
-            });
+            const res = await fetch(
+                `${API_BASE_URL}/api/progress/check/${noteId}?type=${noteType}`,
+                { headers: authHeaders() }
+            );
             const data = await res.json();
             return data.success ? data.completed : false;
         } catch (error) {
@@ -207,31 +211,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function renderProgressCheckbox(contentId, completed) {
+    function renderProgressCheckbox(noteId, noteType, completed) {
         return `
             <label style="margin-left:10px; font-size:13px; cursor:pointer; user-select:none;">
                 <input
                     type="checkbox"
                     ${completed ? "checked" : ""}
-                    onchange="toggleProgress(${contentId}, this)"
+                    onchange="toggleProgress(${noteId}, '${noteType}', this)"
                     style="margin-right:4px; vertical-align:middle;"
                 >
-                Completed
+                ✅ Mark as Done
             </label>
         `;
     }
 
-    window.toggleProgress = async function (contentId, checkboxEl) {
+    window.toggleProgress = async function (noteId, noteType, checkboxEl) {
 
         const completed = checkboxEl.checked;
         checkboxEl.disabled = true;
 
         try {
 
-            const res = await fetch(`${API_BASE_URL}/api/progress/${contentId}`, {
+            const res = await fetch(`${API_BASE_URL}/api/progress/${noteId}`, {
                 method: "POST",
                 headers: authHeaders(),
-                body: JSON.stringify({ completed })
+                body: JSON.stringify({ completed, note_type: noteType })
             });
 
             const data = await res.json();
@@ -268,6 +272,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.subject_notes.map(note => isBookmarked(note.id, "subject"))
             );
 
+            const progressStates = await Promise.all(
+                data.subject_notes.map(note => getProgress(note.id, "subject"))
+            );
+
             area.innerHTML = `
                 <div style="margin-top:14px;">
                     <strong>Subject Notes:</strong>
@@ -275,6 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div style="background:#fff7e6; padding:10px; border-radius:6px; margin-top:6px;">
                             <strong>${note.title}</strong>
                             ${renderBookmarkButton(note.id, "subject", note.title, note.file_url, bookmarkStates[i])}
+                            ${renderProgressCheckbox(note.id, "subject", progressStates[i])}
                             ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
                             ${renderFileButton(note.file_url)}
                         </div>
@@ -347,6 +356,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     shortNotes.map(note => isBookmarked(note.id, "unit"))
                 );
 
+                const shortProgressStates = await Promise.all(
+                    shortNotes.map(note => getProgress(note.id, "unit"))
+                );
+
                 shortNotesHtml = `
                     <div style="margin-bottom:14px;">
                         <strong>Unit Notes:</strong>
@@ -354,6 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div style="background:#f0f4ff; padding:10px; border-radius:6px; margin-top:6px;">
                                 <strong>${note.title}</strong>
                                 ${renderBookmarkButton(note.id, "unit", note.title, note.file_url, shortBookmarkStates[i])}
+                                ${renderProgressCheckbox(note.id, "unit", shortProgressStates[i])}
                                 ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
                                 ${renderFileButton(note.file_url)}
                             </div>
@@ -379,7 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const progressStates = await Promise.all(
-                contentsWithNotes.map(c => getProgress(c.id))
+                contentsWithNotes.map(c => getProgress(c.id, "content"))
             );
 
             target.innerHTML = shortNotesHtml + `
@@ -388,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <li style="margin-bottom:10px;">
                             <strong>${c.content_number}. ${c.content_name}</strong>
                             <button onclick="viewNotes(${c.id})" style="margin-left:10px; padding:4px 10px; font-size:13px;">View Notes</button>
-                            ${renderProgressCheckbox(c.id, progressStates[i])}
+                            ${renderProgressCheckbox(c.id, "content", progressStates[i])}
                             <div id="notes-${c.id}" style="margin-top:8px;"></div>
                         </li>
                     `).join("")}
