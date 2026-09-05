@@ -207,6 +207,11 @@ async function loadNotes() {
                         )}
                     </h3>
 
+                    <div class="note-stats">
+                        <span class="stat-badge">👁️ ${note.views || 0} views</span>
+                        <span class="stat-badge">⬇️ ${note.downloads || 0} downloads</span>
+                    </div>
+
                 </div>
 
 
@@ -222,14 +227,19 @@ async function loadNotes() {
                     ${
                         note.file_url
                             ? `
-                                <a
-                                    href="${note.file_url}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <button
                                     class="note-file-btn"
+                                    onclick="viewNoteFile(${note.id})"
                                 >
                                     📄 View File
-                                </a>
+                                </button>
+
+                                <button
+                                    class="note-download-btn"
+                                    onclick="downloadNoteFile(${note.id})"
+                                >
+                                    ⬇️ Download
+                                </button>
                             `
                             : ""
                     }
@@ -283,6 +293,46 @@ async function loadNotes() {
         `;
 
     }
+
+}
+
+
+// ==========================================
+// VIEW NOTE FILE (tracks view count)
+// ==========================================
+
+async function viewNoteFile(noteId) {
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/subjects/notes/${noteId}/view`
+        );
+
+        const data = await response.json();
+
+        if (data.success && data.note && data.note.file_url) {
+            window.open(data.note.file_url, "_blank");
+        } else {
+            alert("Unable to open file.");
+        }
+
+    } catch (error) {
+        console.error("View note error:", error);
+        alert("Unable to connect to server.");
+    }
+
+}
+
+
+// ==========================================
+// DOWNLOAD NOTE FILE (tracks download count)
+// ==========================================
+
+function downloadNoteFile(noteId) {
+
+    window.location.href =
+        `${API_BASE_URL}/api/subjects/notes/${noteId}/download`;
 
 }
 
