@@ -259,9 +259,10 @@ router.post("/notes/upload", verifyToken, upload.single("file"), (req, res) => {
 // Body: { content_id, title, body, file_url }
 // ==================================================
 
-router.post("/notes", (req, res) => {
+router.post("/notes", verifyToken, (req, res) => {
 
     const { content_id, title, body, file_url } = req.body;
+    const uploadedBy = req.user.id;
 
     if (!content_id || !title) {
 
@@ -272,11 +273,11 @@ router.post("/notes", (req, res) => {
     }
 
     const sql = `
-        INSERT INTO notes (content_id, title, body, file_url)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO notes (content_id, title, body, file_url, uploaded_by)
+        VALUES (?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [content_id, title, body || null, file_url || null], (error, results) => {
+    db.query(sql, [content_id, title, body || null, file_url || null, uploadedBy], (error, results) => {
 
         if (error) {
 
@@ -470,9 +471,10 @@ router.get("/unit/:unitId/short-notes", (req, res) => {
 // Body: { unit_id, title, body, file_url }
 // ==================================================
 
-router.post("/short-notes", (req, res) => {
+router.post("/short-notes", verifyToken, (req, res) => {
 
     const { unit_id, title, body, file_url } = req.body;
+    const uploadedBy = req.user.id;
 
     if (!unit_id || !title) {
         return res.status(400).json({ success: false, message: "unit_id and title are required" });
@@ -508,11 +510,11 @@ router.post("/short-notes", (req, res) => {
 
         const insertSql = `
             INSERT INTO short_notes
-            (semester_id, subject_id, unit_number, unit_title, title, body, file_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (semester_id, subject_id, unit_number, unit_title, title, body, file_url, uploaded_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        const values = [semester_id, subject_id, unit_number, unit_name, title, body || "", file_url || null];
+        const values = [semester_id, subject_id, unit_number, unit_name, title, body || "", file_url || null, uploadedBy];
 
         db.query(insertSql, values, (error, result) => {
 
@@ -583,9 +585,10 @@ router.get("/:subjectId/subject-notes", (req, res) => {
 // Body: { subject_id, title, body, file_url }
 // ==================================================
 
-router.post("/subject-notes", (req, res) => {
+router.post("/subject-notes", verifyToken, (req, res) => {
 
     const { subject_id, title, body, file_url } = req.body;
+    const uploadedBy = req.user.id;
 
     if (!subject_id || !title) {
         return res.status(400).json({
@@ -595,11 +598,11 @@ router.post("/subject-notes", (req, res) => {
     }
 
     const sql = `
-        INSERT INTO subject_notes (subject_id, title, body, file_url)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO subject_notes (subject_id, title, body, file_url, uploaded_by)
+        VALUES (?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [subject_id, title, body || "", file_url || null], (error, result) => {
+    db.query(sql, [subject_id, title, body || "", file_url || null, uploadedBy], (error, result) => {
 
         if (error) {
             console.error("Create Subject Note Error:", error);
@@ -759,11 +762,17 @@ router.get("/leaderboard", verifyToken, (req, res) => {
         SELECT
             u.id,
             u.full_name,
-            COUNT(n.id) AS upload_count,
-            COALESCE(SUM(n.views), 0) AS total_views,
-            COALESCE(SUM(n.downloads), 0) AS total_downloads
+            COUNT(x.id) AS upload_count,
+            COALESCE(SUM(x.views), 0) AS total_views,
+            COALESCE(SUM(x.downloads), 0) AS total_downloads
         FROM users u
-        JOIN notes n ON n.uploaded_by = u.id
+        JOIN (
+            SELECT id, uploaded_by, views, downloads FROM notes
+            UNION ALL
+            SELECT id, uploaded_by, views, downloads FROM short_notes
+            UNION ALL
+            SELECT id, uploaded_by, views, downloads FROM subject_notes
+        ) x ON x.uploaded_by = u.id
         GROUP BY u.id
         ORDER BY upload_count DESC, total_views DESC
         LIMIT 20
@@ -793,13 +802,15 @@ router.get("/my-uploads", verifyToken, (req, res) => {
     const userId = req.user.id;
 
     const sql = `
-        SELECT id, title, views, downloads, created_at
-        FROM notes
-        WHERE uploaded_by = ?
+        SELECT id, title, views, downloads, created_at, 'content' AS note_type FROM notes WHERE uploaded_by = ?
+        UNION ALL
+        SELECT id, title, views, downloads, created_at, 'unit' AS note_type FROM short_notes WHERE uploaded_by = ?
+        UNION ALL
+        SELECT id, title, views, downloads, created_at, 'subject' AS note_type FROM subject_notes WHERE uploaded_by = ?
         ORDER BY created_at DESC
     `;
 
-    db.query(sql, [userId], (error, results) => {
+    db.query(sql, [userId, userId, userId], (error, results) => {
 
         if (error) {
             console.error("My Uploads Error:", error);
