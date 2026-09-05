@@ -1,5 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    const API_BASE_URL =
+        window.location.hostname === "localhost"
+            ? "http://localhost:5000"
+            : "https://college-notes-website-f64v.onrender.com";
+
+    function authHeaders() {
+        return {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        };
+    }
+
     const params = new URLSearchParams(window.location.search);
     const subjectId = params.get("id");
 
@@ -44,9 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ==========================================
     // INLINE FILE VIEWER
-    // Replaces target="_blank" links with a toggle
-    // button that shows the file in an iframe on
-    // the same page.
     // ==========================================
 
     let fileViewerCounter = 0;
@@ -73,14 +82,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const container = document.getElementById(uid);
 
-        // Already open — close it
         if (container.style.display === "block") {
             container.style.display = "none";
             container.innerHTML = "";
             return;
         }
 
-        // Open it and load the file inline
         container.style.display = "block";
         container.innerHTML = `
             <iframe
@@ -91,18 +98,155 @@ document.addEventListener("DOMContentLoaded", () => {
 
     };
 
+    // ==========================================
+    // BOOKMARKS (only for content-level notes,
+    // since bookmarkRoutes.js checks the "notes" table)
+    // ==========================================
+
+    async function isBookmarked(noteId) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/bookmarks/check/${noteId}`, {
+                headers: authHeaders()
+            });
+            const data = await res.json();
+            return data.success ? data.bookmarked : false;
+        } catch (error) {
+            console.error("Bookmark Check Error:", error);
+            return false;
+        }
+    }
+
+    function renderBookmarkButton(noteId, bookmarked) {
+        return `
+            <button
+                class="bookmark-btn"
+                data-note-id="${noteId}"
+                onclick="toggleBookmark(${noteId}, this)"
+                style="margin-left:8px; padding:4px 10px; font-size:13px; background:${bookmarked ? '#fef3c7' : '#f3f4f6'}; border:1px solid #e5e7eb; border-radius:6px; cursor:pointer;"
+            >
+                ${bookmarked ? "🔖 Bookmarked" : "🔖 Bookmark"}
+            </button>
+        `;
+    }
+
+    window.toggleBookmark = async function (noteId, btnEl) {
+
+        const isCurrentlyBookmarked = btnEl.textContent.includes("Bookmarked");
+
+        btnEl.disabled = true;
+
+        try {
+
+            if (isCurrentlyBookmarked) {
+
+                const res = await fetch(`${API_BASE_URL}/api/bookmarks/${noteId}`, {
+                    method: "DELETE",
+                    headers: authHeaders()
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    btnEl.textContent = "🔖 Bookmark";
+                    btnEl.style.background = "#f3f4f6";
+                }
+
+            } else {
+
+                const res = await fetch(`${API_BASE_URL}/api/bookmarks`, {
+                    method: "POST",
+                    headers: authHeaders(),
+                    body: JSON.stringify({ note_id: noteId })
+                });
+                const data = await res.json();
+
+                if (data.success || res.status === 409) {
+                    btnEl.textContent = "🔖 Bookmarked";
+                    btnEl.style.background = "#fef3c7";
+                }
+
+            }
+
+        } catch (error) {
+            console.error("Toggle Bookmark Error:", error);
+            alert("Unable to update bookmark. Please try again.");
+        } finally {
+            btnEl.disabled = false;
+        }
+
+    };
+
+    // ==========================================
+    // PROGRESS TRACKING (per topic / content)
+    // ==========================================
+
+    async function getProgress(contentId) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/progress/check/${contentId}`, {
+                headers: authHeaders()
+            });
+            const data = await res.json();
+            return data.success ? data.completed : false;
+        } catch (error) {
+            console.error("Progress Check Error:", error);
+            return false;
+        }
+    }
+
+    function renderProgressCheckbox(contentId, completed) {
+        return `
+            <label style="margin-left:10px; font-size:13px; cursor:pointer; user-select:none;">
+                <input
+                    type="checkbox"
+                    ${completed ? "checked" : ""}
+                    onchange="toggleProgress(${contentId}, this)"
+                    style="margin-right:4px; vertical-align:middle;"
+                >
+                Completed
+            </label>
+        `;
+    }
+
+    window.toggleProgress = async function (contentId, checkboxEl) {
+
+        const completed = checkboxEl.checked;
+        checkboxEl.disabled = true;
+
+        try {
+
+            const res = await fetch(`${API_BASE_URL}/api/progress/${contentId}`, {
+                method: "POST",
+                headers: authHeaders(),
+                body: JSON.stringify({ completed })
+            });
+
+            const data = await res.json();
+
+            if (!data.success) {
+                checkboxEl.checked = !completed; // revert on failure
+                alert(data.message || "Unable to update progress.");
+            }
+
+        } catch (error) {
+            console.error("Toggle Progress Error:", error);
+            checkboxEl.checked = !completed;
+            alert("Unable to connect to server.");
+        } finally {
+            checkboxEl.disabled = false;
+        }
+
+    };
+
     // Fetches and renders notes uploaded directly to the whole subject
-    // (not tied to any specific unit).
     async function loadSubjectNotes(subjectId) {
         try {
             const response = await fetch(`/api/subjects/${subjectId}/subject-notes`);
             const data = await response.json();
 
             const area = document.getElementById("subjectNotesArea");
-            if (!area) return; // subject card hasn't rendered yet, safe to skip
+            if (!area) return;
 
             if (!data.success || !data.subject_notes || data.subject_notes.length === 0) {
-                return; // nothing to show
+                return;
             }
 
             area.innerHTML = `
@@ -119,8 +263,6 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
         } catch (error) {
             console.error("Load Subject Notes Error:", error);
-            // Fail silently here — unit notes below are more important
-            // and shouldn't be blocked by this optional section.
         }
     }
 
@@ -140,8 +282,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `).join("");
     }
 
-    // Fetches the notes for a single topic and returns how many there are.
-    // Used to decide whether a topic should be shown at all.
     async function getNoteCount(contentId) {
         try {
             const response = await fetch(`/api/subjects/content/${contentId}/notes`);
@@ -180,7 +320,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Build HTML for unit-level short notes (if any)
             let shortNotesHtml = "";
             if (shortNotes.length > 0) {
                 shortNotesHtml = `
@@ -202,8 +341,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Check every topic's note count in parallel, then keep only
-            // the ones that actually have notes uploaded.
             const counts = await Promise.all(
                 data.contents.map(c => getNoteCount(c.id))
             );
@@ -215,12 +352,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Fetch progress state for each topic in parallel
+            const progressStates = await Promise.all(
+                contentsWithNotes.map(c => getProgress(c.id))
+            );
+
             target.innerHTML = shortNotesHtml + `
                 <ul style="list-style:none; padding-left:0;">
-                    ${contentsWithNotes.map(c => `
+                    ${contentsWithNotes.map((c, i) => `
                         <li style="margin-bottom:10px;">
                             <strong>${c.content_number}. ${c.content_name}</strong>
                             <button onclick="viewNotes(${c.id})" style="margin-left:10px; padding:4px 10px; font-size:13px;">View Notes</button>
+                            ${renderProgressCheckbox(c.id, progressStates[i])}
                             <div id="notes-${c.id}" style="margin-top:8px;"></div>
                         </li>
                     `).join("")}
@@ -250,9 +393,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            target.innerHTML = data.notes.map(note => `
+            // Check bookmark state for each note in parallel
+            const bookmarkStates = await Promise.all(
+                data.notes.map(note => isBookmarked(note.id))
+            );
+
+            target.innerHTML = data.notes.map((note, i) => `
                 <div style="background:#f0f4ff; padding:10px; border-radius:6px; margin-bottom:6px;">
                     <strong>${note.title}</strong>
+                    ${renderBookmarkButton(note.id, bookmarkStates[i])}
                     ${note.body ? `<p style="margin:6px 0;">${note.body}</p>` : ""}
                     ${renderFileButton(note.file_url)}
                 </div>
