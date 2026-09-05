@@ -4,23 +4,27 @@ const router = express.Router();
 const db = require("../config/db");
 const { verifyToken } = require("../middleware/auth");
 
+// Valid note_type values: 'content', 'unit', 'subject'
+
 
 // ==========================================
 // CHECK PROGRESS
-// GET /api/progress/check/:contentId
+// GET /api/progress/check/:noteId?type=unit
 // ==========================================
 
-router.get("/check/:contentId", verifyToken, (req, res) => {
+router.get("/check/:noteId", verifyToken, (req, res) => {
 
     const user_id = req.user.id;
-    const content_id = req.params.contentId;
+    const note_id = req.params.noteId;
+    const note_type = req.query.type || "content";
 
     db.query(
         `SELECT completed
          FROM study_progress
          WHERE user_id = ?
+         AND note_type = ?
          AND content_id = ?`,
-        [user_id, content_id],
+        [user_id, note_type, note_id],
         (err, rows) => {
 
             if (err) {
@@ -50,24 +54,41 @@ router.get("/check/:contentId", verifyToken, (req, res) => {
 
 // ==========================================
 // UPDATE PROGRESS
-// POST /api/progress/:contentId
+// POST /api/progress/:noteId
+// Body: { completed, note_type }
 // ==========================================
 
-router.post("/:contentId", verifyToken, (req, res) => {
+router.post("/:noteId", verifyToken, (req, res) => {
 
     const user_id = req.user.id;
-    const content_id = req.params.contentId;
+    const note_id = req.params.noteId;
 
+    const note_type = req.body.note_type || "content";
     const completed = req.body.completed ? 1 : 0;
 
-    // Check content exists
+    if (!["content", "unit", "subject"].includes(note_type)) {
+        return res.status(400).json({
+            success: false,
+            message: "note_type must be 'content', 'unit', or 'subject'."
+        });
+    }
+
+    // Table to verify the note actually exists, per type
+    const tableMap = {
+        content: "contents",
+        unit: "short_notes",
+        subject: "subject_notes"
+    };
+
+    const checkTable = tableMap[note_type];
+
     db.query(
-        "SELECT id FROM contents WHERE id = ?",
-        [content_id],
+        `SELECT id FROM ${checkTable} WHERE id = ?`,
+        [note_id],
         (err, rows) => {
 
             if (err) {
-                console.error("Content check error:", err);
+                console.error("Note check error:", err);
 
                 return res.status(500).json({
                     success: false,
@@ -78,7 +99,7 @@ router.post("/:contentId", verifyToken, (req, res) => {
             if (rows.length === 0) {
                 return res.status(404).json({
                     success: false,
-                    message: "Content not found."
+                    message: "Note not found."
                 });
             }
 
@@ -90,11 +111,12 @@ router.post("/:contentId", verifyToken, (req, res) => {
                 (
                     user_id,
                     content_id,
+                    note_type,
                     completed,
                     viewed_at,
                     completed_at
                 )
-                VALUES (?, ?, ?, NOW(), ?)
+                VALUES (?, ?, ?, ?, NOW(), ?)
 
                 ON DUPLICATE KEY UPDATE
                     completed = VALUES(completed),
@@ -106,7 +128,8 @@ router.post("/:contentId", verifyToken, (req, res) => {
                 sql,
                 [
                     user_id,
-                    content_id,
+                    note_id,
+                    note_type,
                     completed,
                     completedAt
                 ],
@@ -129,8 +152,8 @@ router.post("/:contentId", verifyToken, (req, res) => {
                         completed: completed === 1,
                         message:
                             completed === 1
-                                ? "Topic marked as completed."
-                                : "Topic marked as incomplete."
+                                ? "Marked as completed."
+                                : "Marked as incomplete."
                     });
                 }
             );
@@ -151,6 +174,7 @@ router.get("/", verifyToken, (req, res) => {
     db.query(
         `SELECT
             content_id,
+            note_type,
             completed,
             viewed_at,
             completed_at
@@ -184,66 +208,72 @@ router.get("/", verifyToken, (req, res) => {
 // ==========================================
 // GET OVERALL PROGRESS SUMMARY
 // GET /api/progress/summary
+// Counts across all three note types
 // ==========================================
 
 router.get("/summary", verifyToken, (req, res) => {
 
     const user_id = req.user.id;
 
-    db.query(
-        "SELECT COUNT(*) AS total FROM contents",
-        (err, totalRows) => {
+    const totalSql = `
+        SELECT
+            (SELECT COUNT(*) FROM contents) +
+            (SELECT COUNT(*) FROM short_notes) +
+            (SELECT COUNT(*) FROM subject_notes)
+            AS total
+    `;
 
-            if (err) {
-                console.error(
-                    "Progress summary total error:",
-                    err
-                );
+    db.query(totalSql, (err, totalRows) => {
 
-                return res.status(500).json({
-                    success: false,
-                    message: "Server error."
-                });
-            }
+        if (err) {
+            console.error(
+                "Progress summary total error:",
+                err
+            );
 
-            db.query(
-                `SELECT COUNT(*) AS completedCount
-                 FROM study_progress
-                 WHERE user_id = ?
-                 AND completed = 1`,
-                [user_id],
-                (err, completedRows) => {
+            return res.status(500).json({
+                success: false,
+                message: "Server error."
+            });
+        }
 
-                    if (err) {
-                        console.error(
-                            "Progress summary completed error:",
-                            err
-                        );
+        db.query(
+            `SELECT COUNT(*) AS completedCount
+             FROM study_progress
+             WHERE user_id = ?
+             AND completed = 1`,
+            [user_id],
+            (err, completedRows) => {
 
-                        return res.status(500).json({
-                            success: false,
-                            message: "Server error."
-                        });
-                    }
+                if (err) {
+                    console.error(
+                        "Progress summary completed error:",
+                        err
+                    );
 
-                    const total = totalRows[0].total || 0;
-                    const completed = completedRows[0].completedCount || 0;
-
-                    const percentage =
-                        total > 0
-                            ? Math.round((completed / total) * 100)
-                            : 0;
-
-                    res.json({
-                        success: true,
-                        total: total,
-                        completed: completed,
-                        percentage: percentage
+                    return res.status(500).json({
+                        success: false,
+                        message: "Server error."
                     });
                 }
-            );
-        }
-    );
+
+                const total = totalRows[0].total || 0;
+                const completed = completedRows[0].completedCount || 0;
+
+                const percentage =
+                    total > 0
+                        ? Math.round((completed / total) * 100)
+                        : 0;
+
+                res.json({
+                    success: true,
+                    total: total,
+                    completed: completed,
+                    percentage: percentage
+                });
+            }
+        );
+    });
 });
 
 
