@@ -753,7 +753,7 @@ router.get("/notes/:id/download", (req, res) => {
 // GET /api/subjects/leaderboard
 // ==================================================
 
-router.get("/leaderboard", (req, res) => {
+router.get("/leaderboard", verifyToken, (req, res) => {
 
     const sql = `
         SELECT
