@@ -1083,11 +1083,22 @@
         </div>
 
 
-        <!-- LOGOUT -->
+        
 
-        <button id="logoutButton">
-            Logout
+              <!-- NOTIFICATIONS -->
+
+      <div style="position: relative;">
+        <button id="notifBell" style="background: #fff; border: 1px solid #e5e7eb; padding: 9px 14px; border-radius: 10px; cursor: pointer; font-size: 16px; position: relative;">
+          🔔
+          <span id="notifBadge" style="display:none; position:absolute; top:-4px; right:-4px; background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:2px 5px; border-radius:999px;"></span>
         </button>
+
+        <div id="notifDropdown" style="display:none; position:absolute; top:48px; right:0; width:320px; max-height:400px; overflow-y:auto; background:#fff; border-radius:12px; box-shadow:0 15px 40px rgba(0,0,0,0.22); z-index:200;"></div>
+      </div>
+
+      <!-- LOGOUT -->
+
+      <button id="logoutButton">Logout</button>
 
     </div>
 
@@ -1252,7 +1263,101 @@
 
     </div>
 
+    <!-- =====================================================
+         NOTIFICATIONS
+    ===================================================== -->
 
+    <script>
+      (function () {
+        "use strict";
+
+        const API_BASE_URL =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+            ? "http://localhost:5000"
+            : "https://college-notes-website-f64v.onrender.com";
+
+        const token = localStorage.getItem("token");
+
+        const bell = document.getElementById("notifBell");
+        const badge = document.getElementById("notifBadge");
+        const dropdown = document.getElementById("notifDropdown");
+
+        function typeLabel(type) {
+          if (type === "subject") return "Subject Note";
+          if (type === "unit") return "Unit Note";
+          return "Topic Note";
+        }
+
+        async function loadNotifications() {
+          try {
+            const res = await fetch(API_BASE_URL + "/api/notifications", {
+              headers: { Authorization: "Bearer " + token }
+            });
+            const data = await res.json();
+
+            if (!data.success) return;
+
+            if (data.count > 0) {
+              badge.textContent = data.count;
+              badge.style.display = "block";
+            } else {
+              badge.style.display = "none";
+            }
+
+            if (data.notifications.length === 0) {
+              dropdown.innerHTML =
+                '<div style="padding:20px; text-align:center; color:#6b7280; font-size:13px;">No new notes yet.</div>';
+              return;
+            }
+
+            dropdown.innerHTML = data.notifications.map(function (n) {
+              return (
+                '<div style="padding:14px 16px; border-bottom:1px solid #f0f1f5;">' +
+                  '<div style="font-size:11px; font-weight:700; color:#4f46e5; text-transform:uppercase; margin-bottom:4px;">' +
+                    typeLabel(n.note_type) +
+                  '</div>' +
+                  '<div style="font-size:14px; font-weight:600; color:#1f2937;">' + n.title + '</div>' +
+                '</div>'
+              );
+            }).join("");
+
+          } catch (error) {
+            console.warn("Notifications unavailable:", error);
+          }
+        }
+
+        bell.addEventListener("click", async function () {
+
+          const isOpen = dropdown.style.display === "block";
+          dropdown.style.display = isOpen ? "none" : "block";
+
+          if (!isOpen && badge.style.display === "block") {
+
+            try {
+              await fetch(API_BASE_URL + "/api/notifications/mark-seen", {
+                method: "POST",
+                headers: { Authorization: "Bearer " + token }
+              });
+              badge.style.display = "none";
+            } catch (error) {
+              console.warn("Mark seen failed:", error);
+            }
+
+          }
+
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!event.target.closest("#notifBell") && !event.target.closest("#notifDropdown")) {
+            dropdown.style.display = "none";
+          }
+        });
+
+        loadNotifications();
+
+      })();
+    </script>
     <!-- =====================================================
          LIVE USER COUNT
     ===================================================== -->
