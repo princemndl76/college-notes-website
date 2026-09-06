@@ -10,7 +10,7 @@ const db = require("./config/db");
 // ======================================
 // ROUTES
 // ======================================
-
+const notificationRoutes = require("./routes/notificationRoutes");
 const authRoutes = require("./routes/authRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
 const academicRoutes = require("./routes/academicRoutes");
