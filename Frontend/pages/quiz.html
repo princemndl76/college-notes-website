@@ -567,6 +567,8 @@
                     currentAttemptId = data.attempt_id;
                     questions = data.questions;
 
+                    console.log("DEBUG - loaded questions:", questions);
+
                     if (data.completed) {
                         showScoreScreen({
                             score: data.score,
@@ -627,6 +629,8 @@
                 const q = questions[currentIndex];
                 const total = questions.length;
 
+                console.log("DEBUG - rendering question:", q, "| question_id:", q.question_id, "| typeof:", typeof q.question_id);
+
                 progressLabel.textContent = "Question " + (currentIndex + 1) + "/" + total;
                 progressFill.style.width = (((currentIndex + 1) / total) * 100) + "%";
 
@@ -654,6 +658,9 @@
                     btn.addEventListener("click", function () {
 
                         userAnswers[q.question_id] = opt.key;
+
+                        console.log("DEBUG - answer selected. question_id:", q.question_id, "| option:", opt.key);
+                        console.log("DEBUG - userAnswers now:", JSON.parse(JSON.stringify(userAnswers)));
 
                         document.querySelectorAll(".quiz-option").forEach(function (b) {
                             b.classList.remove("selected");
@@ -684,16 +691,32 @@
             }
 
             function updateNavButtons() {
-                const q = questions[currentIndex];
 
                 if (currentIndex === questions.length - 1) {
-                    submitBtn.enabled = !allQuestionsAnswered();
+
+                    const allAnswered = allQuestionsAnswered();
+
+                    console.log("DEBUG - checking submit button state");
+                    console.log("DEBUG - userAnswers:", JSON.parse(JSON.stringify(userAnswers)));
+                    console.log("DEBUG - question IDs expected:", questions.map(function (q) { return q.question_id; }));
+                    console.log("DEBUG - allAnswered result:", allAnswered);
+
+                    submitBtn.disabled = !allAnswered;
+
                 }
+
             }
 
             function allQuestionsAnswered() {
                 return questions.every(function (q) {
-                    return !!userAnswers[q.question_id];
+                    const answer = userAnswers[q.question_id];
+                    const hasAnswer = !!answer;
+
+                    if (!hasAnswer) {
+                        console.log("DEBUG - MISSING answer for question_id:", q.question_id, "(type:", typeof q.question_id, ")");
+                    }
+
+                    return hasAnswer;
                 });
             }
 
