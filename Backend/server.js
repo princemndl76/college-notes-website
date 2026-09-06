@@ -11,6 +11,7 @@ const db = require("./config/db");
 // ROUTES
 // ======================================
 const notificationRoutes = require("./routes/notificationRoutes");
+const studyRoutes = require("./routes/studyRoutes");
 const authRoutes = require("./routes/authRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
 const academicRoutes = require("./routes/academicRoutes");
@@ -57,6 +58,24 @@ app.use(express.urlencoded({
 app.use(
     "/api/quiz",
     quizRoutes
+);
+
+// ======================================
+// NOTIFICATIONS
+// ======================================
+
+app.use(
+    "/api/notifications",
+    notificationRoutes
+);
+
+// ======================================
+// STUDY TIME TRACKER
+// ======================================
+
+app.use(
+    "/api/study",
+    studyRoutes
 );
 
 // ======================================
@@ -179,14 +198,7 @@ app.use(
     "/api/feedback",
     feedbackRoutes
 );
-// ======================================
-// STUDY TIME TRACKER
-// ======================================
 
-app.use(
-    "/api/study",
-    studyRoutes
-);
 // ======================================
 // SUBJECTS / UNITS / CONTENTS / NOTES
 // ======================================
