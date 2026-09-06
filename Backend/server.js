@@ -44,6 +44,12 @@ app.use(
         credentials: true
     })
 );
+app.use(express.json());
+
+app.use(express.urlencoded({
+    extended: true
+}));
+
 // ======================================
 // QUIZ
 // ======================================
@@ -52,12 +58,6 @@ app.use(
     "/api/quiz",
     quizRoutes
 );
-
-app.use(express.json());
-
-app.use(express.urlencoded({
-    extended: true
-}));
 
 // ======================================
 // REQUEST TIMEOUT
