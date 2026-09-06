@@ -1484,8 +1484,16 @@
                         });
 
                         if (opt.key === q.correct_option) {
+
                             btn.classList.add("correct");
+
+                            // Correct answer - auto close after a short delay
+                            setTimeout(function () {
+                                closeWidget();
+                            }, 1000);
+
                         } else {
+
                             btn.classList.add("incorrect");
 
                             allButtons.forEach(function (b, i) {
@@ -1493,6 +1501,9 @@
                                     b.classList.add("correct");
                                 }
                             });
+
+                            // Wrong answer - stays open, user closes manually
+
                         }
 
                     });
