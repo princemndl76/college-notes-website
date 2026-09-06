@@ -1083,22 +1083,22 @@
         </div>
 
 
-        
+        <!-- NOTIFICATIONS -->
 
-              <!-- NOTIFICATIONS -->
+        <div style="position: relative;">
+            <button id="notifBell" style="background: #fff; border: 1px solid #e5e7eb; padding: 9px 14px; border-radius: 10px; cursor: pointer; font-size: 16px; position: relative;">
+              🔔
+              <span id="notifBadge" style="display:none; position:absolute; top:-4px; right:-4px; background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:2px 5px; border-radius:999px;"></span>
+            </button>
 
-      <div style="position: relative;">
-        <button id="notifBell" style="background: #fff; border: 1px solid #e5e7eb; padding: 9px 14px; border-radius: 10px; cursor: pointer; font-size: 16px; position: relative;">
-          🔔
-          <span id="notifBadge" style="display:none; position:absolute; top:-4px; right:-4px; background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:2px 5px; border-radius:999px;"></span>
+            <div id="notifDropdown" style="display:none; position:absolute; top:48px; right:0; width:320px; max-height:400px; overflow-y:auto; background:#fff; border-radius:12px; box-shadow:0 15px 40px rgba(0,0,0,0.22); z-index:200;"></div>
+        </div>
+
+        <!-- LOGOUT -->
+
+        <button id="logoutButton">
+            Logout
         </button>
-
-        <div id="notifDropdown" style="display:none; position:absolute; top:48px; right:0; width:320px; max-height:400px; overflow-y:auto; background:#fff; border-radius:12px; box-shadow:0 15px 40px rgba(0,0,0,0.22); z-index:200;"></div>
-      </div>
-
-      <!-- LOGOUT -->
-
-      <button id="logoutButton">Logout</button>
 
     </div>
 
@@ -1148,6 +1148,20 @@
         </div>
 
 
+        <!-- STUDY TIMER -->
+
+        <div id="studyTimerCard" style="background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(6px); border-radius: 14px; padding: 16px 20px; margin-bottom: 18px; box-shadow: 0 5px 18px rgba(0, 0, 0, 0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:13px; font-weight:700; color:#374151;">⏱️ Study Timer</span>
+              <span id="studyTodayTotal" style="font-size:13px; font-weight:700; color:#4f46e5;">Today: 0m</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span id="studyTimerDisplay" style="font-size:24px; font-weight:800; color:#1f2937; font-variant-numeric: tabular-nums;">00:00:00</span>
+              <button id="studyTimerToggle" style="padding:8px 18px; border:none; border-radius:8px; background:#4f46e5; color:#fff; font-weight:700; font-size:13px; cursor:pointer;">Start</button>
+            </div>
+        </div>
+
+
         <!-- SEARCH STATUS -->
 
         <div
@@ -1191,6 +1205,8 @@
         <!-- =================================================
              BOTTOM ACTIONS
         ================================================= -->
+
+        <div class="bottom-actions">
 
             <!-- ADMIN -->
 
@@ -1262,6 +1278,7 @@
         </div>
 
     </div>
+
 
     <!-- =====================================================
          NOTIFICATIONS
@@ -1358,6 +1375,134 @@
 
       })();
     </script>
+
+
+    <!-- =====================================================
+         STUDY TIMER
+    ===================================================== -->
+
+    <script>
+      (function () {
+        "use strict";
+
+        const API_BASE_URL =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+            ? "http://localhost:5000"
+            : "https://college-notes-website-f64v.onrender.com";
+
+        const token = localStorage.getItem("token");
+
+        const display = document.getElementById("studyTimerDisplay");
+        const toggleBtn = document.getElementById("studyTimerToggle");
+        const todayTotalEl = document.getElementById("studyTodayTotal");
+
+        let isRunning = false;
+        let startTime = null;
+        let elapsedBeforePause = 0;
+        let tickInterval = null;
+
+        function formatTime(totalSeconds) {
+          const h = Math.floor(totalSeconds / 3600);
+          const m = Math.floor((totalSeconds % 3600) / 60);
+          const s = Math.floor(totalSeconds % 60);
+          return (
+            String(h).padStart(2, "0") + ":" +
+            String(m).padStart(2, "0") + ":" +
+            String(s).padStart(2, "0")
+          );
+        }
+
+        function formatMinutes(totalSeconds) {
+          const m = Math.round(totalSeconds / 60);
+          return "Today: " + m + "m";
+        }
+
+        function updateDisplay() {
+          const now = Date.now();
+          const elapsed = elapsedBeforePause + (isRunning ? (now - startTime) / 1000 : 0);
+          display.textContent = formatTime(elapsed);
+        }
+
+        async function loadTodayTotal() {
+          try {
+            const res = await fetch(API_BASE_URL + "/api/study/today", {
+              headers: { Authorization: "Bearer " + token }
+            });
+            const data = await res.json();
+            if (data.success) {
+              todayTotalEl.textContent = formatMinutes(data.total_seconds);
+            }
+          } catch (error) {
+            console.warn("Study today total unavailable:", error);
+          }
+        }
+
+        async function logSession(durationSeconds) {
+          if (durationSeconds < 5) return; // ignore trivially short sessions
+
+          try {
+            await fetch(API_BASE_URL + "/api/study/log", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token
+              },
+              body: JSON.stringify({ duration_seconds: Math.round(durationSeconds) })
+            });
+            loadTodayTotal();
+          } catch (error) {
+            console.warn("Log study session failed:", error);
+          }
+        }
+
+        toggleBtn.addEventListener("click", function () {
+
+          if (!isRunning) {
+
+            isRunning = true;
+            startTime = Date.now();
+            toggleBtn.textContent = "Stop";
+            toggleBtn.style.background = "#dc2626";
+
+            tickInterval = setInterval(updateDisplay, 1000);
+
+          } else {
+
+            isRunning = false;
+            const sessionSeconds = (Date.now() - startTime) / 1000;
+            elapsedBeforePause += sessionSeconds;
+
+            clearInterval(tickInterval);
+            toggleBtn.textContent = "Start";
+            toggleBtn.style.background = "#4f46e5";
+
+            logSession(sessionSeconds);
+
+          }
+
+        });
+
+        // If the user navigates away while running, log whatever time has passed
+        window.addEventListener("beforeunload", function () {
+          if (isRunning) {
+            const sessionSeconds = (Date.now() - startTime) / 1000;
+            const payload = JSON.stringify({ duration_seconds: Math.round(sessionSeconds) });
+
+            navigator.sendBeacon &&
+              navigator.sendBeacon(
+                API_BASE_URL + "/api/study/log",
+                new Blob([payload], { type: "application/json" })
+              );
+          }
+        });
+
+        loadTodayTotal();
+
+      })();
+    </script>
+
+
     <!-- =====================================================
          LIVE USER COUNT
     ===================================================== -->

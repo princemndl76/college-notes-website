@@ -179,7 +179,14 @@ app.use(
     "/api/feedback",
     feedbackRoutes
 );
+// ======================================
+// STUDY TIME TRACKER
+// ======================================
 
+app.use(
+    "/api/study",
+    studyRoutes
+);
 // ======================================
 // SUBJECTS / UNITS / CONTENTS / NOTES
 // ======================================
